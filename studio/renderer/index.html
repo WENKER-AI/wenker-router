@@ -31,13 +31,13 @@
 
     <!-- Activity bar (left) -->
     <nav class="activity-bar" id="activity-bar">
-      <button class="act" data-view="explorer" title="Explorer (Ctrl+Shift+E)">&#128193;</button>
-      <button class="act" data-view="search" title="Tim kiem (Ctrl+Shift+F)">&#128269;</button>
-      <button class="act" data-view="git" title="Git">&#9099;</button>
-      <button class="act" data-view="models" title="Model & Key">&#9889;</button>
-      <button class="act" data-view="terminal" title="Terminal">&#9000;</button>
+      <button class="act" data-view="explorer" title="Explorer (Ctrl+Shift+E)">File</button>
+      <button class="act" data-view="search" title="Tim kiem (Ctrl+Shift+F)">Tim</button>
+      <button class="act" data-view="git" title="Git">Git</button>
+      <button class="act" data-view="models" title="Model & Key">Model</button>
+      <button class="act" data-view="terminal" title="Terminal">&gt;_</button>
       <div class="act-spacer"></div>
-      <button class="act" data-view="settings" title="Cai dat">&#9881;</button>
+      <button class="act" data-view="settings" title="Cai dat">Set</button>
     </nav>
 
     <!-- Left sidebar (resizable) -->
@@ -47,9 +47,9 @@
         <div class="panel-head">
           <span class="panel-title">Explorer</span>
           <div class="panel-actions">
-            <button id="btn-new-file" class="mini" title="File moi">&#65291;</button>
-            <button id="btn-new-folder" class="mini" title="Thu muc moi">&#128193;+</button>
-            <button id="btn-refresh" class="mini" title="Lam moi">&#8635;</button>
+            <button id="btn-new-file" class="mini" title="File moi">+</button>
+            <button id="btn-new-folder" class="mini" title="Thu muc moi">+Dir</button>
+            <button id="btn-refresh" class="mini" title="Lam moi">Re</button>
           </div>
         </div>
         <div id="ws-chip" class="ws-chip hidden"></div>
@@ -70,7 +70,7 @@
       <section class="view hidden" data-view="git">
         <div class="panel-head">
           <span class="panel-title">Git</span>
-          <div class="panel-actions"><button id="btn-git-refresh" class="mini" title="Lam moi">&#8635;</button></div>
+          <div class="panel-actions"><button id="btn-git-refresh" class="mini" title="Lam moi">Re</button></div>
         </div>
         <div id="git-body" class="git-body"><div class="empty">Mo thu muc co Git de bat dau.</div></div>
       </section>
@@ -134,7 +134,7 @@
         </div>
         <div class="resizer hidden" id="resizer-split"></div>
         <div class="preview-col hidden" id="preview-col">
-          <div class="preview-head"><span>Preview</span><button id="btn-preview-close" class="mini">&#10005;</button></div>
+          <div class="preview-head"><span>Preview</span><button id="btn-preview-close" class="mini">x</button></div>
           <iframe id="preview-frame" class="preview-frame" sandbox="allow-scripts"></iframe>
         </div>
       </div>
@@ -143,9 +143,9 @@
         <div class="hero-logo">WENKER <em>Studio</em></div>
         <p class="hero-sub">Agent IDE chay offline — doc/ghi file, chay lenh, git, ngay trong thu muc cua ban.</p>
         <div class="hero-actions">
-          <button id="hero-open" class="btn primary big">&#128194; Mo thu muc</button>
-          <button id="hero-new" class="btn big">&#128193; Tao project</button>
-          <button id="hero-recent" class="btn big">&#128336; Mo gan day</button>
+          <button id="hero-open" class="btn primary big">Mo thu muc</button>
+          <button id="hero-new" class="btn big">Tao project</button>
+          <button id="hero-recent" class="btn big">Mo gan day</button>
         </div>
         <div id="hero-recent-list" class="hero-recent hidden"></div>
         <div class="hero-keys">
@@ -161,8 +161,8 @@
       <div class="panel-head">
         <span class="panel-title">Agent</span>
         <div class="panel-actions">
-          <button id="btn-plan" class="mini toggle-mini" title="Che do Plan truoc, Code sau">&#9776; Plan</button>
-          <button id="btn-clear" class="mini" title="Xoa noi dung chat">&#128465;</button>
+          <button id="btn-plan" class="mini toggle-mini" title="Che do Plan truoc, Code sau">Plan</button>
+          <button id="btn-clear" class="mini" title="Xoa noi dung chat">Xoa</button>
         </div>
       </div>
       <div id="chat" class="chat">
@@ -186,13 +186,13 @@
 
     <!-- Status bar (bottom) -->
     <footer class="status-bar">
-      <span class="sb-item" id="sb-model" title="Model dang dung">&#9889; —</span>
-      <span class="sb-item" id="sb-git" title="Nhanh Git">&#9099; —</span>
-      <span class="sb-item" id="sb-tools" title="So tool-call phien nay">&#128295; 0</span>
+      <span class="sb-item" id="sb-model" title="Model dang dung">Model: —</span>
+      <span class="sb-item" id="sb-git" title="Nhanh Git">Git: —</span>
+      <span class="sb-item" id="sb-tools" title="So tool-call phien nay">tools: 0</span>
       <div class="sb-spacer"></div>
       <span class="sb-item" id="sb-lang">—</span>
       <span class="sb-item" id="sb-pos">Ln 1, Col 1</span>
-      <span class="sb-item" id="sb-router" title="Cong router">&#9679; router</span>
+      <span class="sb-item" id="sb-router" title="Cong router">router</span>
     </footer>
   </div>
 
@@ -201,7 +201,7 @@
     <div class="brand">WENKER <span>Studio</span></div>
     <button id="btn-folder" class="tb-btn" title="Mo thu muc workspace">Mo thu muc</button>
     <div id="ws-label" class="ws-label">chua co workspace</div>
-    <button id="btn-cmd" class="tb-btn ghost" title="Command palette (Ctrl+Shift+P)">&#8984; Lenh</button>
+    <button id="btn-cmd" class="tb-btn ghost" title="Command palette (Ctrl+Shift+P)">Lenh</button>
     <div class="spacer"></div>
     <select id="model-select" class="model-select" title="Chon model"></select>
     <label class="toggle" title="Agent dung tool"><input type="checkbox" id="tools-enabled-top" checked /><span>Agent tools</span></label>
@@ -216,7 +216,7 @@
     <div class="palette-box">
       <input id="palette-input" type="text" placeholder="Nhap lenh hoac ten file..." autocomplete="off" />
       <div id="palette-list" class="palette-list"></div>
-      <div class="palette-hint"><kbd>&#8593;&#8595;</kbd> chon &nbsp; <kbd>Enter</kbd> mo &nbsp; <kbd>Esc</kbd> dong</div>
+      <div class="palette-hint"><kbd>Up/Down</kbd> chon &nbsp; <kbd>Enter</kbd> mo &nbsp; <kbd>Esc</kbd> dong</div>
     </div>
   </div>
 

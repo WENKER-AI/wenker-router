@@ -85,7 +85,7 @@ function renderSteps(activeIdx) {
     const done = i < activeIdx;
     const act = i === activeIdx;
     li.className = done ? "done" : act ? "active" : "";
-    li.innerHTML = '<span class="dot">' + (done ? "\u2713" : act ? "\u25CC" : "\u00B7") + "</span><span>" + s + "</span>";
+    li.innerHTML = '<span class="dot">' + (done ? "\u25CF" : act ? "\u25CF" : "\u00B7") + "</span><span>" + s + "</span>";
     box.appendChild(li);
   });
   const fill = id("boot-fill");
@@ -208,7 +208,7 @@ function renderModelSelect() {
 }
 function labelFor(m) {
   const b = [];
-  if (m.wenker_supports_tools) b.push("\u{1F527}tool");
+  if (m.wenker_supports_tools) b.push("tool");
   if (m.wenker_free) b.push("free");
   if (m.wenker_needs_key || m.wenker_status === "needs_key") b.push("can-key");
   if (m.wenker_status === "down") b.push("xuong");
@@ -223,7 +223,7 @@ function currentModelMeta() { return state.models.find((m) => m.id === id("model
 function updateStatusModel() {
   const m = currentModelMeta();
   const e = id("sb-model");
-  if (e) { e.innerHTML = "\u26A1 " + escapeHtml(m ? m.id : "—"); e.classList.toggle("accent", !!(m && m.wenker_supports_tools)); }
+  if (e) { e.textContent = m ? m.id : "—"; e.classList.toggle("accent", !!(m && m.wenker_supports_tools)); }
 }
 
 // ---- Editor (Monaco + fallback) ------------------------------------------
@@ -345,14 +345,14 @@ function closeTab(rel) {
 }
 function fileIcon(p) {
   const ext = (p.split(".").pop() || "").toLowerCase();
-  if (["js","mjs","cjs"].includes(ext)) return "\u{1F7E8}";
-  if (["jsx","tsx","ts"].includes(ext)) return "\u{1F535}";
-  if (["json"].includes(ext)) return "\u{1F7E1}";
-  if (["css","scss","less"].includes(ext)) return "\u{1F537}";
-  if (["html","htm","vue"].includes(ext)) return "\u{1F310}";
-  if (["md","markdown"].includes(ext)) return "\u{1F4DD}";
-  if (["py"].includes(ext)) return "\u{1F40D}";
-  return "\u{1F4C4}";
+  if (["js","mjs","cjs"].includes(ext)) return "js";
+  if (["jsx","tsx","ts"].includes(ext)) return "ts";
+  if (["json"].includes(ext)) return "{}";
+  if (["css","scss","less"].includes(ext)) return "#";
+  if (["html","htm","vue"].includes(ext)) return "<>";
+  if (["md","markdown"].includes(ext)) return "md";
+  if (["py"].includes(ext)) return "py";
+  return "";
 }
 function renderCrumbs() {
   const box = id("crumbs");
@@ -415,7 +415,7 @@ function buildNode(n) {
   const row = document.createElement("div"); row.className = "row";
   row.dataset.path = n.path; if (!n.dir) row.dataset.file = "1";
   const caret = n.dir ? "\u25B8" : "";
-  const ico = n.dir ? "\uD83D\uDCC1" : fileIcon(n.name);
+  const ico = n.dir ? "" : fileIcon(n.name);
   row.innerHTML = '<span class="caret">' + caret + '</span><span class="ico">' + ico + "</span><span>" + escapeHtml(n.name) + "</span>";
   wrap.appendChild(row);
   let childBox = null;
@@ -450,20 +450,20 @@ function popupMenu(x, y, items) {
 function closeMenu() { if (menuEl) { menuEl.remove(); menuEl = null; } }
 function showTreeMenu(ev, n) {
   const items = [];
-  items.push({ label: "\u{1F4C2} Mo", run: () => (n.dir ? null : openFile(n.path)) });
+  items.push({ label: "Mo", run: () => (n.dir ? null : openFile(n.path)) });
   if (n.dir) {
-    items.push({ label: "\u{1F5D1} File moi trong nay", run: () => promptNew(n.path + "/", false) });
-    items.push({ label: "\u{1F4C1} Thu muc moi trong nay", run: () => promptNew(n.path + "/", true) });
+    items.push({ label: "File moi trong nay", run: () => promptNew(n.path + "/", false) });
+    items.push({ label: "Thu muc moi trong nay", run: () => promptNew(n.path + "/", true) });
   }
-  items.push({ label: "\u270F Renamed", run: () => promptRename(n.path) });
-  items.push({ label: "\u{1F5D1} Xoa", run: () => confirmDelete(n.path) });
-  items.push({ label: "\u{1F441} Reveal trong Explorer", run: () => api.reveal(n.path) });
+  items.push({ label: "Doi ten", run: () => promptRename(n.path) });
+  items.push({ label: "Xoa", run: () => confirmDelete(n.path) });
+  items.push({ label: "Reveal trong Explorer", run: () => api.reveal(n.path) });
   popupMenu(ev.clientX, ev.clientY, items);
 }
 function showTabMenu(ev, path) { popupMenu(ev.clientX, ev.clientY, [
-  { label: "\u{1F5D1} Dong", run: () => closeTab(path) },
-  { label: "\u{1F441} Reveal", run: () => api.reveal(path) },
-  { label: "\u{1F50D} Preview", run: () => openPreview() }
+  { label: "Dong", run: () => closeTab(path) },
+  { label: "Reveal", run: () => api.reveal(path) },
+  { label: "Preview", run: () => openPreview() }
 ]); }
 async function promptRename(path) {
   const to = await promptDialog("Doi ten / di chuyen", path, "Duong dan moi (tuong doi):");
@@ -527,16 +527,16 @@ async function runSearch() {
 // ---- Git ------------------------------------------------------------------
 async function refreshGit() {
   const box = id("git-body");
-  if (!state.workspace) { box.innerHTML = '<div class="empty">Mo thu muc co Git de bat dau.</div>'; id("sb-git").textContent = "\u23E9 —"; return; }
+  if (!state.workspace) { box.innerHTML = '<div class="empty">Mo thu muc co Git de bat dau.</div>'; id("sb-git").textContent = "Git: —"; return; }
   box.innerHTML = '<div class="empty">Dang kiem tra...</div>';
   const isRepo = await api.git(["rev-parse", "--is-inside-work-tree"]);
-  if (!isRepo.ok) { box.innerHTML = '<div class="empty">Khong phai Git repo.</div>'; id("sb-git").textContent = "\u23E9 khong phai repo"; return; }
+  if (!isRepo.ok) { box.innerHTML = '<div class="empty">Khong phai Git repo.</div>'; id("sb-git").textContent = "Git: khong phai repo"; return; }
   const branch = await api.git(["rev-parse", "--abbrev-ref", "HEAD"]);
   const status = await api.git(["status", "--porcelain"]);
   const b = (branch.stdout || "").trim() || "(dau)";
-  id("sb-git").innerHTML = "\u23E9 " + escapeHtml(b);
+  id("sb-git").textContent = "Git: " + b;
   const files = (status.stdout || "").split("\n").map((l) => l.replace(/^\s+/, "")).filter(Boolean);
-  box.innerHTML = '<div class="git-branch">\u23E9 ' + escapeHtml(b) + "</div>";
+  box.innerHTML = '<div class="git-branch">' + escapeHtml(b) + "</div>";
   if (!files.length) { box.insertAdjacentHTML("beforeend", '<div class="empty">Khong co thay doi.</div>'); }
   for (const line of files) {
     const st = line.slice(0, 2).trim() || "?";
@@ -553,7 +553,7 @@ async function refreshGit() {
   id("git-commit").onclick = async () => {
     const msg = id("git-msg").value.trim(); if (!msg) return addSystem("Nhap commit message.");
     const r = await api.git(["commit", "-m", msg]);
-    addSystem(r.ok ? "\u2713 " + (r.stdout || "").trim().split("\n").slice(-1)[0] : "\u2717 " + (r.stderr || "").trim());
+    addSystem(r.ok ? (r.stdout || "").trim().split("\n").slice(-1)[0] : (r.stderr || "").trim());
     refreshGit();
   };
 }
@@ -593,8 +593,8 @@ async function refreshModelsPanel() {
     }
     box.appendChild(g);
   };
-  section("\u2713 San sang", byStatus.ready);
-  section("\u26A0 Can key", byStatus.key);
+  section("San sang", byStatus.ready);
+  section("Can key", byStatus.key);
   section("Khac", byStatus.other);
 }
 async function promptProviderKey(p) {
@@ -603,13 +603,13 @@ async function promptProviderKey(p) {
   try {
     const r = await fetch(state.baseUrl + "/api/providers/" + encodeURIComponent(p.id), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userApiKey: key }) });
     const j = await r.json();
-    if (r.ok && j.success) { addSystem("\u2713 Da luu key cho " + p.name); await loadModels(); refreshModelsPanel(); }
+    if (r.ok && j.success) { addSystem("Da luu key cho " + p.name); await loadModels(); refreshModelsPanel(); }
     else showError("Loi luu key: " + JSON.stringify(j));
   } catch (e) { showError(e.message); }
 }
 async function pingProvider(p) {
   addSystem("Ping " + p.name + "...");
-  try { const r = await fetch(state.baseUrl + "/api/providers/" + encodeURIComponent(p.id) + "/ping", { method: "POST" }); const j = await r.json(); addSystem("\u2192 " + JSON.stringify(j).slice(0, 200)); }
+  try { const r = await fetch(state.baseUrl + "/api/providers/" + encodeURIComponent(p.id) + "/ping", { method: "POST" }); const j = await r.json(); addSystem("-> " + JSON.stringify(j).slice(0, 200)); }
   catch (e) { showError(e.message); }
 }
 
@@ -643,7 +643,7 @@ function startTask(title) {
 }
 function addToolCard(parent, name, args, status) {
   const card = document.createElement("div"); card.className = "tool-card " + (status || "pending");
-  card.innerHTML = '<div class="tool-head"><span class="tool-status">' + (status || "\u25CC dang") + '</span><span class="tool-name">' + escapeHtml(name) + "</span></div>" +
+  card.innerHTML = '<div class="tool-head"><span class="tool-status">' + (status || "dang...") + '</span><span class="tool-name">' + escapeHtml(name) + "</span></div>" +
     '<pre class="args">' + escapeHtml(prettyArgs(args)) + "</pre>";
   parent.appendChild(card); scrollChat();
   return card;
@@ -783,7 +783,7 @@ function updateMentionPopup() {
     const hits = files.filter((f) => f.toLowerCase().includes(q)).slice(0, 30);
     if (!hits.length) { pop.classList.add("hidden"); mentionOpen = false; return; }
     pop.innerHTML = ""; mentionOpen = true; pop.classList.remove("hidden");
-    hits.forEach((f) => { const d = document.createElement("div"); d.className = "mi"; d.innerHTML = "\u{1F4C4} <span>" + escapeHtml(f) + "</span>"; d.onmousedown = (e) => { e.preventDefault(); insertMention(f); }; pop.appendChild(d); });
+    hits.forEach((f) => { const d = document.createElement("div"); d.className = "mi"; d.textContent = f; d.onmousedown = (e) => { e.preventDefault(); insertMention(f); }; pop.appendChild(d); });
   });
 }
 function insertMention(path) {
@@ -860,7 +860,7 @@ async function runAgent(userText) {
       if (!resp.ok) {
         const code = data && data.error && (data.error.code || data.error.type);
         if (code === "tools_not_supported" || resp.status === 400) {
-          showNotice("Model <b>" + escapeHtml(model) + "</b> khong ho tro tool. Tat <b>Tools</b> hoac chon model co badge \u{1F527}tool (Groq/OpenRouter/Gemini da co key). <span style='color:var(--muted)'>" + escapeHtml((data && data.error && (data.error.message || data.error.hint)) || "") + "</span>");
+          showNotice("Model <b>" + escapeHtml(model) + "</b> khong ho tro tool. Tat <b>Tools</b> hoac chon model co badge tool (Groq/OpenRouter/Gemini da co key). <span style='color:var(--muted)'>" + escapeHtml((data && data.error && (data.error.message || data.error.hint)) || "") + "</span>");
           setLoop(""); state.running = false; break;
         }
         throw httpError(resp, data);
@@ -877,14 +877,14 @@ async function runAgent(userText) {
           if (state.abort) break;
           const fname = tc.function && tc.function.name;
           const fargs = parseArgs(tc.function && tc.function.arguments);
-          state.toolCalls++; id("sb-tools").innerHTML = "\u{1F527} " + state.toolCalls;
+          state.toolCalls++; id("sb-tools").textContent = "tools: " + state.toolCalls;
           const card = addToolCard(taskBody, fname, tc.function && tc.function.arguments, "pending");
           setLoop("dang chay " + fname + "...");
           let result;
           try { result = await execTool(fname, fargs, taskBody); }
           catch (e) { result = { ok: false, text: "Loi thuc thi: " + e.message }; }
           card.className = "tool-card " + (result.ok ? "ok" : "err");
-          card.querySelector(".tool-status").textContent = result.ok ? "\u2713 xong" : "\u2717 loi";
+          card.querySelector(".tool-status").textContent = result.ok ? "xong" : "loi";
           const pre = document.createElement("pre"); pre.className = "out" + (result.ok ? "" : " err"); pre.textContent = preview(result.text, 4000); card.appendChild(pre);
           if (fname === "write_file" && result.ok) addUndoButton(card, tc.id);
           state.history.push({ role: "tool", tool_call_id: tc.id, content: typeof result.text === "string" ? result.text : JSON.stringify(result.text) });
@@ -897,7 +897,7 @@ async function runAgent(userText) {
     }
     // Nut tien hanh sau khi lap ke hoach
     if (state.planMode) {
-      const go = document.createElement("button"); go.className = "btn sm primary"; go.textContent = "\u25B6 Tien hanh ke hoach";
+      const go = document.createElement("button"); go.className = "btn sm primary"; go.textContent = "Tien hanh ke hoach";
       go.onclick = () => { state.planMode = false; id("btn-plan").classList.remove("on"); runAgent("Hay thuc hien theo dung ke hoach ban vua lap."); };
       taskBody.appendChild(go);
     }
@@ -910,12 +910,12 @@ async function runAgent(userText) {
 }
 function addBubbleIn(parent, cls, label, text) { const m = document.createElement("div"); m.className = "msg " + cls; roleTag(m, label, cls); const b = document.createElement("div"); b.className = "bubble"; b.textContent = text; m.appendChild(b); parent.appendChild(m); scrollChat(); return b; }
 function addUndoButton(card, callId) {
-  const btn = document.createElement("button"); btn.className = "undo"; btn.textContent = "\u21BA Hoan tac file nay";
+  const btn = document.createElement("button"); btn.className = "undo"; btn.textContent = "Hoan tac file nay";
   btn.onclick = async () => {
     for (const path of Array.from(state.turnTouched || [])) {
-      try { const r = await api.restore("t" + state.turnId + "-" + path); addSystem("\u21BA Da hoan tac " + path + " (hoi " + r.restored + ", xoa " + r.deleted + ")"); if (state.active === path) { const { content } = await api.readFile(path); const t = state.tabs.find((x) => x.path === path); if (t) { t.content = content; t.dirty = false; } if (state.active === path) setEditorContent(content); } } catch (e) {}
+      try { const r = await api.restore("t" + state.turnId + "-" + path); addSystem("Da hoan tac " + path + " (hoi " + r.restored + ", xoa " + r.deleted + ")"); if (state.active === path) { const { content } = await api.readFile(path); const t = state.tabs.find((x) => x.path === path); if (t) { t.content = content; t.dirty = false; } if (state.active === path) setEditorContent(content); } } catch (e) {}
     }
-    btn.disabled = true; btn.textContent = "\u2713 Da hoan tac";
+    btn.disabled = true; btn.textContent = "Da hoan tac";
   };
   card.appendChild(btn);
 }
@@ -1037,7 +1037,7 @@ function wire() {
     updateStatusModel();
     const m = currentModelMeta();
     if (m && (m.wenker_needs_key || m.wenker_status === "needs_key")) showNotice("Model <b>" + escapeHtml(m.id) + "</b> can API key. Mo panel <b>Model &amp; Key</b> hoac <b>Dashboard</b> de them key mien phi.");
-    else if (m && !m.wenker_supports_tools) showNotice("Model <b>" + escapeHtml(m.id) + "</b> khong ho tro tool (nguon mien phi khong key). Tat <b>Tools</b> hoac chon model co badge \u{1F527}tool.");
+    else if (m && !m.wenker_supports_tools) showNotice("Model <b>" + escapeHtml(m.id) + "</b> khong ho tro tool (nguon mien phi khong key). Tat <b>Tools</b> hoac chon model co badge tool.");
     else hideNotice();
     persistConfig();
   });
@@ -1052,7 +1052,7 @@ function wire() {
   ["set-theme", "set-accent", "set-layout"].forEach((s) => id(s).addEventListener("change", () => { applyConfigToUI(); if (state.monaco && s === "set-theme") window.monaco.editor.setTheme(id("set-theme").value === "dark" ? "vs-dark" : "vs"); persistConfig(); }));
   id("set-fontsize").addEventListener("input", () => { document.documentElement.style.setProperty("--fs", id("set-fontsize").value + "px"); if (state.monaco) state.monaco.updateOptions({ fontSize: Number(id("set-fontsize").value) }); });
   id("set-minimap").addEventListener("change", () => { if (state.monaco) state.monaco.updateOptions({ minimap: { enabled: id("set-minimap").checked } }); });
-  id("btn-save-settings").onclick = () => { persistConfig(); addSystem("\u2713 Da luu cai dat."); saveWorkspaceConfig(); };
+  id("btn-save-settings").onclick = () => { persistConfig(); addSystem("Da luu cai dat."); saveWorkspaceConfig(); };
 
   // palette keys
   id("palette-input").addEventListener("input", (e) => paletteQuery(e.target.value));
