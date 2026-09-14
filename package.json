@@ -20,7 +20,6 @@
     "client/dist/",
     "system-prompts/",
     "web/",
-    "studio/",
     "!web/assets/banner.png",
     "!web/assets/icon.png",
     "!web/assets/chữ thường.ttf",
@@ -63,6 +62,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "undici": "^6.28.1"
   }
 }

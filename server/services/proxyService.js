@@ -268,7 +268,7 @@ class ProxyService {
           type: "invalid_request_error",
           param: "tools",
           code: "tools_not_supported",
-          hint: "WENKER Studio / agent loop: dung model groq llama-3.3-70b hoặc openrouter deepseek-r1 - ca hai loai key mien phi."
+          hint: "Agent/tool loop: dung model groq llama-3.3-70b hoặc openrouter deepseek-r1 - ca hai loai key mien phi."
         }
       });
     }

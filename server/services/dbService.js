@@ -149,6 +149,13 @@ const defaultSettings = {
   fallbackOrder: ['wenker-cloud', 'openrouter', 'groq', 'google-gemini', 'nim-nvidia', 'duckduckgo', 'pollinations'],
   // Free WENKER Cloud allowance per login user per day (see ~/.wenker/users.json).
   wenkerCloudDailyLimit: DEFAULT_DAILY_LIMIT,
+  // Outbound VPN / HTTP proxy (xem server/services/proxyFetch.js). Mac dinh tat.
+  // proxyNoProxy: danh sach host/duoi host bo qua proxy (phan biet chu hoa thuong
+  // khong quan trong). Loopback + mang rieng tu (10./172.16-31./192.168.) LUON
+  // duoc bo qua tu dong, nen chi can them ten mien rieng o day neu can.
+  proxyEnabled: false,
+  proxyUrl: '',
+  proxyNoProxy: 'localhost',
   providerOverrides: {}
 };
 

@@ -4,6 +4,7 @@ const db = require('../services/dbService');
 const proxyService = require('../services/proxyService');
 const healthService = require('../services/healthService');
 const addonService = require('../services/addonService');
+const proxyFetch = require('../services/proxyFetch');
 
 // Stats
 router.get('/stats', (req, res) => {
@@ -151,7 +152,16 @@ router.get('/settings', (req, res) => {
 
 router.post('/settings', (req, res) => {
   const updated = db.updateSettings(req.body);
+  // proxyUrl/proxyEnabled co the vua doi -> dong agent cu de request sau dung proxy moi.
+  proxyFetch.reset();
   res.json({ success: true, settings: updated });
+});
+
+// Thu nhanh HTTP proxy: goi lenh nay tu UI "Ket noi" de biet proxy co ra duoc
+// internet that khong (tra ve IP nhin thay phia ben kia). Khong anh huong settings.
+router.post('/settings/proxy-test', async (req, res) => {
+  const result = await proxyFetch.testProxy(req.body && req.body.proxyUrl);
+  res.json(result);
 });
 
 // ---- Add-on engine (kho .addon: theme / provider / snippet) ----

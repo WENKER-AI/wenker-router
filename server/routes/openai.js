@@ -44,7 +44,7 @@ router.get('/models', (req, res) => {
     const needsKey = requiresAuth && !p.userApiKey;
     // Tool-calling is only honest on a real OpenAI-compatible upstream. The free
     // no-auth paths (Pollinations anonymous / DuckDuckGo) cannot answer with
-    // tool_calls, so the Studio UI uses this flag to grey out the Agent toggle.
+    // tool_calls, so clients use this flag to hide the agent/tool toggle.
     const supportsTools = !/pollinations\.ai/i.test(String(p.baseUrl || "")) && p.id !== "duckduckgo";
     const meta = (m) => ({
       owned_by: p.name,

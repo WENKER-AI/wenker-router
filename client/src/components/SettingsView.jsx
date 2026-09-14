@@ -10,6 +10,7 @@ import {
   Info,
   Terminal,
   Laptop,
+  Globe,
   Users
 } from 'lucide-react';
 import { authFetch } from '../session';
@@ -20,6 +21,26 @@ export default function SettingsView() {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
+  const [proxyTesting, setProxyTesting] = useState(false);
+  const [proxyResult, setProxyResult] = useState(null);
+
+  const testProxy = async () => {
+    setProxyTesting(true);
+    setProxyResult(null);
+    try {
+      const res = await authFetch('/api/settings/proxy-test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ proxyUrl: settings.proxyUrl })
+      });
+      const data = await res.json();
+      setProxyResult(data);
+    } catch (err) {
+      setProxyResult({ ok: false, error: String(err && err.message ? err.message : err) });
+    } finally {
+      setProxyTesting(false);
+    }
+  };
 
   const fetchSettings = async () => {
     try {
@@ -141,6 +162,79 @@ export default function SettingsView() {
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* Card: Outbound VPN / HTTP proxy */}
+          <div className="card-glass p-6 rounded-xl space-y-4">
+            <h2 className="font-bold text-sm text-white flex items-center gap-2">
+              <Globe className="w-4 h-4 text-violet-400" />
+              <span>Kết nối ra ngoài qua VPN / Proxy cục bộ</span>
+            </h2>
+
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="proxyEnabledCheck"
+                checked={Boolean(settings.proxyEnabled)}
+                onChange={(e) => setSettings({ ...settings, proxyEnabled: e.target.checked })}
+                className="mt-1 rounded bg-slate-950 border-slate-800 text-violet-500 focus:ring-violet-500"
+              />
+              <div>
+                <label htmlFor="proxyEnabledCheck" className="text-slate-200 text-xs font-semibold cursor-pointer block">
+                  Đẩy mọi request upstream qua HTTP proxy
+                </label>
+                <p className="text-slate-400 text-[11px] mt-0.5 leading-relaxed">
+                  Dành cho VPN công cụ local (Clash, v2rayN, mihomo…) phát HTTP proxy trên máy bạn. Khi bật, router gửi mọi lời gọi tới OpenAI / Anthropic / Groq / OpenRouter… qua proxy này. Node không tự đọc biến <code className="text-violet-300">HTTP_PROXY</code>, nên phải khai báo ở đây.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label className="block text-slate-300 font-medium mb-1">Địa chỉ Proxy (http://…):</label>
+                <input
+                  type="text"
+                  placeholder="http://127.0.0.1:7890"
+                  value={settings.proxyUrl || ''}
+                  onChange={(e) => setSettings({ ...settings, proxyUrl: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:border-violet-500 focus:outline-none"
+                />
+                <span className="text-[10px] text-slate-500 mt-1 block">Chỉ hỗ trợ proxy HTTP/HTTPS. SOCKS cần cấu hình riêng.</span>
+              </div>
+              <div>
+                <label className="block text-slate-300 font-medium mb-1">Bỏ qua proxy (NO_PROXY, phân tách bởi dấu phẩy):</label>
+                <input
+                  type="text"
+                  placeholder="localhost, internal.company"
+                  value={settings.proxyNoProxy || ''}
+                  onChange={(e) => setSettings({ ...settings, proxyNoProxy: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:border-violet-500 focus:outline-none"
+                />
+                <span className="text-[10px] text-slate-500 mt-1 block">Vòng ngoài (localhost) và mạng riêng (10.x, 192.168.x, 172.16–31.x) LUÔN được bỏ qua tự động — model local (Ollama/LM Studio/vLLM) không bao giờ bị đẩy ra proxy.</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-1">
+              <button
+                type="button"
+                onClick={testProxy}
+                disabled={proxyTesting || !settings.proxyUrl}
+                className="inline-flex items-center gap-2 text-xs px-3 py-2 rounded-lg bg-violet-500/10 text-violet-300 border border-violet-500/30 hover:bg-violet-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              >
+                {proxyTesting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Globe className="w-4 h-4" />}
+                <span>Kiểm tra kết nối</span>
+              </button>
+              {proxyResult && (
+                <span className={proxyResult.ok ? 'text-[11px] text-emerald-400' : 'text-[11px] text-rose-400'}>
+                  {proxyResult.ok
+                    ? <>OK · IP ra ngoài <strong className="font-mono">{proxyResult.ip}</strong> · {proxyResult.latencyMs}ms</>
+                    : <>Thất bại: {proxyResult.error}</>}
+                </span>
+              )}
+            </div>
+            <p className="text-[10px] text-slate-500 leading-relaxed">
+              Nhấn <strong>Lưu Cấu Hình</strong> để áp dụng. Sau khi lưu, request mới dùng proxy ngay (không cần khởi động lại server).
+            </p>
           </div>
 
           {/* Card: WENKER Cloud Quota */}

@@ -8,16 +8,19 @@ const anthropicRouter = require('./routes/anthropic');
 const adminRouter = require('./routes/admin');
 const authRouter = require('./routes/auth');
 
-// Guard: khi chay trong Electron (studio/main.js) hoac khi terminal/pipe cua stdout
-// bi dong giua chung, moi lan console.log co the nem "write EPIPE" -> uncaught
-// exception -> Electron bat hop thoai crash "A JavaScript error occurred in the
-// main process", con `npm start` thi chet. Mot gateway khong bao gio duoc phep
-// chet chi vi ghi log that bai, nen nho bo qua loi tren stdout/stderr.
+// Guard: khi terminal/pipe cua stdout bi dong giua chung (chay nen, dong cua so
+// cmd, hoac process bi quan ly boi `pm2`/`systemd`...), moi lan console.log co the
+// nem "write EPIPE" -> uncaught exception -> `npm start` chet. Mot gateway khong
+// bao gio duoc phep chet chi vi ghi log that bai, nen nho bo qua loi stdout/stderr.
 for (const stream of [process.stdout, process.stderr]) {
   if (stream && typeof stream.on === 'function') {
     stream.on('error', () => { /* pipe da chet - lang thi ghi log, khong crash */ });
   }
 }
+
+// Boc globalThis.fetch de moi request upstream tu dong di qua VPN/HTTP proxy cuc bo
+// khi nguoi dung bat trong Settings (co bypass loopback/private cho model local).
+require('./services/proxyFetch').install();
 
 const app = express();
 const settings = db.getSettings();
@@ -119,14 +122,6 @@ app.use(express.static(clientDistPath));
 const webPath = path.join(__dirname, '..', 'web');
 app.use('/web', express.static(webPath));
 app.get('/web', (req, res) => res.redirect('/web/'));
-
-// WENKER Studio (IDE Electron) — renderer là static, phục vụ luôn dưới /ide để:
-//   1) app Electron chỉ việc loadURL http://127.0.0.1:PORT/ide/ (chung origin, khỏi CORS);
-//   2) ai chưa cài app vẫn thử được UI trong browser.
-// Thu muc nguon la studio/ (tranh va cham hoa/thuong voi IDE/ cua VS Code extension).
-const idePath = path.join(__dirname, '..', 'studio', 'renderer');
-app.use('/ide', express.static(idePath));
-app.get('/ide', (req, res) => res.redirect('/ide/'));
 
 const fs = require('fs');
 const clientIndex = path.join(clientDistPath, 'index.html');
