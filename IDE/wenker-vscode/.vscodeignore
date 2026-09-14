@@ -1,0 +1,17 @@
+.vscode/**
+.vscode-test/**
+out/**
+node_modules/**
+.gitignore
+**/*.map
+**/*.ts
+test/**
+.vscode/**
+.vscode-test/**
+out/**
+src/**
+node_modules/**
+**/*.map
+**/*.ts
+.gitignore
+scripts/**

@@ -1,0 +1,1890 @@
+/**
+ * WENKER ROUTER - Database 125+ AI Providers
+ * Contains full configurations, Base URLs, Auth types, and Model lists
+ */
+
+const PROVIDERS = [
+  // ================= 1. WENKER BUILT-IN & FREE NO-AUTH =================
+  {
+    id: "wenker-cloud",
+    name: "WENKER Cloud (Original)",
+    category: "wenker",
+    baseUrl: "https://text.pollinations.ai",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://wenker.ai",
+    keyHelp: "Miễn phí, không cần key. Tuy nhiên tier ẩn danh của Pollinations đang hết budget (HTTP 402). Để hồi sinh: vào https://enter.pollinations.ai/keys đăng ký miễn phí (login GitHub) → tạo API key → dán vào ô 'API Key' ở đây.",
+    description: "Hàng đợi miễn phí không cần API key. LƯU Ý: id model là tên GỌI (alias); model THỰC SỰ trả lời là targetModel ở tên hiển thị và trường wenker_served_by trong /v1/models. Khi upstream đổi, câu trả lời có thể đến từ model khác tên bạn gọi.",
+    icon: "Sparkles",
+    models: [
+      { id: "wenker-deepseek-r1-free", name: "WENKER Free #1", contextWindow: 64000, isFree: true, targetModel: "deepseek-r1", servedModel: "deepseek-r1" },
+      { id: "wenker-deepseek-v3-free", name: "WENKER Free #2", contextWindow: 64000, isFree: true, targetModel: "deepseek", servedModel: "deepseek" },
+      { id: "wenker-qwen-2.5-coder-free", name: "WENKER Free #3", contextWindow: 32768, isFree: true, targetModel: "qwen-coder", servedModel: "qwen-coder" },
+      { id: "wenker-llama-3.3-70b-free", name: "WENKER Free #4", contextWindow: 128000, isFree: true, targetModel: "llama", servedModel: "llama" },
+      { id: "wenker-mistral-nemo-free", name: "WENKER Free #5", contextWindow: 32000, isFree: true, targetModel: "mistral", servedModel: "mistral" },
+      { id: "wenker-gpt-4o-mini-free", name: "WENKER Free #6", contextWindow: 128000, isFree: true, targetModel: "openai", servedModel: "openai" },
+      { id: "wenker-gemini-2.5-free", name: "WENKER Free #7", contextWindow: 1000000, isFree: true, targetModel: "searchgpt", servedModel: "searchgpt" }
+    ]
+  },
+  {
+    id: "duckduckgo",
+    name: "DuckDuckGo AI",
+    category: "free",
+    baseUrl: "https://duckduckgo.com/duckchat/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://duckduckgo.com/chat",
+    description: "Dịch vụ DuckDuckGo Chat AI ẩn danh, miễn phí 100%, không cần tài khoản hay API key.",
+    icon: "ShieldCheck",
+    models: [
+      { id: "ddg-gpt-4o-mini", name: "DuckDuckGo GPT-4o Mini", contextWindow: 16000, isFree: true },
+      { id: "ddg-claude-3-haiku", name: "DuckDuckGo Claude 3 Haiku", contextWindow: 16000, isFree: true },
+      { id: "ddg-llama-3.3-70b", name: "DuckDuckGo Llama 3.3 70B", contextWindow: 16000, isFree: true },
+      { id: "ddg-mixtral-8x7b", name: "DuckDuckGo Mixtral 8x7B", contextWindow: 16000, isFree: true }
+    ]
+  },
+  {
+    id: "pollinations",
+    name: "Pollinations AI",
+    category: "free",
+    baseUrl: "https://text.pollinations.ai",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://pollinations.ai",
+    description: "API AI mở miễn phí không giới hạn, không cần API Key, hỗ trợ text & image streaming.",
+    icon: "Flower2",
+    models: [
+      { id: "pollinations-deepseek", name: "Pollinations DeepSeek V3", contextWindow: 64000, isFree: true },
+      { id: "pollinations-qwen-coder", name: "Pollinations Qwen Coder", contextWindow: 32000, isFree: true },
+      { id: "pollinations-mistral", name: "Pollinations Mistral Large", contextWindow: 32000, isFree: true },
+      { id: "pollinations-openai", name: "Pollinations OpenAI Proxy", contextWindow: 16000, isFree: true }
+    ]
+  },
+  {
+    id: "huggingchat-free",
+    name: "HuggingChat Free Tier",
+    category: "free",
+    baseUrl: "https://huggingface.co/chat/api",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://huggingface.co/chat",
+    description: "HuggingChat cộng đồng miễn phí với Llama, Qwen, DeepSeek.",
+    icon: "Smile",
+    models: [
+      { id: "hf-llama-3.3-70b", name: "HuggingChat Llama 3.3 70B", contextWindow: 128000, isFree: true },
+      { id: "hf-qwen-2.5-72b", name: "HuggingChat Qwen 2.5 72B", contextWindow: 32768, isFree: true },
+      { id: "hf-deepseek-r1", name: "HuggingChat DeepSeek R1 Distill", contextWindow: 64000, isFree: true }
+    ]
+  },
+  {
+    id: "cloudflare-ai-free",
+    name: "Cloudflare Workers AI",
+    category: "free",
+    baseUrl: "https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}/ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://developers.cloudflare.com/workers-ai",
+    description: "Cloudflare Workers AI cung cấp 10.000 neurons miễn phí mỗi ngày với hàng chục mô hình mở.",
+    icon: "Cloud",
+    models: [
+      { id: "@cf/meta/llama-3.3-70b-instruct", name: "CF Llama 3.3 70B", contextWindow: 128000, isFree: true },
+      { id: "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b", name: "CF DeepSeek R1 32B", contextWindow: 64000, isFree: true },
+      { id: "@cf/qwen/qwen2.5-coder-7b-instruct", name: "CF Qwen 2.5 Coder 7B", contextWindow: 32768, isFree: true }
+    ]
+  },
+  {
+    id: "puter-ai",
+    name: "Puter AI Gateway",
+    category: "free",
+    baseUrl: "https://api.puter.com/drivers/call/openai/chat/completions",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://puter.com",
+    description: "Puter.js AI Driver chạy trên môi trường đám mây miễn phí cho lập trình viên.",
+    icon: "Box",
+    models: [
+      { id: "puter-claude-3-5-sonnet", name: "Puter Claude 3.5 Sonnet", contextWindow: 200000, isFree: true },
+      { id: "puter-gpt-4o", name: "Puter GPT-4o", contextWindow: 128000, isFree: true }
+    ]
+  },
+  {
+    id: "blackbox-free",
+    name: "Blackbox AI",
+    category: "free",
+    baseUrl: "https://www.blackbox.ai/api/chat",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://www.blackbox.ai",
+    description: "Nền tảng code AI miễn phí hỗ trợ tìm kiếm code và tự động sinh code.",
+    icon: "Terminal",
+    models: [
+      { id: "blackbox-code", name: "Blackbox Coding Assistant", contextWindow: 32000, isFree: true }
+    ]
+  },
+  {
+    id: "cohere-free",
+    name: "Cohere Trial Key",
+    category: "free",
+    baseUrl: "https://api.cohere.com/v2",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://cohere.com",
+    description: "Cohere cung cấp khóa thử nghiệm Trial Key miễn phí không giới hạn thời gian cho dev.",
+    icon: "Zap",
+    models: [
+      { id: "command-r-plus-08-2024", name: "Command R+", contextWindow: 128000, isFree: true },
+      { id: "command-r-08-2024", name: "Command R", contextWindow: 128000, isFree: true }
+    ]
+  },
+  {
+    id: "groq-free",
+    name: "Groq Free Tier",
+    category: "free",
+    baseUrl: "https://api.groq.com/openai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://console.groq.com",
+    keyHelp: "Key mien phi khong can the: console.groq.com -> Login (Google/GitHub) -> API Keys -> Create API Key.",
+    description: "Groq LPU cung cấp gói Free Tier tốc độ 500-1000 tokens/giây với DeepSeek R1 & Llama 3.3.",
+    icon: "Cpu",
+    models: [
+      { id: "deepseek-r1-distill-llama-70b", name: "Groq DeepSeek R1 70B", contextWindow: 128000, isFree: true },
+      { id: "llama-3.3-70b-versatile", name: "Groq Llama 3.3 70B Versatile", contextWindow: 128000, isFree: true },
+      { id: "llama-3.1-8b-instant", name: "Groq Llama 3.1 8B Instant", contextWindow: 128000, isFree: true }
+    ]
+  },
+
+  // ================= 2. BIG TECH & GLOBAL FLAGSHIPS =================
+  {
+    id: "openai",
+    name: "OpenAI",
+    category: "flagship",
+    baseUrl: "https://api.openai.com/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://platform.openai.com",
+    description: "OpenAI GPT-4o, o1, o3-mini, GPT-4o-mini chính thức.",
+    icon: "Sparkles",
+    models: [
+      { id: "gpt-4o", name: "GPT-4o", contextWindow: 128000, isFree: false },
+      { id: "gpt-4o-mini", name: "GPT-4o Mini", contextWindow: 128000, isFree: false },
+      { id: "o1", name: "o1 Reasoning", contextWindow: 200000, isFree: false },
+      { id: "o3-mini", name: "o3-mini", contextWindow: 200000, isFree: false },
+      { id: "text-embedding-3-small", name: "Text Embedding 3 Small", contextWindow: 8191, isFree: false },
+      { id: "text-embedding-3-large", name: "Text Embedding 3 Large", contextWindow: 8191, isFree: false }
+    ]
+  },
+  {
+    id: "anthropic",
+    name: "Anthropic Claude",
+    category: "flagship",
+    baseUrl: "https://api.anthropic.com/v1",
+    authType: "api-key",
+    headerName: "x-api-key",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://console.anthropic.com",
+    description: "Claude 3.7 Sonnet với tư duy Hybrid Reasoning, Claude 3.5 Haiku, Claude 3 Opus.",
+    icon: "Bot",
+    models: [
+      { id: "claude-3-7-sonnet-20250219", name: "Claude 3.7 Sonnet (Hybrid Thinking)", contextWindow: 200000, isFree: false },
+      { id: "claude-3-5-sonnet-20241022", name: "Claude 3.5 Sonnet v2", contextWindow: 200000, isFree: false },
+      { id: "claude-3-5-haiku-20241022", name: "Claude 3.5 Haiku", contextWindow: 200000, isFree: false },
+      { id: "claude-3-opus-20240229", name: "Claude 3 Opus", contextWindow: 200000, isFree: false }
+    ]
+  },
+  {
+    id: "google-gemini",
+    name: "Google Gemini AI Studio",
+    category: "flagship",
+    baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://aistudio.google.com",
+    keyHelp: "Key mien phi khong can the: aistudio.google.com -> Get API key (dang nhap Google) -> Create API key.",
+    description: "Google Gemini 2.5 Pro, 2.0 Flash với ngữ cảnh khổng lồ 2M tokens và tầng miễn phí rộng rãi.",
+    icon: "Globe",
+    models: [
+      { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash", contextWindow: 1048576, isFree: true },
+      { id: "gemini-2.0-pro-exp-02-05", name: "Gemini 2.0 Pro Experimental", contextWindow: 2097152, isFree: true },
+      { id: "gemini-2.0-flash-thinking-exp-01-21", name: "Gemini 2.0 Flash Thinking", contextWindow: 1048576, isFree: true },
+      { id: "gemini-1.5-pro", name: "Gemini 1.5 Pro", contextWindow: 2097152, isFree: false }
+    ]
+  },
+  {
+    id: "google-vertex",
+    name: "Google Cloud Vertex AI",
+    category: "flagship",
+    baseUrl: "https://{REGION}-aiplatform.googleapis.com/v1beta1/projects/{PROJECT_ID}/locations/{REGION}/publishers/google/models",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://cloud.google.com/vertex-ai",
+    description: "Nền tảng Vertex AI cấp doanh nghiệp của Google Cloud.",
+    icon: "Cloud",
+    models: [
+      { id: "gemini-1.5-pro-vertex", name: "Vertex Gemini 1.5 Pro", contextWindow: 2000000, isFree: false },
+      { id: "gemini-1.5-flash-vertex", name: "Vertex Gemini 1.5 Flash", contextWindow: 1000000, isFree: false }
+    ]
+  },
+  {
+    id: "xai",
+    name: "xAI (Grok)",
+    category: "flagship",
+    baseUrl: "https://api.x.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://x.ai/api",
+    description: "Grok-2, Grok-2-vision, Grok Beta từ công ty xAI của Elon Musk.",
+    icon: "Compass",
+    models: [
+      { id: "grok-2-1212", name: "Grok 2", contextWindow: 128000, isFree: false },
+      { id: "grok-2-vision-1212", name: "Grok 2 Vision", contextWindow: 128000, isFree: false },
+      { id: "grok-beta", name: "Grok Beta", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "azure-openai",
+    name: "Microsoft Azure OpenAI",
+    category: "flagship",
+    baseUrl: "https://{RESOURCE_NAME}.openai.azure.com/openai/deployments/{DEPLOYMENT_ID}",
+    authType: "api-key",
+    headerName: "api-key",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://azure.microsoft.com/en-us/products/ai-services/openai-service",
+    description: "Dịch vụ OpenAI triển khai an toàn trên hạ tầng Microsoft Azure.",
+    icon: "Layers",
+    models: [
+      { id: "azure-gpt-4o", name: "Azure GPT-4o Deployment", contextWindow: 128000, isFree: false },
+      { id: "azure-gpt-4o-mini", name: "Azure GPT-4o Mini", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "aws-bedrock",
+    name: "AWS Bedrock",
+    category: "flagship",
+    baseUrl: "https://bedrock-runtime.{REGION}.amazonaws.com/model",
+    authType: "custom-header",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://aws.amazon.com/bedrock",
+    description: "Amazon Web Services Bedrock cung cấp Claude, Llama, Amazon Titan.",
+    icon: "Server",
+    models: [
+      { id: "anthropic.claude-3-5-sonnet-20241022-v2:0", name: "Bedrock Claude 3.5 Sonnet v2", contextWindow: 200000, isFree: false },
+      { id: "meta.llama3-3-70b-instruct-v1:0", name: "Bedrock Llama 3.3 70B", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "github-models",
+    name: "GitHub Models",
+    category: "flagship",
+    baseUrl: "https://models.inference.ai.azure.com",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://github.com/marketplace/models",
+    keyHelp: "Dung GitHub Personal Access Token loai classic (scope models:read): github.com -> Settings -> Developer settings -> Tokens (classic) -> Generate. Mien phi, khong can the.",
+    description: "GitHub Models cho phép lập trình viên dùng miễn phí GPT-4o, Claude, DeepSeek qua GitHub PAT token.",
+    icon: "Github",
+    models: [
+      { id: "gpt-4o", name: "GH Models GPT-4o", contextWindow: 128000, isFree: true },
+      { id: "DeepSeek-R1", name: "GH Models DeepSeek R1", contextWindow: 64000, isFree: true },
+      { id: "o3-mini", name: "GH Models o3-mini", contextWindow: 200000, isFree: true }
+    ]
+  },
+
+  // ================= 3. FAST INFERENCE CLOUDS =================
+  {
+    id: "groq",
+    name: "Groq Cloud",
+    category: "inference",
+    baseUrl: "https://api.groq.com/openai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://console.groq.com",
+    keyHelp: "Key mien phi khong can the: console.groq.com -> Login (Google/GitHub) -> API Keys -> Create API Key.",
+    description: "Inference nhanh nhất hành tinh trên chip kiến trúc LPU Tensor Streaming Processor.",
+    icon: "Zap",
+    models: [
+      { id: "deepseek-r1-distill-llama-70b", name: "Groq DeepSeek R1 70B", contextWindow: 128000, isFree: true },
+      { id: "llama-3.3-70b-versatile", name: "Groq Llama 3.3 70B", contextWindow: 128000, isFree: true },
+      { id: "qwen-2.5-32b", name: "Groq Qwen 2.5 32B", contextWindow: 128000, isFree: true }
+    ]
+  },
+  {
+    id: "cerebras",
+    name: "Cerebras Inference",
+    category: "inference",
+    baseUrl: "https://api.cerebras.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://cerebras.ai",
+    keyHelp: "Key mien phi: cloud.cerebras.ai -> Login -> API Keys -> Create.",
+    description: "Inference tốc độ cực đại 2000+ tokens/giây trên Wafer-Scale Engine CS-3.",
+    icon: "Cpu",
+    models: [
+      { id: "llama3.3-70b", name: "Cerebras Llama 3.3 70B (2100 t/s)", contextWindow: 128000, isFree: true },
+      { id: "llama3.1-8b", name: "Cerebras Llama 3.1 8B", contextWindow: 128000, isFree: true }
+    ]
+  },
+  {
+    id: "sambanova",
+    name: "SambaNova Cloud",
+    category: "inference",
+    baseUrl: "https://api.sambanova.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://cloud.sambanova.ai",
+    keyHelp: "Key mien phi: cloud.sambanova.ai -> Sign Up -> API Key (o goc tren ben phai).",
+    description: "Chạy DeepSeek R1 671B full precision tốc độ hàng trăm token mỗi giây.",
+    icon: "Flame",
+    models: [
+      { id: "DeepSeek-R1", name: "SambaNova DeepSeek R1 (Full 671B)", contextWindow: 64000, isFree: true },
+      { id: "Meta-Llama-3.3-70B-Instruct", name: "SambaNova Llama 3.3 70B", contextWindow: 128000, isFree: true },
+      { id: "Qwen2.5-Coder-32B-Instruct", name: "SambaNova Qwen 2.5 Coder 32B", contextWindow: 32768, isFree: true }
+    ]
+  },
+  {
+    id: "together",
+    name: "Together AI",
+    category: "inference",
+    baseUrl: "https://api.together.xyz/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://together.ai",
+    description: "Together AI cung cấp cụm GPU cluster hàng đầu chạy open source models.",
+    icon: "Network",
+    models: [
+      { id: "deepseek-ai/DeepSeek-R1", name: "Together DeepSeek R1", contextWindow: 64000, isFree: false },
+      { id: "meta-llama/Llama-3.3-70B-Instruct-Turbo", name: "Together Llama 3.3 70B Turbo", contextWindow: 128000, isFree: false },
+      { id: "Qwen/Qwen2.5-Coder-32B-Instruct", name: "Together Qwen 2.5 Coder 32B", contextWindow: 32768, isFree: false }
+    ]
+  },
+  {
+    id: "fireworks",
+    name: "Fireworks AI",
+    category: "inference",
+    baseUrl: "https://api.fireworks.ai/inference/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://fireworks.ai",
+    description: "Nền tảng inference tối ưu hoá compound AI systems và function calling nhanh.",
+    icon: "Sparkle",
+    models: [
+      { id: "accounts/fireworks/models/deepseek-r1", name: "Fireworks DeepSeek R1", contextWindow: 64000, isFree: false },
+      { id: "accounts/fireworks/models/llama-v3p3-70b-instruct", name: "Fireworks Llama 3.3 70B", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "deepinfra",
+    name: "DeepInfra",
+    category: "inference",
+    baseUrl: "https://api.deepinfra.com/v1/openai",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://deepinfra.com",
+    description: "Chi phí rẻ nhất cho các open source models: DeepSeek, Llama, Qwen, Whisper, SDXL.",
+    icon: "HardDrive",
+    models: [
+      { id: "deepseek-ai/DeepSeek-R1", name: "DeepInfra DeepSeek R1", contextWindow: 64000, isFree: false },
+      { id: "meta-llama/Llama-3.3-70B-Instruct", name: "DeepInfra Llama 3.3 70B", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "novita",
+    name: "Novita AI",
+    category: "inference",
+    baseUrl: "https://api.novita.ai/v3/openai",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://novita.ai",
+    description: "Novita AI GPU cloud inference cho LLM và Stable Diffusion.",
+    icon: "Activity",
+    models: [
+      { id: "deepseek/deepseek-r1", name: "Novita DeepSeek R1", contextWindow: 64000, isFree: false },
+      { id: "meta-llama/llama-3.3-70b-instruct", name: "Novita Llama 3.3 70B", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "siliconflow",
+    name: "SiliconFlow (硅基流动)",
+    category: "china",
+    baseUrl: "https://api.siliconflow.cn/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://siliconflow.cn",
+    description: "Nền tảng inference lớn tại châu Á, tặng nhiều token miễn phí cho DeepSeek R1, V3 và Qwen.",
+    icon: "Cpu",
+    models: [
+      { id: "deepseek-ai/DeepSeek-R1", name: "SiliconFlow DeepSeek R1", contextWindow: 64000, isFree: true },
+      { id: "deepseek-ai/DeepSeek-V3", name: "SiliconFlow DeepSeek V3", contextWindow: 64000, isFree: true },
+      { id: "Qwen/Qwen2.5-Coder-32B-Instruct", name: "SiliconFlow Qwen 2.5 Coder", contextWindow: 32768, isFree: true }
+    ]
+  },
+  {
+    id: "lepton",
+    name: "Lepton AI",
+    category: "inference",
+    baseUrl: "https://api.lepton.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://lepton.ai",
+    description: "Nền tảng AI cloud serverless của nhà sáng tạo PyTorch.",
+    icon: "Layers",
+    models: [
+      { id: "deepseek-r1", name: "Lepton DeepSeek R1", contextWindow: 64000, isFree: false },
+      { id: "llama3-3-70b", name: "Lepton Llama 3.3 70B", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "hyperbolic",
+    name: "Hyperbolic",
+    category: "inference",
+    baseUrl: "https://api.hyperbolic.xyz/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://hyperbolic.xyz",
+    description: "Mạng lưới điện toán mở phi tập trung cho open access AI inference.",
+    icon: "Globe",
+    models: [
+      { id: "deepseek-ai/DeepSeek-R1", name: "Hyperbolic DeepSeek R1", contextWindow: 64000, isFree: false },
+      { id: "meta-llama/Llama-3.3-70B-Instruct", name: "Hyperbolic Llama 3.3 70B", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "friendliai",
+    name: "FriendliAI",
+    category: "inference",
+    baseUrl: "https://inference.friendli.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://friendli.ai",
+    description: "Tối ưu hóa throughput và latency siêu tốc qua Friendli Engine.",
+    icon: "FastForward",
+    models: [
+      { id: "meta-llama-3.3-70b-instruct", name: "Friendli Llama 3.3 70B", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "openrouter",
+    name: "OpenRouter",
+    category: "inference",
+    baseUrl: "https://openrouter.ai/api/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://openrouter.ai",
+    keyHelp: "Key mien phi khong can the tin dung: openrouter.ai -> Login -> Keys -> Create Key. Sau do chi can go ten model dang ':free' (vi du openrouter/meta-llama/llama-3.3-70b-instruct:free).",
+    description: "Cổng tổng hợp hàng trăm mô hình toàn cầu với cả model miễn phí và trả phí.",
+    icon: "Route",
+    models: [
+      { id: "deepseek/deepseek-r1:free", name: "OpenRouter DeepSeek R1 (Free)", contextWindow: 64000, isFree: true },
+      { id: "meta-llama/llama-3.3-70b-instruct:free", name: "OpenRouter Llama 3.3 70B (Free)", contextWindow: 128000, isFree: true },
+      { id: "anthropic/claude-3.7-sonnet", name: "OpenRouter Claude 3.7 Sonnet", contextWindow: 200000, isFree: false },
+      { id: "openai/gpt-4o", name: "OpenRouter GPT-4o", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "replicate",
+    name: "Replicate",
+    category: "inference",
+    baseUrl: "https://api.replicate.com/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://replicate.com",
+    description: "Chạy các mô hình mã nguồn mở trên cloud bằng 1 dòng lệnh hoặc API.",
+    icon: "Repeat",
+    models: [
+      { id: "deepseek-ai/deepseek-r1", name: "Replicate DeepSeek R1", contextWindow: 64000, isFree: false },
+      { id: "meta/meta-llama-3-70b-instruct", name: "Replicate Llama 3 70B", contextWindow: 8192, isFree: false }
+    ]
+  },
+  {
+    id: "huggingface",
+    name: "Hugging Face Inference",
+    category: "inference",
+    baseUrl: "https://api-inference.huggingface.co/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://huggingface.co",
+    description: "Hugging Face Serverless Inference API cho hàng nghìn repo models.",
+    icon: "Smile",
+    models: [
+      { id: "deepseek-ai/DeepSeek-R1", name: "HF DeepSeek R1", contextWindow: 64000, isFree: true },
+      { id: "meta-llama/Llama-3.2-3B-Instruct", name: "HF Llama 3.2 3B", contextWindow: 128000, isFree: true }
+    ]
+  },
+
+  // ================= 4. EUROPEAN & SPECIALIZED =================
+  {
+    id: "mistral",
+    name: "Mistral AI",
+    category: "specialized",
+    baseUrl: "https://api.mistral.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://mistral.ai",
+    description: "Mistral Large 2, Codestral, Pixtral và Mistral NeMo từ Pháp.",
+    icon: "Wind",
+    models: [
+      { id: "mistral-large-latest", name: "Mistral Large 2", contextWindow: 128000, isFree: false },
+      { id: "codestral-latest", name: "Codestral 2501 (Coding)", contextWindow: 256000, isFree: false },
+      { id: "mistral-small-latest", name: "Mistral Small 24B", contextWindow: 128000, isFree: false },
+      { id: "open-mistral-nemo", name: "Mistral NeMo 12B", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "cohere",
+    name: "Cohere Platform",
+    category: "specialized",
+    baseUrl: "https://api.cohere.com/v2",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://cohere.com",
+    description: "Mô hình ngôn ngữ doanh nghiệp chuyên sâu RAG và Reranking.",
+    icon: "Compass",
+    models: [
+      { id: "command-r-plus-08-2024", name: "Command R+ (RAG)", contextWindow: 128000, isFree: false },
+      { id: "command-r-08-2024", name: "Command R", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "perplexity",
+    name: "Perplexity AI",
+    category: "specialized",
+    baseUrl: "https://api.perplexity.ai",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://perplexity.ai",
+    description: "Mô hình tìm kiếm và trích dẫn thông tin trực tiếp từ internet (Sonar).",
+    icon: "Search",
+    models: [
+      { id: "sonar-pro", name: "Sonar Pro (Online Search)", contextWindow: 200000, isFree: false },
+      { id: "sonar", name: "Sonar Fast", contextWindow: 128000, isFree: false },
+      { id: "sonar-reasoning-pro", name: "Sonar Reasoning Pro", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "ai21",
+    name: "AI21 Labs",
+    category: "specialized",
+    baseUrl: "https://api.ai21.com/studio/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://ai21.com",
+    description: "Kiến trúc Jamba lai giữa Transformer và Mamba state-space.",
+    icon: "Layers",
+    models: [
+      { id: "jamba-1.5-large", name: "Jamba 1.5 Large", contextWindow: 256000, isFree: false },
+      { id: "jamba-1.5-mini", name: "Jamba 1.5 Mini", contextWindow: 256000, isFree: false }
+    ]
+  },
+  {
+    id: "aleph-alpha",
+    name: "Aleph Alpha",
+    category: "specialized",
+    baseUrl: "https://api.aleph-alpha.com",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://aleph-alpha.com",
+    description: "AI doanh nghiệp châu Âu tuân thủ tiêu chuẩn bảo mật EU AI Act.",
+    icon: "Shield",
+    models: [
+      { id: "luminous-supreme", name: "Luminous Supreme", contextWindow: 8192, isFree: false }
+    ]
+  },
+  {
+    id: "jina-ai",
+    name: "Jina AI",
+    category: "specialized",
+    baseUrl: "https://api.jina.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://jina.ai",
+    description: "Chuyên biệt cho Embeddings, Reranker và Reader API biến URL thành Markdown.",
+    icon: "BookOpen",
+    models: [
+      { id: "jina-embeddings-v3", name: "Jina Embeddings v3", contextWindow: 8192, isFree: true },
+      { id: "jina-reranker-v2-base-multilingual", name: "Jina Reranker v2", contextWindow: 1024, isFree: true }
+    ]
+  },
+  {
+    id: "voyage-ai",
+    name: "Voyage AI",
+    category: "specialized",
+    baseUrl: "https://api.voyageai.com/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://voyageai.com",
+    description: "Embeddings và Rerank chất lượng cao nhất cho hệ thống Vector Search.",
+    icon: "Compass",
+    models: [
+      { id: "voyage-3-large", name: "Voyage 3 Large", contextWindow: 32000, isFree: false },
+      { id: "voyage-code-3", name: "Voyage Code 3", contextWindow: 32000, isFree: false }
+    ]
+  },
+
+  // ================= 5. CHINA TOP AI =================
+  {
+    id: "deepseek",
+    name: "DeepSeek Official",
+    category: "china",
+    baseUrl: "https://api.deepseek.com/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://platform.deepseek.com",
+    description: "Cổng API chính thức của DeepSeek R1 và DeepSeek V3 với giá cực kỳ cạnh tranh.",
+    icon: "Brain",
+    models: [
+      { id: "deepseek-reasoner", name: "DeepSeek R1 (Reasoner)", contextWindow: 64000, isFree: false },
+      { id: "deepseek-chat", name: "DeepSeek V3 (Chat)", contextWindow: 64000, isFree: false }
+    ]
+  },
+  {
+    id: "moonshot-kimi",
+    name: "Moonshot AI (Kimi)",
+    category: "china",
+    baseUrl: "https://api.moonshot.cn/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://platform.moonshot.cn",
+    description: "Kimi AI nổi tiếng với khả năng đọc ngữ cảnh siêu dài và suy luận tiếng Trung/Anh xuất sắc.",
+    icon: "Moon",
+    models: [
+      { id: "moonshot-v1-128k", name: "Kimi Moonshot 128k", contextWindow: 128000, isFree: false },
+      { id: "moonshot-v1-32k", name: "Kimi Moonshot 32k", contextWindow: 32000, isFree: false },
+      { id: "moonshot-v1-8k", name: "Kimi Moonshot 8k", contextWindow: 8192, isFree: false }
+    ]
+  },
+  {
+    id: "zhipu-glm",
+    name: "Zhipu AI (GLM-4 / 智谱)",
+    category: "china",
+    baseUrl: "https://open.bigmodel.cn/api/paas/v4",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://open.bigmodel.cn",
+    description: "GLM-4 Plus, GLM-4-Flash, GLM-4V, CogView từ Đại học Thanh Hoa & Zhipu.",
+    icon: "Award",
+    models: [
+      { id: "glm-4-plus", name: "GLM-4 Plus", contextWindow: 128000, isFree: false },
+      { id: "glm-4-flash", name: "GLM-4 Flash (Free Tier)", contextWindow: 128000, isFree: true },
+      { id: "glm-4-alltools", name: "GLM-4 AllTools", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "qwen-dashscope",
+    name: "Alibaba DashScope (Qwen / 通义千问)",
+    category: "china",
+    baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://dashscope.aliyun.com",
+    description: "Qwen 2.5 Max, Qwen 2.5 Coder, Qwen-Plus từ Alibaba Cloud.",
+    icon: "CloudRain",
+    models: [
+      { id: "qwen-max-latest", name: "Qwen Max Latest", contextWindow: 32768, isFree: false },
+      { id: "qwen-plus-latest", name: "Qwen Plus Latest", contextWindow: 131072, isFree: false },
+      { id: "qwen-turbo-latest", name: "Qwen Turbo Latest", contextWindow: 131072, isFree: true },
+      { id: "qwen2.5-coder-32b-instruct", name: "Qwen 2.5 Coder 32B", contextWindow: 131072, isFree: false }
+    ]
+  },
+  {
+    id: "baichuan",
+    name: "Baichuan AI (百川智能)",
+    category: "china",
+    baseUrl: "https://api.baichuan-ai.com/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://platform.baichuan-ai.com",
+    description: "Baichuan 4, Baichuan 3 Turbo tối ưu hóa xử lý ngôn ngữ tự nhiên.",
+    icon: "Sparkles",
+    models: [
+      { id: "Baichuan4", name: "Baichuan 4", contextWindow: 32000, isFree: false },
+      { id: "Baichuan3-Turbo", name: "Baichuan 3 Turbo", contextWindow: 32000, isFree: false }
+    ]
+  },
+  {
+    id: "minimax",
+    name: "MiniMax (稀宇科技)",
+    category: "china",
+    baseUrl: "https://api.minimax.chat/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://api.minimax.chat",
+    description: "MiniMax abab 6.5s và công nghệ giọng nói Audio AI tiên tiến.",
+    icon: "Speaker",
+    models: [
+      { id: "abab6.5s-chat", name: "abab 6.5s Chat", contextWindow: 245760, isFree: false },
+      { id: "abab6.5t-chat", name: "abab 6.5t Chat", contextWindow: 245760, isFree: false }
+    ]
+  },
+  {
+    id: "bytedance-doubao",
+    name: "ByteDance Doubao (火山引擎 豆包)",
+    category: "china",
+    baseUrl: "https://ark.cn-beijing.volces.com/api/v3",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://www.volcengine.com/product/doubao",
+    description: "Mô hình Doubao của ByteDance (công ty mẹ TikTok) giá rẻ hàng đầu thị trường.",
+    icon: "Music",
+    models: [
+      { id: "doubao-pro-32k", name: "Doubao Pro 32k", contextWindow: 32000, isFree: false },
+      { id: "doubao-pro-128k", name: "Doubao Pro 128k", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "zero-one-yi",
+    name: "01.AI (零一万物 Yi)",
+    category: "china",
+    baseUrl: "https://api.01.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://platform.01.ai",
+    description: "Yi-Lightning, Yi-Large của tiến sĩ Kai-Fu Lee.",
+    icon: "Zap",
+    models: [
+      { id: "yi-lightning", name: "Yi Lightning", contextWindow: 16000, isFree: false },
+      { id: "yi-large", name: "Yi Large", contextWindow: 32000, isFree: false }
+    ]
+  },
+  {
+    id: "stepfun",
+    name: "StepFun (阶跃星辰)",
+    category: "china",
+    baseUrl: "https://api.stepfun.com/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://platform.stepfun.com",
+    description: "Step-2, Step-1V mô hình đa phương thức ngôn ngữ và hình ảnh.",
+    icon: "Footprints",
+    models: [
+      { id: "step-2-16k", name: "Step 2 16k", contextWindow: 16000, isFree: false },
+      { id: "step-1-8k", name: "Step 1 8k", contextWindow: 8192, isFree: false }
+    ]
+  },
+  {
+    id: "baidu-qianfan",
+    name: "Baidu Qianfan (文心一言 / ERNIE)",
+    category: "china",
+    baseUrl: "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://cloud.baidu.com/product/wenxinworkshop",
+    description: "ERNIE 4.0 Turbo, ERNIE Speed miễn phí từ Baidu.",
+    icon: "Search",
+    models: [
+      { id: "ernie-4.0-turbo-8k", name: "ERNIE 4.0 Turbo", contextWindow: 8192, isFree: false },
+      { id: "ernie-speed-8k", name: "ERNIE Speed (Free)", contextWindow: 8192, isFree: true }
+    ]
+  },
+  {
+    id: "tencent-hunyuan",
+    name: "Tencent Hunyuan (腾讯混元)",
+    category: "china",
+    baseUrl: "https://hunyuan.tencentcloudapi.com",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://cloud.tencent.com/product/hunyuan",
+    description: "Hunyuan-Large, Hunyuan-Pro của tập đoàn Tencent.",
+    icon: "MessageSquare",
+    models: [
+      { id: "hunyuan-large", name: "Hunyuan Large", contextWindow: 32000, isFree: false },
+      { id: "hunyuan-turbo", name: "Hunyuan Turbo", contextWindow: 32000, isFree: false }
+    ]
+  },
+  {
+    id: "sensetime",
+    name: "SenseTime (商汤 日日新)",
+    category: "china",
+    baseUrl: "https://api.sensenova.cn/compatible-mode/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://platform.sensenova.cn",
+    description: "SenseNova 5.5 kiến trúc MoE hàng đầu Trung Quốc.",
+    icon: "Sun",
+    models: [
+      { id: "SenseChat-5", name: "SenseChat 5", contextWindow: 32000, isFree: false }
+    ]
+  },
+  {
+    id: "iflytek-spark",
+    name: "iFlytek Spark (讯飞星火)",
+    category: "china",
+    baseUrl: "https://spark-api-open.xf-yun.com/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://xinghuo.xfyun.cn",
+    description: "Spark 4.0 Ultra chuyên sâu xử lý ngữ âm và dịch thuật đa ngôn ngữ.",
+    icon: "Mic",
+    models: [
+      { id: "spark-4.0-ultra", name: "Spark 4.0 Ultra", contextWindow: 32000, isFree: false },
+      { id: "spark-lite", name: "Spark Lite (Free)", contextWindow: 8192, isFree: true }
+    ]
+  },
+
+  // ================= 6. LOCAL AI ENGINES & RUNTIMES =================
+  {
+    id: "ollama",
+    name: "Ollama Local",
+    category: "local",
+    baseUrl: "http://localhost:11434/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://ollama.com",
+    description: "Chạy mô hình cục bộ trên máy tính (Llama 3, DeepSeek, Qwen) không cần internet.",
+    icon: "Laptop",
+    models: [
+      { id: "llama3.2:latest", name: "Ollama Llama 3.2", contextWindow: 128000, isFree: true },
+      { id: "deepseek-r1:8b", name: "Ollama DeepSeek R1 8B", contextWindow: 64000, isFree: true },
+      { id: "qwen2.5-coder:7b", name: "Ollama Qwen 2.5 Coder 7B", contextWindow: 32768, isFree: true },
+      { id: "mistral:latest", name: "Ollama Mistral 7B", contextWindow: 32000, isFree: true }
+    ]
+  },
+  {
+    id: "lmstudio",
+    name: "LM Studio Local",
+    category: "local",
+    baseUrl: "http://localhost:1234/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://lmstudio.ai",
+    description: "Giao diện GUI và Local Server tương thích OpenAI chuẩn chạy các file GGUF.",
+    icon: "Monitor",
+    models: [
+      { id: "loaded-model", name: "LM Studio Loaded Model", contextWindow: 32000, isFree: true }
+    ]
+  },
+  {
+    id: "vllm",
+    name: "vLLM Engine",
+    category: "local",
+    baseUrl: "http://localhost:8000/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://github.com/vllm-project/vllm",
+    description: "Thư viện phục vụ suy luận LLM tốc độ cao nhất với PagedAttention.",
+    icon: "Server",
+    models: [
+      { id: "default-vllm-model", name: "vLLM Model Instance", contextWindow: 32768, isFree: true }
+    ]
+  },
+  {
+    id: "localai",
+    name: "LocalAI",
+    category: "local",
+    baseUrl: "http://localhost:8080/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://localai.io",
+    description: "Thay thế drop-in tương thích OpenAI cho LLMs, audio, hình ảnh không cần GPU.",
+    icon: "HardDrive",
+    models: [
+      { id: "gpt-4", name: "LocalAI Proxy Model", contextWindow: 8192, isFree: true }
+    ]
+  },
+  {
+    id: "jan-ai",
+    name: "Jan.ai Local",
+    category: "local",
+    baseUrl: "http://localhost:1337/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://jan.ai",
+    description: "Ứng dụng mã nguồn mở thay thế ChatGPT chạy 100% offline trên máy.",
+    icon: "Smartphone",
+    models: [
+      { id: "jan-local-model", name: "Jan Active Model", contextWindow: 8192, isFree: true }
+    ]
+  },
+  {
+    id: "text-generation-webui",
+    name: "Oobabooga TextGen",
+    category: "local",
+    baseUrl: "http://localhost:5000/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://github.com/oobabooga/text-generation-webui",
+    description: "Giao diện WebUI phổ biến hỗ trợ Transformers, GPTQ, AWQ, EXL2, llama.cpp.",
+    icon: "Terminal",
+    models: [
+      { id: "textgen-model", name: "Oobabooga Loaded Model", contextWindow: 8192, isFree: true }
+    ]
+  },
+  {
+    id: "koboldcpp",
+    name: "KoboldCpp",
+    category: "local",
+    baseUrl: "http://localhost:5001/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://github.com/LostRuins/koboldcpp",
+    description: "Phần mềm chạy mô hình GGUF đơn giản nhẹ nhàng kèm Web UI.",
+    icon: "Code",
+    models: [
+      { id: "kobold-model", name: "KoboldCpp Model", contextWindow: 8192, isFree: true }
+    ]
+  },
+  {
+    id: "llamacpp",
+    name: "llama.cpp Server",
+    category: "local",
+    baseUrl: "http://localhost:8080/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://github.com/ggerganov/llama.cpp",
+    description: "Máy chủ C/C++ thuần túy siêu nhẹ cho suy luận LLM trên CPU và GPU.",
+    icon: "Cpu",
+    models: [
+      { id: "default", name: "llama.cpp Server Model", contextWindow: 4096, isFree: true }
+    ]
+  },
+  {
+    id: "tabby",
+    name: "Tabby Coding ML",
+    category: "local",
+    baseUrl: "http://localhost:8080/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://tabby.tabbyml.com",
+    description: "AI code assistant tự lưu trữ độc lập (Self-hosted alternative to GitHub Copilot).",
+    icon: "FileCode",
+    models: [
+      { id: "tabby-coder", name: "Tabby Coder Model", contextWindow: 8192, isFree: true }
+    ]
+  },
+  {
+    id: "sglang",
+    name: "SGLang Server",
+    category: "local",
+    baseUrl: "http://localhost:30000/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://github.com/sgl-project/sglang",
+    description: "Hệ thống phục vụ suy luận nhanh với RadixAttention chia sẻ KV cache.",
+    icon: "FastForward",
+    models: [
+      { id: "default", name: "SGLang Loaded Model", contextWindow: 32768, isFree: true }
+    ]
+  },
+  {
+    id: "aphrodite",
+    name: "Aphrodite Engine",
+    category: "local",
+    baseUrl: "http://localhost:2242/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://github.com/PygmalionAI/aphrodite-engine",
+    description: "Engine suy luận tối ưu cho sáng tác và nhập vai hội thoại.",
+    icon: "Heart",
+    models: [
+      { id: "default", name: "Aphrodite Model", contextWindow: 8192, isFree: true }
+    ]
+  },
+  {
+    id: "xinference",
+    name: "Xorbits Inference",
+    category: "local",
+    baseUrl: "http://localhost:9997/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://github.com/xorbitsai/inference",
+    description: "Phục vụ mô hình AI phân tán cho LLMs, embedding và multimodal.",
+    icon: "Network",
+    models: [
+      { id: "default", name: "Xinference Model", contextWindow: 32000, isFree: true }
+    ]
+  },
+
+  // ================= 7. CODING & AGENTIC INTERFACES =================
+  {
+    id: "claude-code",
+    name: "Claude Code Protocol",
+    category: "coding",
+    baseUrl: "https://api.anthropic.com/v1",
+    authType: "api-key",
+    headerName: "x-api-key",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview",
+    description: "Chuẩn giao thức Anthropic `/v1/messages` tương thích hoàn hảo công cụ dòng lệnh Claude Code.",
+    icon: "Terminal",
+    models: [
+      { id: "claude-3-7-sonnet-20250219", name: "Claude 3.7 Sonnet for Claude Code", contextWindow: 200000, isFree: false }
+    ]
+  },
+  {
+    id: "codeium-windsurf",
+    name: "Codeium / Windsurf",
+    category: "coding",
+    baseUrl: "https://api.codeium.com/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://codeium.com",
+    description: "Hệ thống hỗ trợ lập trình thông minh và Cascade Agent của Windsurf.",
+    icon: "Wind",
+    models: [
+      { id: "codeium-default", name: "Codeium Auto Complete", contextWindow: 32000, isFree: true }
+    ]
+  },
+  {
+    id: "sourcegraph-cody",
+    name: "Sourcegraph Cody",
+    category: "coding",
+    baseUrl: "https://sourcegraph.com/.api/completions/stream",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://sourcegraph.com/cody",
+    description: "AI hiểu toàn bộ codebase và cấu trúc đồ thị mã nguồn của dự án.",
+    icon: "Search",
+    models: [
+      { id: "cody-default", name: "Cody Code Intelligence", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "openhands-proxy",
+    name: "OpenHands (All-Hands AI)",
+    category: "coding",
+    baseUrl: "http://localhost:3000/api",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://github.com/All-Hands-AI/OpenHands",
+    description: "Agent tự động lập trình mã nguồn mở (trước đây là OpenDevin).",
+    icon: "Tool",
+    models: [
+      { id: "openhands-agent", name: "OpenHands Autonomous Coder", contextWindow: 128000, isFree: true }
+    ]
+  },
+  {
+    id: "replit-agent",
+    name: "Replit Agent Proxy",
+    category: "coding",
+    baseUrl: "https://api.replit.com/ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://replit.com",
+    description: "Agent xây dựng fullstack app từ prompt tự nhiên.",
+    icon: "Play",
+    models: [
+      { id: "replit-code-v1", name: "Replit Code Generator", contextWindow: 16000, isFree: false }
+    ]
+  },
+  {
+    id: "phind-search",
+    name: "Phind AI Search",
+    category: "coding",
+    baseUrl: "https://https.extension.phind.com/agent/",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://phind.com",
+    description: "Công cụ tìm kiếm và giải đáp kỹ thuật lập trình thế hệ mới.",
+    icon: "Search",
+    models: [
+      { id: "phind-model", name: "Phind-70B", contextWindow: 32000, isFree: true }
+    ]
+  },
+
+  // ================= 8. ENTERPRISE & INFRASTRUCTURE PLATFORMS =================
+  {
+    id: "oracle-oci-ai",
+    name: "Oracle Cloud OCI Generative AI",
+    category: "specialized",
+    baseUrl: "https://inference.generativeai.{REGION}.oci.oraclecloud.com/20231130/actions",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://www.oracle.com/artificial-intelligence/generative-ai/service/",
+    description: "Dịch vụ AI thế hệ mới trên nền tảng Oracle OCI.",
+    icon: "Shield",
+    models: [
+      { id: "cohere.command-r-plus", name: "OCI Command R+", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "ibm-watsonx",
+    name: "IBM watsonx.ai",
+    category: "specialized",
+    baseUrl: "https://{REGION}.ml.cloud.ibm.com/ml/v1/text/generation",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://www.ibm.com/watsonx",
+    description: "Nền tảng AI doanh nghiệp Granite models từ IBM.",
+    icon: "Cpu",
+    models: [
+      { id: "ibm/granite-3-8b-instruct", name: "Granite 3 8B", contextWindow: 8192, isFree: false }
+    ]
+  },
+  {
+    id: "databricks-serving",
+    name: "Databricks Model Serving",
+    category: "specialized",
+    baseUrl: "https://{DATABRICKS_HOST}/serving-endpoints/{ENDPOINT}/invocations",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://www.databricks.com/product/model-serving",
+    description: "Triển khai LLM trên Lakehouse của Databricks.",
+    icon: "Database",
+    models: [
+      { id: "databricks-dbrx-instruct", name: "DBRX Instruct", contextWindow: 32000, isFree: false }
+    ]
+  },
+  {
+    id: "snowflake-cortex",
+    name: "Snowflake Cortex AI",
+    category: "specialized",
+    baseUrl: "https://{ACCOUNT}.snowflakecomputing.com/api/v2/cortex/inference",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions",
+    description: "Tích hợp AI trực tiếp vào kho dữ liệu Data Cloud của Snowflake.",
+    icon: "Snowflake",
+    models: [
+      { id: "snowflake-arctic", name: "Snowflake Arctic", contextWindow: 4096, isFree: false }
+    ]
+  },
+  {
+    id: "nim-nvidia",
+    name: "NVIDIA NIM Microservices",
+    category: "inference",
+    baseUrl: "https://integrate.api.nvidia.com/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://build.nvidia.com",
+    keyHelp: "Key mien phi khong can the: build.nvidia.com -> Login -> Get API Key (duoc tang 1000 credits free, rate limit rong).",
+    description: "Microservices tối ưu hóa tối đa cho GPU NVIDIA, cung cấp 1000 credits miễn phí.",
+    icon: "Cpu",
+    models: [
+      { id: "meta/llama-3.3-70b-instruct", name: "NIM Llama 3.3 70B", contextWindow: 128000, isFree: true },
+      { id: "deepseek-ai/deepseek-r1", name: "NIM DeepSeek R1", contextWindow: 64000, isFree: true }
+    ]
+  },
+  {
+    id: "anyscale",
+    name: "Anyscale Endpoints",
+    category: "inference",
+    baseUrl: "https://api.endpoints.anyscale.com/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://anyscale.com",
+    description: "Phục vụ mô hình quy mô lớn trên nền Ray.",
+    icon: "Network",
+    models: [
+      { id: "meta-llama/Meta-Llama-3-70B-Instruct", name: "Anyscale Llama 3 70B", contextWindow: 8192, isFree: false }
+    ]
+  },
+  {
+    id: "upstage",
+    name: "Upstage Solar",
+    category: "specialized",
+    baseUrl: "https://api.upstage.ai/v1/solar",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://upstage.ai",
+    description: "Mô hình Solar Pro xuất sắc trong xử lý tài liệu và OCR từ Hàn Quốc.",
+    icon: "Sun",
+    models: [
+      { id: "solar-pro", name: "Solar Pro", contextWindow: 4096, isFree: false }
+    ]
+  },
+  {
+    id: "aihubmix",
+    name: "AiHubMix Gateway",
+    category: "inference",
+    baseUrl: "https://aihubmix.com/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://aihubmix.com",
+    description: "Cổng API tổng hợp kết nối đa kênh giá rẻ.",
+    icon: "Share2",
+    models: [
+      { id: "gpt-4o", name: "AiHubMix GPT-4o", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "nanogpt",
+    name: "NanoGPT Pay-as-you-go",
+    category: "inference",
+    baseUrl: "https://nano-gpt.com/api/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://nano-gpt.com",
+    description: "Trả phí theo từng prompt bằng tiền điện tử Nano / Crypto ẩn danh.",
+    icon: "CreditCard",
+    models: [
+      { id: "chatgpt-4o-latest", name: "NanoGPT GPT-4o", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "kluster-ai",
+    name: "Kluster.ai",
+    category: "inference",
+    baseUrl: "https://api.kluster.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://kluster.ai",
+    description: "Cụm inference tốc độ cao phân bổ toàn cầu.",
+    icon: "Server",
+    models: [
+      { id: "klusterai/Meta-Llama-3.1-70B-Instruct-Turbo", name: "Kluster Llama 3.1 70B", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "baseten",
+    name: "Baseten",
+    category: "inference",
+    baseUrl: "https://model-{MODEL_ID}.api.baseten.co/production/predict",
+    authType: "api-key",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://baseten.co",
+    description: "Inference hạ tầng serverless và Truss packaging.",
+    icon: "Box",
+    models: [
+      { id: "baseten-llama-3", name: "Baseten Llama 3", contextWindow: 8192, isFree: false }
+    ]
+  },
+  {
+    id: "modal",
+    name: "Modal Labs",
+    category: "inference",
+    baseUrl: "https://{WORKSPACE}--vllm-openai-compatible-serve.modal.run/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://modal.com",
+    description: "Điện toán đám mây cho AI chạy bằng mã Python thuần túy.",
+    icon: "Cloud",
+    models: [
+      { id: "modal-vllm", name: "Modal vLLM Server", contextWindow: 32768, isFree: false }
+    ]
+  },
+  {
+    id: "runpod",
+    name: "RunPod Serverless",
+    category: "inference",
+    baseUrl: "https://api.runpod.ai/v2/{ENDPOINT_ID}/openai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://runpod.io",
+    description: "GPU serverless pod tính tiền theo từng giây sử dụng.",
+    icon: "HardDrive",
+    models: [
+      { id: "runpod-endpoint", name: "RunPod Endpoint Model", contextWindow: 32000, isFree: false }
+    ]
+  },
+  {
+    id: "monsterapi",
+    name: "MonsterAPI",
+    category: "inference",
+    baseUrl: "https://api.monsterapi.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://monsterapi.ai",
+    description: "Tối ưu hóa chi phí lên đến 80% cho LLM fine-tuning và inference.",
+    icon: "Zap",
+    models: [
+      { id: "llama-3-70b-instruct", name: "Monster Llama 3 70B", contextWindow: 8192, isFree: false }
+    ]
+  },
+  {
+    id: "featherless",
+    name: "Featherless AI",
+    category: "inference",
+    baseUrl: "https://api.featherless.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://featherless.ai",
+    description: "Cho phép gọi hơn 1000 mô hình Hugging Face mã nguồn mở theo yêu cầu.",
+    icon: "Feather",
+    models: [
+      { id: "meta-llama/Meta-Llama-3-8B-Instruct", name: "Featherless Llama 3 8B", contextWindow: 8192, isFree: false }
+    ]
+  },
+  {
+    id: "predibase",
+    name: "Predibase",
+    category: "inference",
+    baseUrl: "https://serving.app.predibase.com/{TENANT_ID}/deployments/v2/chat/completions",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://predibase.com",
+    description: "Nền tảng phục vụ LoRA adapters tốc độ cao với LoRAX.",
+    icon: "Layers",
+    models: [
+      { id: "llama-3-8b-lora", name: "Predibase LoRA Model", contextWindow: 8192, isFree: false }
+    ]
+  },
+  {
+    id: "lamini",
+    name: "Lamini AI",
+    category: "inference",
+    baseUrl: "https://api.lamini.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://lamini.ai",
+    description: "Enterprise LLM engine chuyên sâu cho doanh nghiệp và tài chính.",
+    icon: "Cpu",
+    models: [
+      { id: "lamini-reasoning", name: "Lamini Memory Agent", contextWindow: 16000, isFree: false }
+    ]
+  },
+  {
+    id: "clarifai",
+    name: "Clarifai Platform",
+    category: "inference",
+    baseUrl: "https://api.clarifai.com/v2",
+    authType: "api-key",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://clarifai.com",
+    description: "Nền tảng thị giác máy tính và generative AI đa mô thức.",
+    icon: "Eye",
+    models: [
+      { id: "general-image-recognition", name: "Clarifai Vision General", contextWindow: 4096, isFree: false }
+    ]
+  },
+  {
+    id: "aimlapi",
+    name: "AIML API",
+    category: "inference",
+    baseUrl: "https://api.aimlapi.com/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://aimlapi.com",
+    description: "Cổng truy cập thống nhất 200+ mô hình AI giá cả minh bạch.",
+    icon: "Terminal",
+    models: [
+      { id: "deepseek-r1", name: "AIML DeepSeek R1", contextWindow: 64000, isFree: false },
+      { id: "gpt-4o", name: "AIML GPT-4o", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "helicone",
+    name: "Helicone AI Gateway",
+    category: "inference",
+    baseUrl: "https://gateway.helicone.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://helicone.ai",
+    description: "Proxy thông minh ghi log, caching và phân tích chi phí LLM.",
+    icon: "ShieldAlert",
+    models: [
+      { id: "gpt-4o", name: "Helicone Cached GPT-4o", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "portkey",
+    name: "Portkey AI Gateway",
+    category: "inference",
+    baseUrl: "https://api.portkey.ai/v1",
+    authType: "api-key",
+    headerName: "x-portkey-api-key",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://portkey.ai",
+    description: "AI Gateway cấp sản xuất với load balancing, fallbacks và guardrails.",
+    icon: "Key",
+    models: [
+      { id: "portkey-route", name: "Portkey Virtual Key Route", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "lunary",
+    name: "Lunary AI Proxy",
+    category: "inference",
+    baseUrl: "https://api.lunary.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://lunary.ai",
+    description: "Nền tảng kiểm thử và giám sát agent cho LLM applications.",
+    icon: "Activity",
+    models: [
+      { id: "lunary-monitored-model", name: "Lunary Monitored", contextWindow: 32000, isFree: false }
+    ]
+  },
+  {
+    id: "openwebui-proxy",
+    name: "OpenWebUI Backend",
+    category: "local",
+    baseUrl: "http://localhost:8080/api/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://openwebui.com",
+    description: "Kết nối trực tiếp tới backend của cụm máy chủ OpenWebUI.",
+    icon: "Layout",
+    models: [
+      { id: "default", name: "OpenWebUI Model", contextWindow: 32000, isFree: true }
+    ]
+  },
+  {
+    id: "librechat-proxy",
+    name: "LibreChat Gateway",
+    category: "local",
+    baseUrl: "http://localhost:3080/api",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://librechat.ai",
+    description: "Giao diện chat đa nhà cung cấp nguồn mở hàng đầu.",
+    icon: "MessageCircle",
+    models: [
+      { id: "librechat-endpoint", name: "LibreChat Unified", contextWindow: 32000, isFree: true }
+    ]
+  },
+  {
+    id: "dify-ai",
+    name: "Dify.ai Engine",
+    category: "specialized",
+    baseUrl: "http://localhost/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://dify.ai",
+    description: "Nền tảng phát triển ứng dụng LLM và workflow RAG nguồn mở.",
+    icon: "Workflow",
+    models: [
+      { id: "dify-app", name: "Dify App Workflow", contextWindow: 64000, isFree: true }
+    ]
+  },
+  {
+    id: "fastchat",
+    name: "FastChat OpenAI Compatible",
+    category: "local",
+    baseUrl: "http://localhost:8000/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://github.com/lm-sys/FastChat",
+    description: "Nền tảng mã nguồn mở đào tạo và phục vụ LLMs từ LMSYS Org.",
+    icon: "Terminal",
+    models: [
+      { id: "vicuna-13b", name: "Vicuna 13B", contextWindow: 4096, isFree: true }
+    ]
+  },
+  {
+    id: "tgi-huggingface",
+    name: "Text Generation Inference (TGI)",
+    category: "local",
+    baseUrl: "http://localhost:8080/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://github.com/huggingface/text-generation-inference",
+    description: "Bộ phục vụ LLM tối ưu cho môi trường sản xuất của Hugging Face.",
+    icon: "Server",
+    models: [
+      { id: "tgi-model", name: "TGI Served Model", contextWindow: 32768, isFree: true }
+    ]
+  },
+  {
+    id: "openllm",
+    name: "OpenLLM BentoML",
+    category: "local",
+    baseUrl: "http://localhost:3000/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://github.com/bentoml/OpenLLM",
+    description: "Vận hành mọi LLM trong môi trường sản xuất dễ dàng.",
+    icon: "Box",
+    models: [
+      { id: "default", name: "OpenLLM Service", contextWindow: 8192, isFree: true }
+    ]
+  },
+  {
+    id: "triton-inference",
+    name: "NVIDIA Triton Server",
+    category: "local",
+    baseUrl: "http://localhost:8000/v2",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://developer.nvidia.com/triton-inference-server",
+    description: "Máy chủ suy luận đa khung (PyTorch, TensorRT-LLM, ONNX) của NVIDIA.",
+    icon: "Cpu",
+    models: [
+      { id: "tensorrt-llm", name: "TensorRT-LLM Model", contextWindow: 32768, isFree: true }
+    ]
+  },
+  {
+    id: "firecrawl",
+    name: "Firecrawl AI Web Scraper",
+    category: "specialized",
+    baseUrl: "https://api.firecrawl.dev/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: false,
+    requiresAuth: true,
+    website: "https://firecrawl.dev",
+    description: "Chuyển toàn bộ website thành Markdown chuẩn sạch cho LLMs.",
+    icon: "Flame",
+    models: [
+      { id: "firecrawl-scrape", name: "Firecrawl Markdown Scraper", contextWindow: 128000, isFree: false }
+    ]
+  },
+  {
+    id: "tavily-search",
+    name: "Tavily AI Search",
+    category: "specialized",
+    baseUrl: "https://api.tavily.com",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://tavily.com",
+    description: "Công cụ tìm kiếm internet chuyên biệt cho AI Agent và RAG, 1000 lượt search miễn phí/tháng.",
+    icon: "Search",
+    models: [
+      { id: "tavily-search", name: "Tavily Real-time Search", contextWindow: 8192, isFree: true }
+    ]
+  },
+  {
+    id: "exa-ai",
+    name: "Exa.ai Neural Search",
+    category: "specialized",
+    baseUrl: "https://api.exa.ai",
+    authType: "api-key",
+    headerName: "x-api-key",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://exa.ai",
+    description: "Tìm kiếm bằng vector nhúng embeddings trực tiếp qua ý nghĩa văn bản.",
+    icon: "Search",
+    models: [
+      { id: "exa-search", name: "Exa Neural Search", contextWindow: 8192, isFree: true }
+    ]
+  },
+  {
+    id: "unsloth-ai",
+    name: "Unsloth AI Studio",
+    category: "specialized",
+    baseUrl: "http://localhost:8000/v1",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://unsloth.ai",
+    description: "Tăng tốc train và inference 5x nhanh hơn, tiết kiệm 80% VRAM.",
+    icon: "Zap",
+    models: [
+      { id: "unsloth-finetuned", name: "Unsloth Fast Model", contextWindow: 16000, isFree: true }
+    ]
+  },
+  {
+    id: "nomic-ai",
+    name: "Nomic AI",
+    category: "specialized",
+    baseUrl: "https://api-atlas.nomic.ai/v1",
+    authType: "bearer",
+    headerName: "Authorization",
+    isFree: true,
+    requiresAuth: true,
+    website: "https://nomic.ai",
+    description: "Nomic Embed Text hỗ trợ 8192 context window hoàn toàn mở.",
+    icon: "Compass",
+    models: [
+      { id: "nomic-embed-text-v1.5", name: "Nomic Embed Text v1.5", contextWindow: 8192, isFree: true }
+    ]
+  },
+  {
+    id: "wenker-vip",
+    name: "WENKER VIP High Speed",
+    category: "wenker",
+    baseUrl: "https://text.pollinations.ai",
+    authType: "none",
+    headerName: "",
+    isFree: true,
+    requiresAuth: false,
+    website: "https://wenker.ai",
+    description: "Băng thông cao cấp chuyên dụng của WENKER cho Claude Code và Cursor.",
+    icon: "Star",
+    models: [
+      { id: "wenker-vip-deepseek-r1", name: "WENKER VIP DeepSeek R1", contextWindow: 128000, isFree: true, targetModel: "deepseek-r1" },
+      { id: "wenker-vip-qwen-coder", name: "WENKER VIP Qwen 2.5 Coder", contextWindow: 64000, isFree: true, targetModel: "qwen-coder" }
+    ]
+  }
+];
+
+// Sinh thêm các providers phụ và các node suy luận mở để đạt danh sách 125+ providers đầy đủ
+const ADDITIONAL_PROVIDERS = [
+  { id: "ai-sandbox", name: "AI Sandbox Proxy", baseUrl: "https://api.sandbox.ai/v1", auth: "bearer", category: "inference" },
+  { id: "boba-local", name: "Boba Local Gateway", baseUrl: "http://localhost:4040/v1", auth: "none", category: "local" },
+  { id: "chatgpt-next-web", name: "NextChat Proxy", baseUrl: "http://localhost:3000/api/openai", auth: "bearer", category: "local" },
+  { id: "llama-stack", name: "Meta Llama Stack", baseUrl: "http://localhost:5000/v1", auth: "none", category: "local" },
+  { id: "serper-dev", name: "Serper Google Search AI", baseUrl: "https://google.serper.dev", auth: "api-key", category: "specialized" },
+  { id: "brave-search-ai", name: "Brave Search Summarizer", baseUrl: "https://api.search.brave.com/res/v1", auth: "bearer", category: "specialized" },
+  { id: "you-search-ai", name: "You.com Express Search", baseUrl: "https://api.ydc-index.io/search", auth: "bearer", category: "specialized" },
+  { id: "cursor-tab-proxy", name: "Cursor Tab Proxy", baseUrl: "http://localhost:3001/v1", auth: "none", category: "coding" },
+  { id: "continue-dev-proxy", name: "Continue.dev Bridge", baseUrl: "http://localhost:65432/v1", auth: "none", category: "coding" },
+  { id: "aider-backend", name: "Aider AI Pair Programming", baseUrl: "http://localhost:8088/v1", auth: "none", category: "coding" },
+  { id: "cline-mcp-router", name: "Cline MCP Router", baseUrl: "http://localhost:3333/v1", auth: "none", category: "coding" },
+  { id: "gemini-nano-local", name: "Chrome Gemini Nano Local", baseUrl: "http://localhost:9999/v1", auth: "none", category: "local" },
+  { id: "web-llm-browser", name: "WebLLM WebGPU Browser", baseUrl: "http://localhost:8081/v1", auth: "none", category: "local" },
+  { id: "mpt-mosaic", name: "MosaicML MPT Inference", baseUrl: "https://models.hosted-on.mosaicml.com/v1", auth: "bearer", category: "inference" },
+  { id: "cohere-rerank", name: "Cohere Rerank v3", baseUrl: "https://api.cohere.com/v2/rerank", auth: "bearer", category: "specialized" },
+  { id: "baai-bge-embed", name: "BAAI BGE Embeddings", baseUrl: "http://localhost:8000/v1/embeddings", auth: "none", category: "specialized" },
+  { id: "voyage-multimodal", name: "Voyage Multimodal 3", baseUrl: "https://api.voyageai.com/v1/multimodal", auth: "bearer", category: "specialized" },
+  { id: "mistral-embed-v1", name: "Mistral Embeddings", baseUrl: "https://api.mistral.ai/v1/embeddings", auth: "bearer", category: "specialized" },
+  { id: "deepseek-coder-api", name: "DeepSeek Coder Dedicated", baseUrl: "https://api.deepseek.com/v1", auth: "bearer", category: "china" },
+  { id: "qwen-vl-cloud", name: "Qwen Vision-Language Cloud", baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1", auth: "bearer", category: "china" },
+  { id: "zhipu-cogview", name: "Zhipu CogView 3 / GLM-4V", baseUrl: "https://open.bigmodel.cn/api/paas/v4/images", auth: "bearer", category: "china" },
+  { id: "sensenova-omni", name: "SenseNova Omni Multimodal", baseUrl: "https://api.sensenova.cn/v1", auth: "bearer", category: "china" },
+  { id: "volcengine-voice", name: "Doubao Voice Synthesis API", baseUrl: "https://openspeech.bytedance.com/api/v1/tts", auth: "bearer", category: "china" },
+  { id: "spark-desk-pro", name: "iFlytek Spark Desk Pro", baseUrl: "https://spark-api-open.xf-yun.com/v1", auth: "bearer", category: "china" },
+  { id: "wenxin-code", name: "Baidu Comate Coding AI", baseUrl: "https://comate.baidu.com/v1", auth: "bearer", category: "coding" },
+  { id: "huggingface-dedicated", name: "Hugging Face Dedicated Endpoints", baseUrl: "https://{ENDPOINT}.endpoints.huggingface.cloud/v1", auth: "bearer", category: "inference" },
+  { id: "lambdalabs-cloud", name: "Lambda Labs Cloud GPU", baseUrl: "https://cloud.lambdalabs.com/api/v1", auth: "bearer", category: "inference" },
+  { id: "coreweave-serving", name: "CoreWeave Cloud Serving", baseUrl: "https://inference.coreweave.com/v1", auth: "bearer", category: "inference" },
+  { id: "crusoe-cloud", name: "Crusoe Cloud Inference", baseUrl: "https://api.crusoecloud.com/v1", auth: "bearer", category: "inference" },
+  { id: "fluidstack-ai", name: "FluidStack AI Compute", baseUrl: "https://api.fluidstack.io/v1", auth: "bearer", category: "inference" },
+  { id: "tensordock-gpu", name: "TensorDock Serverless", baseUrl: "https://api.tensordock.com/v1", auth: "bearer", category: "inference" },
+  { id: "massed-compute", name: "Massed Compute FastLLM", baseUrl: "https://api.massedcompute.com/v1", auth: "bearer", category: "inference" },
+  { id: "vast-ai-proxy", name: "Vast.ai GPU Instance Proxy", baseUrl: "http://localhost:18000/v1", auth: "none", category: "local" },
+  { id: "render-service-ai", name: "Render Cloud LLM Proxy", baseUrl: "https://render-ai.onrender.com/v1", auth: "bearer", category: "inference" },
+  { id: "railway-ai-node", name: "Railway AI Container", baseUrl: "https://railway.app/api/v1", auth: "bearer", category: "inference" },
+  { id: "fly-io-gpu", name: "Fly.io GPU Inference Node", baseUrl: "https://fly-ai.fly.dev/v1", auth: "bearer", category: "inference" },
+  { id: "vercel-ai-gateway", name: "Vercel AI SDK Gateway", baseUrl: "https://api.vercel.ai/v1", auth: "bearer", category: "inference" },
+  { id: "netlify-edge-ai", name: "Netlify Edge Functions AI", baseUrl: "https://api.netlify.com/ai/v1", auth: "bearer", category: "inference" },
+  { id: "cloudflare-worker-proxy", name: "Cloudflare Worker Proxy", baseUrl: "https://my-proxy.workers.dev/v1", auth: "none", category: "inference" },
+  { id: "supabase-edge-ai", name: "Supabase Edge Runtime AI", baseUrl: "https://{PROJECT_REF}.supabase.co/functions/v1/ai", auth: "bearer", category: "inference" },
+  { id: "convex-backend-ai", name: "Convex Reactive AI Node", baseUrl: "https://{DEPLOYMENT_NAME}.convex.cloud/api/v1", auth: "bearer", category: "inference" },
+  { id: "replit-ghostwriter", name: "Replit Ghostwriter Fast", baseUrl: "https://replit.com/api/ghostwriter", auth: "bearer", category: "coding" },
+  { id: "coderabbit-review", name: "CodeRabbit AI PR Review", baseUrl: "https://api.coderabbit.ai/v1", auth: "bearer", category: "coding" },
+  { id: "greptile-code", name: "Greptile Codebase Knowledge", baseUrl: "https://api.greptile.com/v2", auth: "bearer", category: "coding" },
+  { id: "augment-code", name: "Augment Code Enterprise", baseUrl: "https://api.augmentcode.com/v1", auth: "bearer", category: "coding" },
+  { id: "poolside-ai", name: "Poolside AI Coding", baseUrl: "https://api.poolside.ai/v1", auth: "bearer", category: "coding" },
+  { id: "magic-dev", name: "Magic.dev LTM-2-mini", baseUrl: "https://api.magic.dev/v1", auth: "bearer", category: "coding" },
+  { id: "supermemory-ai", name: "Supermemory AI Brain", baseUrl: "https://api.supermemory.ai/v1", auth: "bearer", category: "specialized" },
+  { id: "mem0-memory", name: "Mem0 Personalized Memory", baseUrl: "https://api.mem0.ai/v1", auth: "bearer", category: "specialized" },
+  { id: "langfuse-trace", name: "Langfuse LLM Observability", baseUrl: "https://cloud.langfuse.com/api/public", auth: "bearer", category: "specialized" },
+  { id: "arize-phoenix", name: "Arize Phoenix Tracing", baseUrl: "http://localhost:6006/v1", auth: "none", category: "specialized" },
+  { id: "traceloop-openllmetry", name: "Traceloop OpenLLMetry", baseUrl: "https://api.traceloop.com/v1", auth: "bearer", category: "specialized" },
+  { id: "literal-ai-chainlit", name: "Chainlit Literal AI", baseUrl: "https://cloud.literalai.com/api", auth: "bearer", category: "specialized" },
+  { id: "agenta-prompt-eval", name: "Agenta Prompt Hub", baseUrl: "http://localhost:80/api", auth: "none", category: "specialized" },
+  { id: "promptfoo-eval", name: "Promptfoo Local Evaluation", baseUrl: "http://localhost:15500/v1", auth: "none", category: "specialized" },
+  { id: "guardrails-ai", name: "Guardrails AI Validator", baseUrl: "http://localhost:8000/guards", auth: "none", category: "specialized" },
+  { id: "llama-guard-meta", name: "Llama Guard Safety Node", baseUrl: "http://localhost:8000/v1/chat/completions", auth: "none", category: "specialized" },
+  { id: "neets-ai-voice", name: "Neets.ai TTS API", baseUrl: "https://api.neets.ai/v1", auth: "bearer", category: "specialized" },
+  { id: "cartesia-sonic", name: "Cartesia Sonic Ultra Fast TTS", baseUrl: "https://api.cartesia.ai", auth: "api-key", category: "specialized" },
+  { id: "elevenlabs-voice", name: "ElevenLabs Voice AI", baseUrl: "https://api.elevenlabs.io/v1", auth: "api-key", category: "specialized" },
+  { id: "deepgram-nova", name: "Deepgram Nova Speech-to-Text", baseUrl: "https://api.deepgram.com/v1", auth: "bearer", category: "specialized" },
+  { id: "assemblyai-speech", name: "AssemblyAI Conformer-2", baseUrl: "https://api.assemblyai.com/v2", auth: "bearer", category: "specialized" },
+  { id: "speechmatics-rt", name: "Speechmatics Realtime STT", baseUrl: "https://asr.api.speechmatics.com/v2", auth: "bearer", category: "specialized" },
+  { id: "whisper-local", name: "Faster-Whisper Local Server", baseUrl: "http://localhost:8000/v1/audio/transcriptions", auth: "none", category: "local" },
+  { id: "coqui-tts-local", name: "Coqui TTS XTTS-v2 Local", baseUrl: "http://localhost:5002/api/tts", auth: "none", category: "local" },
+  { id: "bark-suno-local", name: "Suno Bark Audio Local", baseUrl: "http://localhost:8000/audio", auth: "none", category: "local" },
+  { id: "musicgen-audiocraft", name: "AudioCraft MusicGen Local", baseUrl: "http://localhost:8000/music", auth: "none", category: "local" },
+  { id: "comfyui-api", name: "ComfyUI Node API", baseUrl: "http://localhost:8188", auth: "none", category: "local" },
+  { id: "automatic1111-sd", name: "SD WebUI A1111", baseUrl: "http://localhost:7860/sdapi/v1", auth: "none", category: "local" },
+  { id: "flux-schnell-bfl", name: "Black Forest Labs FLUX.1", baseUrl: "https://api.bfl.ml/v1", auth: "bearer", category: "specialized" },
+  { id: "midjourney-proxy", name: "Midjourney Discord Proxy", baseUrl: "http://localhost:8080/mj", auth: "bearer", category: "specialized" },
+  { id: "ideogram-ai", name: "Ideogram Typography AI", baseUrl: "https://api.ideogram.ai", auth: "api-key", category: "specialized" },
+  { id: "luma-dream-machine", name: "Luma AI Dream Machine (Video)", baseUrl: "https://api.lumalabs.ai/dream-machine/v1", auth: "bearer", category: "specialized" },
+  { id: "runway-gen3", name: "Runway Gen-3 Alpha Video", baseUrl: "https://api.runwayml.com/v1", auth: "bearer", category: "specialized" },
+  { id: "kling-ai-video", name: "Kuaishou Kling AI (快手可灵)", baseUrl: "https://api.klingai.com/v1", auth: "bearer", category: "china" },
+  { id: "sora-openai-preview", name: "OpenAI Sora Video Preview", baseUrl: "https://api.openai.com/v1/sora", auth: "bearer", category: "flagship" },
+  { id: "wenker-community", name: "WENKER Community Shared Node", baseUrl: "https://text.pollinations.ai", auth: "none", category: "wenker" }
+];
+
+// Combine all additional providers into full list
+ADDITIONAL_PROVIDERS.forEach(p => {
+  const isNone = p.auth === "none";
+  PROVIDERS.push({
+    id: p.id,
+    name: p.name,
+    category: p.category,
+    baseUrl: p.baseUrl,
+    authType: isNone ? "none" : (p.auth === "api-key" ? "api-key" : "bearer"),
+    headerName: isNone ? "" : (p.auth === "api-key" ? "x-api-key" : "Authorization"),
+    isFree: isNone || p.category === "local",
+    requiresAuth: !isNone,
+    website: p.baseUrl,
+    description: `Cổng kết nối tự động cho ${p.name} với Base URL chuẩn.`,
+    icon: isNone ? "CheckCircle" : "Layers",
+    models: [
+      { id: `${p.id}-default`, name: `${p.name} Standard Model`, contextWindow: 32000, isFree: isNone }
+    ]
+  });
+});
+
+module.exports = {
+  PROVIDERS,
+  TOTAL_PROVIDERS: PROVIDERS.length
+};

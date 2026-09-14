@@ -1,0 +1,109 @@
+{
+  "name": "wenker",
+  "displayName": "WENKER - local AI router (181+ providers)",
+  "description": "Đưa toàn bộ model của WENKER Router (http://localhost:3600) vào danh sách model của VS Code. Đọc /v1/models trực tiếp nên router có model mới là thấy ngay.",
+  "version": "0.1.1",
+  "publisher": "wenker",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.137.0"
+  },
+  "categories": [
+    "AI",
+    "Chat",
+    "Other"
+  ],
+  "keywords": [
+    "wenker",
+    "ai",
+    "router",
+    "proxy",
+    "local",
+    "free",
+    "openai",
+    "anthropic"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "languageModelChatProviders": [
+      {
+        "vendor": "wenker",
+        "displayName": "WENKER (local router)"
+      }
+    ],
+    "configuration": {
+      "title": "WENKER",
+      "properties": {
+        "wenker.baseUrl": {
+          "type": "string",
+          "default": "http://localhost:3600/v1",
+          "description": "Base URL của WENKER Router (chuẩn OpenAI tương thích)."
+        },
+        "wenker.modelFilter": {
+          "type": "string",
+          "enum": [
+            "no-key",
+            "free",
+            "all"
+          ],
+          "default": "free",
+          "enumDescriptions": [
+            "Chỉ những model không đòi API key (chạy được ngay, không cần cấu hình gì)",
+            "Mọi model miễn phí (gồm cả loại cần key nhưng key lấy được miễn phí)",
+            "Toàn bộ danh sách của router"
+          ],
+          "description": "Lọc danh sách model hiển thị trong bộ chọn model của VS Code."
+        },
+        "wenker.maxOutputTokens": {
+          "type": "number",
+          "default": 4096,
+          "description": "Số token đầu ra tối đa khai báo với VS Code (chỉ là giới hạn hiển thị; router quyết định thực tế)."
+        },
+        "wenker.maxInputTokensCap": {
+          "type": "number",
+          "default": 128000,
+          "description": "Mức trần ngữ cảnh VS Code được phép dùng cho mỗi model. Một số nguồn free công bố tới 1M nhưng thực tế không phục vụ nổi tới mức đó; khai báo thừa sẽ khiến VS Code cắt nội dung im lặng. Tăng lên nếu bạn chắc chắn nguồn đó dùng được."
+        },
+        "wenker.requestTimeoutMs": {
+          "type": "number",
+          "default": 120000,
+          "description": "Thời gian cho phép tối đa cho một request (ms)."
+        },
+        "wenker.adminKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key có role admin (sk-wenker-...) để dùng lệnh cài add-on từ máy khác. Để trống thì VS Code sẽ hỏi khi cần."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "wenker.refreshModels",
+        "title": "WENKER: Tải lại danh sách model"
+      },
+      {
+        "command": "wenker.status",
+        "title": "WENKER: Kiểm tra kết nối + định tuyến"
+      },
+      {
+        "command": "wenker.installAddon",
+        "title": "WENKER: Cài một file .addon (theme / provider / snippet)"
+      },
+      {
+        "command": "wenker.listAddons",
+        "title": "WENKER: Liệt kê add-on đang cài"
+      },
+      {
+        "command": "wenker.useInPlayground",
+        "title": "WENKER: Mở dashboard + Playground của WENKER"
+      },
+      {
+        "command": "wenker.verifyPicker",
+        "title": "WENKER: Tự kiểm — VS Code đang thấy bao nhiêu model?"
+      }
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Dữ liệu local — KHÔNG commit: chứa API key (sk-wenker-*) và nhật ký máy bạn.
+# Dữ liệu runtime thật nằm ở ~/.wenker (càng không thuộc repo).
+data/
+
+# Bản dựng client — đã build sẵn trong repo để npm package phục vụ UI ngay.
+# (Bỏ comment dòng dưới nếu muốn không commit dist.)
+# client/dist/
+
+# File build VS Code extension (artifact, khong commit)
+*.vsix
+
+# Rác
+*.tgz
+*.log
+.DS_Store
+Thumbs.db

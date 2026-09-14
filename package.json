@@ -1,0 +1,67 @@
+{
+  "name": "wenker-router",
+  "version": "2.0.0",
+  "description": "WENKER Router - Open Source Local AI Proxy Gateway supporting 180+ providers and WENKER Cloud",
+  "main": "server/index.js",
+  "bin": {
+    "wenker": "bin/wenker.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "win32",
+    "darwin",
+    "linux"
+  ],
+  "files": [
+    "bin/",
+    "server/",
+    "client/dist/",
+    "system-prompts/",
+    "web/",
+    "!web/assets/banner.png",
+    "!web/assets/icon.png",
+    "!web/assets/chữ thường.ttf",
+    "!web/assets/chữ đậm hoặc lớn.ttf",
+    "start.bat",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "build:client": "cd client && npm run build",
+    "dev:client": "cd client && npm run dev",
+    "install:all": "npm install && cd client && npm install",
+    "pack:dry": "npm pack --dry-run",
+    "web": "node scripts/serve-web.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WENKER-AI/wenker-router.git"
+  },
+  "homepage": "https://github.com/WENKER-AI/wenker-router#readme",
+  "bugs": {
+    "url": "https://github.com/WENKER-AI/wenker-router/issues"
+  },
+  "keywords": [
+    "ai",
+    "router",
+    "gateway",
+    "proxy",
+    "openai",
+    "anthropic",
+    "claude-code",
+    "wenker",
+    "deepseek",
+    "ollama"
+  ],
+  "author": "arist999",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

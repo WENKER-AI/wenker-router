@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — WENKER Router</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon-w.svg" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="assets/games.css" />
+</head>
+<body class="page-404">
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" data-icon="w"></span>
+        <span class="brand-text">WENKER<em>·</em>ROUTER</span>
+      </a>
+      <div class="nav-actions">
+        <a class="btn btn-ghost" href="index.html" data-i18n="err.home">Về trang chủ</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container err-main">
+    <p class="eyebrow" data-i18n="err.code">Lỗi 404</p>
+    <h1 class="err-head"><span class="grad" data-i18n="err.head">OFF. Có gì đó không ổn ở đây...</span></h1>
+    <p class="lede" data-i18n="err.sub">Đường link này không tồn tại. Trong lúc chờ, chơi một game cá voi cho khuây khỏa.</p>
+
+    <div class="game-shell">
+      <div class="game-tabs" id="gameTabs">
+        <button class="active" data-game="snake"><span data-icon="snake"></span> <span data-i18n="err.g1">Rắn</span></button>
+        <button data-game="catch"><span data-icon="fish"></span> <span data-i18n="err.g2">Bắt cá</span></button>
+        <button data-game="flappy"><span data-icon="bird"></span> <span data-i18n="err.g3">Cá voi bay</span></button>
+      </div>
+      <canvas id="gameCanvas" width="480" height="320" aria-label="mini game"></canvas>
+      <p class="game-hint" data-i18n="err.hint">Điều khiển: phím mũi tên / WASD · Space để nhảy · hoặc chạm chuột.</p>
+    </div>
+  </main>
+
+  <script src="assets/icons.js"></script>
+  <script src="assets/i18n.js"></script>
+  <script>
+    // Nạp i18n + icon tối giản cho trang 404 (dùng lại dict của app.js nhưng không có đủ DOM của trang chủ).
+    (function () {
+      "use strict";
+      if (window.WenkerIcons) window.WenkerIcons.render(document);
+      var I = window.WenkerI18n;
+      // Auto-detect: ưu tiên lựa chọn đã lưu, nếu chưa thì dò trình duyệt (vi/en/zh/fr).
+      var lang = null;
+      try { lang = localStorage.getItem("wenker.lang"); } catch (e) {}
+      if (!I || !I.DICT[lang]) {
+        var nav = ((navigator.language || "vi")).slice(0, 2).toLowerCase();
+        lang = (I && I.DICT[nav]) ? nav : "vi";
+      }
+      document.querySelectorAll("[data-i18n]").forEach(function (el) {
+        var v = I.DICT[lang][el.getAttribute("data-i18n")];
+        if (v != null) el.innerHTML = v;
+      });
+      document.documentElement.lang = I.HTMLLANG[lang] || lang;
+    })();
+  </script>
+  <script src="assets/games.js"></script>
+  <script>
+    (function () {
+      "use strict";
+      var canvas = document.getElementById("gameCanvas");
+      var tabs = document.getElementById("gameTabs");
+      if (canvas && tabs && window.WenkerGames) window.WenkerGames.mount(canvas, tabs);
+    })();
+  </script>
+</body>
+</html>
