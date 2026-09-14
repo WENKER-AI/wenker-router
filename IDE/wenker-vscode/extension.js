@@ -531,19 +531,19 @@ async function cmdVerifyPicker() {
     lines.push('- Router `/v1/models`: **' + mine.total + '** model tổng');
     lines.push('- Extension sinh ra (bộ lọc "' + modelFilter + '"): **' + mine.list.length + '** model');
   } catch (e) {
-    lines.push(`- ⚠ Không đọc được router (${baseUrl}): ${e.message}`);
+    lines.push(`- ! Không đọc được router (${baseUrl}): ${e.message}`);
   }
 
   let seen = [];
   try {
     seen = await vscode.lm.selectChatModels({ vendor: VENDOR });
   } catch (e) {
-    lines.push('', '- ⚠ `selectChatModels` lỗi: ' + e.message);
+    lines.push('', '- ! `selectChatModels` lỗi: ' + e.message);
   }
   lines.push('', '- **VS Code trả về qua `lm.selectChatModels({vendor:"wenker"}): ' + seen.length + ' model**', '');
 
   if (!seen.length) {
-    lines.push('> ❌ VS Code **không thấy model nào** của WENKER. Mở Output → "Extension Host" để tìm lỗi, hoặc chạy lại "Reload Window".');
+    lines.push('> X VS Code **không thấy model nào** của WENKER. Mở Output → "Extension Host" để tìm lỗi, hoặc chạy lại "Reload Window".');
   } else {
     lines.push('| id VS Code cấp | tên hiển thị | maxInput | maxOutput |');
     lines.push('|---|---|---|---|');
@@ -553,9 +553,9 @@ async function cmdVerifyPicker() {
     if (seen.length > 80) lines.push(`| … còn lại ${seen.length - 80} model | | | |`);
     const ids = new Set(seen.map((m) => m.id));
     if (ids.size === 1) {
-      lines.push('', '> ⚠ **CẢNH BÁO:** VS Code gộp toàn bộ về MỘT id duy nhất — model sẽ không hiện đúng trong bộ chọn.');
+      lines.push('', '> ! **CẢNH BÁO:** VS Code gộp toàn bộ về MỘT id duy nhất — model sẽ không hiện đúng trong bộ chọn.');
     } else {
-      lines.push('', `> ✅ ${ids.size} id phân biệt — bộ chọn model nhận đúng từng model.`);
+      lines.push('', `> OK ${ids.size} id phân biệt — bộ chọn model nhận đúng từng model.`);
     }
   }
 

@@ -73,6 +73,6 @@ async function chat(msg) {
     first.status === 200 && first.j?.choices?.[0]?.message?.content === MARKER &&
     second.status === 200 && second.j?.choices?.[0]?.message?.content === MARKER &&
     hits === 1;
-  console.log(pass ? '\n✅ CACHE PROOF PASSED (mock hit once, second served from cache)' : '\n❌ CACHE PROOF FAILED');
+  console.log(pass ? '\nCACHE PROOF PASSED (mock hit once, second served from cache)' : '\nCACHE PROOF FAILED');
   process.exit(pass ? 0 : 1);
 })();

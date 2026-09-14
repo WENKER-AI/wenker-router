@@ -45,7 +45,13 @@
       border-radius: 999px;
       margin-bottom: 16px;
     }
-    #logo { font-size: 46px; margin-bottom: 10px; }
+    #logo {
+      width: 64px; height: 64px; margin: 0 auto 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: ui-monospace, monospace; font-size: 22px; font-weight: 800; letter-spacing: .06em;
+      color: #67e8f9; background: rgba(34, 211, 238, .08);
+      border: 1px solid rgba(34, 211, 238, .35); border-radius: 16px;
+    }
     #sponsor { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 10px; }
     #pitch { font-size: 14px; line-height: 1.6; color: #94a3b8; margin-bottom: 22px; }
     .bar { height: 8px; border-radius: 999px; background: rgba(30, 41, 59, .9); overflow: hidden; }
@@ -58,7 +64,7 @@
   <div class="glow"></div>
   <div class="card">
     <span class="tag">Tai tro / Sponsored</span>
-    <div id="logo">🚀</div>
+    <div id="logo">--</div>
     <div id="sponsor">Loading...</div>
     <p id="pitch"></p>
     <div class="bar"><div id="fill"></div></div>
@@ -70,15 +76,15 @@
     // A small rotating set of "sponsored" creatives. These are placeholders shown
     // inside WENKER itself - no third-party tracker, no external network call.
     var SPONSORS = [
-      { logo: "🚀", name: "NovaHost VPS", pitch: "May chu toc do cho developer Viet. The gia tri SSD, khoi dong 30 giay, ho tro 24/7." },
-      { logo: "🧠", name: "PromptLab", pitch: "Thu nghiem va version-control prompt cho doi engineering cua ban. Mien phi 14 ngay." },
-      { logo: "⚡", name: "EdgeDeploy", pitch: "Deploy app len 300+ edge node chi voi mot lenh. Khong cau hinh, khong surprise bill." },
-      { logo: "🛰️", name: "TokenWatch", pitch: "Theo doi chi phi API cua 40+ nha cung cap LLM theo thoi gian thuc." },
-      { logo: "🐍", name: "PyCI Cloud", pitch: "CI/CD Python toc do cao, moi lan build chi mat 12 giay." },
-      { logo: "🎧", name: "DevCast FM", pitch: "Podcast ky thuat hang tuan ve AI, he phan tan va language mo hinh." },
-      { logo: "🗂️", name: "VectorStore", pitch: "Namespace vector database cho team. San cho 1 ty embedding." },
-      { logo: "🔒", name: "KeyGuard", pitch: "Quan ly API key va secret cho moi moi truong, co kiem soat truy cap." },
-      { logo: "📊", name: "LatencyLens", pitch: "Rum speed monitoring cho he thong LLM streaming. Phat hien slow request." }
+      { logo: "NH", name: "NovaHost VPS", pitch: "May chu toc do cho developer Viet. The gia tri SSD, khoi dong 30 giay, ho tro 24/7." },
+      { logo: "PL", name: "PromptLab", pitch: "Thu nghiem va version-control prompt cho doi engineering cua ban. Mien phi 14 ngay." },
+      { logo: "ED", name: "EdgeDeploy", pitch: "Deploy app len 300+ edge node chi voi mot lenh. Khong cau hinh, khong surprise bill." },
+      { logo: "TW", name: "TokenWatch", pitch: "Theo doi chi phi API cua 40+ nha cung cap LLM theo thoi gian thuc." },
+      { logo: "PC", name: "PyCI Cloud", pitch: "CI/CD Python toc do cao, moi lan build chi mat 12 giay." },
+      { logo: "DC", name: "DevCast FM", pitch: "Podcast ky thuat hang tuan ve AI, he phan tan va language mo hinh." },
+      { logo: "VS", name: "VectorStore", pitch: "Namespace vector database cho team. San cho 1 ty embedding." },
+      { logo: "KG", name: "KeyGuard", pitch: "Quan ly API key va secret cho moi moi truong, co kiem soat truy cap." },
+      { logo: "LL", name: "LatencyLens", pitch: "Rum speed monitoring cho he thong LLM streaming. Phat hien slow request." }
     ];
 
     var DURATION_MS = 6000;

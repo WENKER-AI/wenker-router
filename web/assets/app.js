@@ -149,7 +149,7 @@
         var text = node ? (node.getAttribute("data-copy") || node.textContent).trim() : (btn.getAttribute("data-copy") || "");
         if (!text) return;
         copyText(text).then(function (ok) {
-          flash(btn, ok ? "Đã chép ✓" : "Bôi đen để chép");
+          flash(btn, ok ? "Đã chép" : "Bôi đen để chép");
         });
       });
     });

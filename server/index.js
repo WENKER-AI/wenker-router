@@ -8,6 +8,17 @@ const anthropicRouter = require('./routes/anthropic');
 const adminRouter = require('./routes/admin');
 const authRouter = require('./routes/auth');
 
+// Guard: khi chay trong Electron (studio/main.js) hoac khi terminal/pipe cua stdout
+// bi dong giua chung, moi lan console.log co the nem "write EPIPE" -> uncaught
+// exception -> Electron bat hop thoai crash "A JavaScript error occurred in the
+// main process", con `npm start` thi chet. Mot gateway khong bao gio duoc phep
+// chet chi vi ghi log that bai, nen nho bo qua loi tren stdout/stderr.
+for (const stream of [process.stdout, process.stderr]) {
+  if (stream && typeof stream.on === 'function') {
+    stream.on('error', () => { /* pipe da chet - lang thi ghi log, khong crash */ });
+  }
+}
+
 const app = express();
 const settings = db.getSettings();
 const PORT = process.env.PORT || settings.port || 3600;
@@ -225,13 +236,13 @@ app.listen(PORT, HOST, () => {
         ╚══╝╚══╝ ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
               Local AI Proxy Router Gateway v2.0
 ============================================================
-  🚀 Core Server Running at: http://localhost:${PORT}
-  📡 OpenAI API Base:        http://localhost:${PORT}/v1
-  🤖 Anthropic Claude Base:  http://localhost:${PORT}/v1
-  🔑 Master Admin Key:       sk-wenker-local-admin
-  🆓 Free Playground Key:    sk-wenker-free-playground
-  🌐 Total Providers:        ${db.getAllProviders().length} AI Providers Preloaded
-  ✨ ${tierLine}
+  Core Server Running at:    http://localhost:${PORT}
+  OpenAI API Base:           http://localhost:${PORT}/v1
+  Anthropic Claude Base:     http://localhost:${PORT}/v1
+  Master Admin Key:          sk-wenker-local-admin
+  Free Playground Key:       sk-wenker-free-playground
+  Total Providers:           ${db.getAllProviders().length} AI Providers Preloaded
+  ${tierLine}
 ============================================================
   Claude Code Configuration:
   export ANTHROPIC_BASE_URL=http://localhost:${PORT}/v1

@@ -143,7 +143,7 @@ export default function Playground({ requestedModel, onModelConsumed }) {
           const newArr = [...prev];
           newArr[assistantMessageIndex] = {
             role: "assistant",
-            content: `⚠️ ${errJson.error?.message || "You have used up your quota for today; please try a different model."}\n\n${errJson.error?.hint || "Ban da dung het luot WENKER Cloud hom nay. Xem quang cao de nhan them luot hoac doi sang model khac."}`
+            content: `${errJson.error?.message || "You have used up your quota for today; please try a different model."}\n\n${errJson.error?.hint || "Ban da dung het luot WENKER Cloud hom nay. Xem quang cao de nhan them luot hoac doi sang model khac."}`
           };
           return newArr;
         });
@@ -218,7 +218,7 @@ export default function Playground({ requestedModel, onModelConsumed }) {
       console.error("Playground Chat Error:", err);
       const detail = err?.handled
         ? err.message
-        : `⚠️ **Lỗi kết nối**: ${err.message}\n\n*Gợi ý*: Kiểm tra tab "Nhà Cung Cấp" hoặc thử chọn mô hình khác trong danh sách miễn phí!`;
+        : `**Lỗi kết nối**: ${err.message}\n\n*Gợi ý*: Kiểm tra tab "Nhà Cung Cấp" hoặc thử chọn mô hình khác trong danh sách miễn phí!`;
       setMessages(prev => {
         const newArr = [...prev];
         newArr[assistantMessageIndex] = {
