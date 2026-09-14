@@ -75,7 +75,7 @@ export default function Dashboard({ stats, setActiveTab }) {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
             <button
               onClick={() => setActiveTab('playground')}
-              className="btn-primary justify-center shadow-lg shadow-cyan-500/20 py-2.5"
+              className="btn-primary justify-center py-2.5"
             >
               <Sparkles className="w-4 h-4" />
               <span>{t('dash.btnTry')}</span>

@@ -53,7 +53,7 @@ export default function App() {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 via-indigo-500 to-purple-600 p-[1.5px] animate-pulse">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-indigo-500 p-px animate-pulse">
             <div className="w-full h-full bg-slate-950 rounded-[15px] flex items-center justify-center">
               <Zap className="w-6 h-6 text-cyan-400" />
             </div>

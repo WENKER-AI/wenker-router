@@ -55,15 +55,15 @@ export default function Navbar({ activeTab, setActiveTab, stats }) {
           
           {/* Logo Brand */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-indigo-500 to-purple-600 p-[1px] shadow-lg shadow-cyan-500/20">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-500 p-px shadow-sm">
               <div className="w-full h-full bg-slate-950 rounded-[11px] flex items-center justify-center">
                 <PixelW className="w-5 h-5 text-cyan-400" />
               </div>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="brand-pixel font-extrabold text-lg tracking-wider text-white">WENKER</span>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border border-cyan-500/30">
+                <span className="brand-pixel font-extrabold text-lg tracking-tight text-white">WENKER</span>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
                   ROUTER v2.0
                 </span>
               </div>
@@ -89,7 +89,7 @@ export default function Navbar({ activeTab, setActiveTab, stats }) {
                   <Icon className={`w-4 h-4 ${isActive ? 'text-cyan-400' : 'text-slate-400'}`} />
                   <span>{item.label}</span>
                   {item.badge && (
-                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 text-white animate-pulse">
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/25">
                       {item.badge}
                     </span>
                   )}
@@ -101,7 +101,7 @@ export default function Navbar({ activeTab, setActiveTab, stats }) {
           {/* Quick Info & Base URL Copy */}
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2 bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-300">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500 animate-ping"></span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
               <span className="text-slate-400">Base URL:</span>
               <span className="text-cyan-300 font-semibold">{baseUrl}</span>
               <button 

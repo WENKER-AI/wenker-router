@@ -63,7 +63,7 @@ export default function LoginScreen() {
         <div className="card-glass bg-slate-900/70 border-slate-800 rounded-2xl p-7 shadow-2xl">
           {/* Brand */}
           <div className="flex flex-col items-center text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 via-indigo-500 to-purple-600 p-[1.5px] shadow-lg shadow-cyan-500/25">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-indigo-500 p-px shadow-sm">
               <div className="w-full h-full bg-slate-950 rounded-[15px] flex items-center justify-center">
                 <PixelW className="w-7 h-7 text-cyan-400" />
               </div>

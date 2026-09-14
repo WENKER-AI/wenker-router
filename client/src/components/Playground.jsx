@@ -355,7 +355,7 @@ export default function Playground({ requestedModel, onModelConsumed }) {
               <button
                 onClick={handleWatchAd}
                 disabled={adBusy}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-amber-500 to-rose-500 text-white hover:opacity-90 active:scale-95 transition disabled:opacity-60"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500 text-white hover:bg-cyan-400 active:scale-95 transition disabled:opacity-60"
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>{adBusy ? 'Đang mở...' : `Xem quảng cáo (+${quota.adCreditAmount || 10})`}</span>
@@ -504,7 +504,7 @@ export default function Playground({ requestedModel, onModelConsumed }) {
             className={`px-5 rounded-xl font-medium flex items-center justify-center transition shadow-lg ${
               !input.trim() || isLoading
                 ? "bg-slate-800 text-slate-500 cursor-not-allowed"
-                : "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-400 hover:to-blue-500 shadow-cyan-500/20"
+                : "bg-cyan-500 text-white hover:bg-cyan-400"
             }`}
           >
             {isLoading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}

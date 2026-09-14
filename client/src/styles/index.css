@@ -201,14 +201,13 @@ code, pre, .font-mono {
 }
 
 /* ============================================================
-   WENKER SEA SKIN — console localhost dung cung bo nhan dien
-   "bien sau" (deep-sea soft) voi trang web: palette navy-blue
-   #0a1420/#5aa7e8/#7fd8a4, goc bo 14px, vien 1.5px, bong mem
-   khuuch tan — it cyberpunk hon, co dien va de cho mat.
+   WENKER SaaS SKIN — giao dien console theo huong clean/modern
+   (shadcn / OpenRouter / Raycast / Linear): nen trung tinh zinc,
+   accent indigo mu (`#6366f1`), goc bo lon, vien hairline,
+   bong nhe khuuch tan, khong glow/lưới nền cyberpunk.
    Toan bo mau trong JSX di qua --color-slate-* / --color-cyan-*
    (xem tailwind.config.js), nen chi can retoken la doi ca console.
-   Font pixel GIU LAI chi cho thuong hieu (class .brand-pixel);
-   tieu de/noi dung dung Plus Jakarta Sans de khong tron font.
+   Thuong hieu dung Plus Jakarta Sans (sans sach) thay font pixel.
    ============================================================ */
 @font-face {
   font-family: 'WenkerPixel';
@@ -229,133 +228,129 @@ code, pre, .font-mono {
   --font-pixel: 'WenkerPixel', 'JetBrains Mono', ui-monospace, 'Segoe UI', system-ui, sans-serif;
   --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
 
-  /* palette bien sau — khop web/assets/style.css */
-  --bg-primary: #0a1420;
-  --bg-secondary: #0d1a29;
-  --bg-card: #12202f;
-  --bg-card-hover: #182a3d;
-  --border-color: #24384e;
-  --border-glow: rgba(90, 167, 232, 0.25);
-  --accent-cyan: #5aa7e8;
-  --accent-blue: #3d84c6;
-  --accent-emerald: #7fd8a4;
-  --text-primary: #e8f0f8;
-  --text-secondary: #93a9c0;
-  --text-muted: #64809c;
-  --radius: 14px;
-  --radius-sm: 10px;
-  --hair: 1.5px;
-  --sea-shadow: 0 4px 14px rgba(3, 10, 20, 0.4);
-  --sea-shadow-lg: 0 10px 28px rgba(3, 10, 20, 0.45);
+  /* nen trung tinh zinc (shadcn neutral), khong con navy */
+  --bg-primary: #09090b;
+  --bg-secondary: #0b0b0e;
+  --bg-card: #131316;
+  --bg-card-hover: #18181b;
+  --border-color: #26262b;
+  --border-glow: rgba(99, 102, 241, 0.18);
+  --accent-cyan: #6366f1;
+  --accent-blue: #6366f1;
+  --accent-emerald: #10b981;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --radius: 16px;
+  --radius-sm: 12px;
+  --hair: 1px;
+  --sea-shadow: 0 1px 2px rgba(0, 0, 0, 0.30);
+  --sea-shadow-lg: 0 10px 30px -12px rgba(0, 0, 0, 0.50);
 
-  /* slate → cac muc nuoc bien (toi → sang) */
-  --color-slate-50: 232 240 248;
-  --color-slate-100: 224 234 246;
-  --color-slate-200: 208 222 236;
-  --color-slate-300: 176 196 216;
-  --color-slate-400: 147 169 192;
-  --color-slate-500: 100 124 150;
-  --color-slate-600: 36 56 78;
-  --color-slate-700: 24 42 61;
-  --color-slate-750: 18 32 47;
-  --color-slate-800: 13 26 41;
-  --color-slate-900: 10 20 32;
-  --color-slate-950: 7 16 25;
+  /* slate → thang trung tinh zinc */
+  --color-slate-50: 250 250 250;
+  --color-slate-100: 244 244 245;
+  --color-slate-200: 228 228 231;
+  --color-slate-300: 212 212 216;
+  --color-slate-400: 161 161 170;
+  --color-slate-500: 113 113 122;
+  --color-slate-600: 82 82 91;
+  --color-slate-700: 63 63 70;
+  --color-slate-750: 45 45 50;
+  --color-slate-800: 39 39 42;
+  --color-slate-900: 24 24 27;
+  --color-slate-950: 9 9 11;
 
-  /* accent cyan → xanh bien #5aa7e8 */
-  --color-cyan-50: 224 240 252;
-  --color-cyan-100: 200 228 248;
-  --color-cyan-200: 165 212 245;
-  --color-cyan-300: 128 190 240;
-  --color-cyan-400: 90 167 232;
-  --color-cyan-500: 61 132 198;
-  --color-cyan-600: 45 105 160;
-  --color-cyan-700: 34 82 125;
-  --color-cyan-800: 26 62 96;
-  --color-cyan-900: 18 45 70;
-  --color-cyan-950: 10 26 44;
+  /* accent cyan → indigo mu (#6366f1) — van giu ten bien de JSX khong doi */
+  --color-cyan-50: 238 242 255;
+  --color-cyan-100: 224 231 255;
+  --color-cyan-200: 199 210 254;
+  --color-cyan-300: 165 180 252;
+  --color-cyan-400: 129 140 248;
+  --color-cyan-500: 99 102 241;
+  --color-cyan-600: 79 70 229;
+  --color-cyan-700: 67 56 202;
+  --color-cyan-800: 55 48 163;
+  --color-cyan-900: 49 46 129;
+  --color-cyan-950: 30 27 75;
 }
 
 body {
   font-family: var(--font-body);
-  /* luoi nhi hue rat mo nhu trang web — khong cyberpunk */
-  background-image:
-    linear-gradient(rgba(36, 56, 78, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(36, 56, 78, 0.08) 1px, transparent 1px);
-  background-size: 28px 28px;
+  /* nen trang, chi con mot vung sang rat mo phia tren — khong lưới, khong cyberpunk */
+  background-color: var(--bg-primary);
+  background-image: radial-gradient(1200px 600px at 50% -10%, rgba(99, 102, 241, 0.06), transparent 60%);
+  background-attachment: fixed;
 }
 
-/* Chi thuong hieu dung font pixel (dong bo favicon W / brand-mark web).
-   Tieu de va noi dung giu Plus Jakarta Sans — tron ven, cung mot font. */
+/* Chi thuong hieu dung font sans sach (khong con pixel tron ven) */
 .brand-pixel {
-  font-family: var(--font-pixel);
-  letter-spacing: 0.06em;
+  font-family: var(--font-body);
+  letter-spacing: -0.01em;
 }
 
-/* Card: vien 1.5px + bong mem khuuch tan, blur nhe */
+/* Card: vien hairline mau trung tinh, bong mem nhe — khong nang khi hover */
 .card-glass {
-  background: rgb(var(--color-slate-800) / 0.72);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: var(--hair) solid var(--border-color);
+  background: rgb(var(--color-slate-900) / 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: var(--hair) solid rgb(var(--color-slate-200) / 0.08);
   border-radius: var(--radius);
   box-shadow: var(--sea-shadow);
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
 }
 .card-glass:hover {
-  border-color: rgb(var(--color-cyan-400) / 0.45);
+  border-color: rgb(var(--color-slate-200) / 0.16);
   box-shadow: var(--sea-shadow-lg);
-  transform: translateY(-2px);
 }
 
-/* Nut: bo goc 11px, vien hairline, bong mem — hover nang nhe */
+/* Nut: bo goc 12px, vien hairline — indigo ran, khong gradient loe */
 .btn-primary, .btn-secondary, .btn-ghost {
-  border-radius: 11px;
+  border-radius: 12px;
   border-width: var(--hair);
   transition: all 0.18s ease;
 }
 .btn-primary {
-  background: linear-gradient(135deg, #3d84c6 0%, #5aa7e8 100%);
-  color: #071019;
+  background: rgb(var(--color-cyan-500));
+  color: #ffffff;
   border-color: transparent;
-  box-shadow: 0 4px 14px rgba(61, 132, 198, 0.35);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 .btn-primary:hover {
-  background: linear-gradient(135deg, #4a92d6 0%, #6cb4f0 100%);
-  box-shadow: 0 8px 22px rgba(90, 167, 232, 0.4);
-  transform: translateY(-2px);
+  background: rgb(var(--color-cyan-400));
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
 }
 .btn-primary:active { transform: translateY(0); }
 .btn-secondary {
-  background: var(--bg-card);
+  background: rgb(var(--color-slate-800));
   color: var(--text-primary);
-  border-color: var(--border-color);
+  border-color: rgb(var(--color-slate-200) / 0.1);
 }
 .btn-secondary:hover {
-  background: var(--bg-card-hover);
-  border-color: rgb(var(--color-cyan-400) / 0.5);
+  background: rgb(var(--color-slate-750));
+  border-color: rgb(var(--color-slate-200) / 0.2);
 }
-.btn-ghost:hover { background: rgba(90, 167, 232, 0.1); }
+.btn-ghost:hover { background: rgb(var(--color-slate-200) / 0.06); }
 
-/* Gradient text → xanh bien → xanh lac (mat hon ban cyan/tim cu) */
+/* Gradient text → indigo → violet nhe nhang */
 .gradient-text {
-  background: linear-gradient(90deg, #5aa7e8 0%, #7fd8a4 100%);
+  background: linear-gradient(90deg, #a5b4fc 0%, #c4b5fd 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Cham trang thai: tron lai, sang nhe kieu den bien */
+/* Cham trang thai: tron, khong glow */
 .status-dot { border-radius: 9999px; }
-.status-dot.online { background-color: #7fd8a4; box-shadow: 0 0 8px rgba(127, 216, 164, 0.5); }
-.status-dot.offline { background-color: #e88a8a; box-shadow: 0 0 8px rgba(232, 138, 138, 0.35); }
+.status-dot.online { background-color: #34d399; box-shadow: none; }
+.status-dot.offline { background-color: #fb7185; box-shadow: none; }
 
-/* Selection mau xanh bien */
-::selection { background: rgba(90, 167, 232, 0.35); color: #e8f0f8; }
+/* Selection mau indigo */
+::selection { background: rgba(99, 102, 241, 0.3); color: #fafafa; }
 
-/* Thanh cuộn tron, mau line bien */
-::-webkit-scrollbar-thumb { background: #2f4a66; border-radius: 6px; border: 2px solid #0a1420; }
-::-webkit-scrollbar-thumb:hover { background: #5aa7e8; }
+/* Thanh cuộn trung tinh */
+::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 6px; border: 2px solid #09090b; }
+::-webkit-scrollbar-thumb:hover { background: #52525b; }
 
 @media (prefers-reduced-motion: reduce) {
   .card-glass, .btn-primary, .btn-secondary, .btn-ghost { transition: none; }
