@@ -42,6 +42,10 @@ router.get('/models', (req, res) => {
     // A provider can be isFree (costs nothing) yet still requiresAuth (needs a free key).
     const requiresAuth = Boolean(p.requiresAuth);
     const needsKey = requiresAuth && !p.userApiKey;
+    // Tool-calling is only honest on a real OpenAI-compatible upstream. The free
+    // no-auth paths (Pollinations anonymous / DuckDuckGo) cannot answer with
+    // tool_calls, so the Studio UI uses this flag to grey out the Agent toggle.
+    const supportsTools = !/pollinations\.ai/i.test(String(p.baseUrl || "")) && p.id !== "duckduckgo";
     const meta = (m) => ({
       owned_by: p.name,
       root: m.id,
@@ -52,6 +56,7 @@ router.get('/models', (req, res) => {
       wenker_free: Boolean(p.isFree || m.isFree),
       wenker_requires_key: requiresAuth,
       wenker_needs_key: needsKey,
+      wenker_supports_tools: supportsTools,
       wenker_auth_type: p.authType || 'none',
       wenker_context: m.contextWindow || p.contextWindow || null,
       wenker_display_name: m.name || m.id,

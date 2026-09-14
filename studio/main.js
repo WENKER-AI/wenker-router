@@ -120,6 +120,116 @@ function listDirTree(dir, depth, max) {
   return out;
 }
 
+// Liet ke PHANG file (de quick-open / command palette / @mention). Khong quay cay.
+function listFilesFlat(dir, depth, max, out) {
+  out = out || [];
+  if (depth < 0 || out.length >= max) return out;
+  let entries = [];
+  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { return out; }
+  entries.sort((a, b) => {
+    if (a.isDirectory() !== b.isDirectory()) return a.isDirectory() ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
+  for (const e of entries) {
+    if (out.length >= max) break;
+    if (e.isDirectory() && (e.name === "node_modules" || e.name === ".git" || e.name === "dist" || e.name === "build")) continue;
+    const abs = path.join(dir, e.name);
+    if (e.isDirectory()) listFilesFlat(abs, depth - 1, max, out);
+    else out.push(toRel(abs));
+  }
+  return out;
+}
+
+// ---- Cau hinh luu ben vung (userData/studio-config.json) ------------------
+function configPath() {
+  try { return path.join(app.getPath("userData"), "studio-config.json"); }
+  catch (e) { return path.join(__dirname, ".studio-config.json"); }
+}
+function readConfig() {
+  try { return JSON.parse(fs.readFileSync(configPath(), "utf8")); } catch (e) { return {}; }
+}
+function writeConfig(obj) {
+  try {
+    fs.mkdirSync(path.dirname(configPath()), { recursive: true });
+    fs.writeFileSync(configPath(), JSON.stringify(obj, null, 2), "utf8");
+    return true;
+  } catch (e) { return false; }
+}
+function rememberWorkspace(abs) {
+  const c = readConfig();
+  const arr = (Array.isArray(c.recents) ? c.recents : []).filter((x) => x !== abs);
+  arr.unshift(abs);
+  c.recents = arr.slice(0, 12);
+  c.lastWorkspace = abs;
+  writeConfig(c);
+  return c.recents;
+}
+
+// ---- Git (tich hop truc tiep, goi git.exe qua spawn) ----------------------
+function gitRun(args, cwd) {
+  return new Promise((resolve) => {
+    let dir = cwd;
+    try { dir = cwd ? resolveInWorkspace(cwd) : (workspaceRoot || ROOT); } catch (e) { dir = workspaceRoot || ROOT; }
+    const child = spawn("git", Array.isArray(args) ? args : [], { cwd: dir, shell: false, windowsHide: true });
+    let stdout = "";
+    let stderr = "";
+    const cap = 400000;
+    const timer = setTimeout(() => { try { child.kill("SIGKILL"); } catch (e) {} }, 30000);
+    child.stdout.on("data", (d) => { if (stdout.length < cap) stdout += d; });
+    child.stderr.on("data", (d) => { if (stderr.length < cap) stderr += d; });
+    child.on("error", (e) => { clearTimeout(timer); resolve({ ok: false, error: e.message, stdout, stderr, code: null }); });
+    child.on("close", (code) => { clearTimeout(timer); resolve({ ok: code === 0, code, stdout, stderr }); });
+  });
+}
+
+// ---- Checkpoint / Undo theo tung luot agent -------------------------------
+function safeId(id) { return String(id || "").replace(/[^a-z0-9_-]/gi, "").slice(0, 80) || "x"; }
+function checkpointDir(id) { return path.join(app.getPath("userData"), "checkpoints", safeId(id)); }
+function snapshotFiles(id, rels) {
+  const dir = checkpointDir(id);
+  fs.rmSync(dir, { recursive: true, force: true });
+  fs.mkdirSync(dir, { recursive: true });
+  const manifest = [];
+  for (const rel of (rels || [])) {
+    try {
+      const abs = resolveInWorkspace(rel);
+      if (fs.existsSync(abs) && fs.statSync(abs).isFile()) {
+        const dst = path.join(dir, rel);
+        fs.mkdirSync(path.dirname(dst), { recursive: true });
+        fs.copyFileSync(abs, dst);
+        manifest.push({ rel, existed: true });
+      } else {
+        manifest.push({ rel, existed: false });
+      }
+    } catch (e) { /* bo qua file ngoai workspace */ }
+  }
+  fs.writeFileSync(path.join(dir, "manifest.json"), JSON.stringify(manifest), "utf8");
+  return { id: safeId(id), count: manifest.length };
+}
+function restoreFiles(id) {
+  const dir = checkpointDir(id);
+  const mpath = path.join(dir, "manifest.json");
+  if (!fs.existsSync(mpath)) throw new Error("Khong tim thay checkpoint.");
+  const manifest = JSON.parse(fs.readFileSync(mpath, "utf8"));
+  let restored = 0;
+  let deleted = 0;
+  for (const item of manifest) {
+    try {
+      const abs = resolveInWorkspace(item.rel);
+      if (item.existed) {
+        const src = path.join(dir, item.rel);
+        fs.mkdirSync(path.dirname(abs), { recursive: true });
+        fs.copyFileSync(src, abs);
+        restored++;
+      } else {
+        fs.rmSync(abs, { force: true });
+        deleted++;
+      }
+    } catch (e) { /* bo qua */ }
+  }
+  return { restored, deleted };
+}
+
 // ---- IPC tools ------------------------------------------------------------
 function registerIpc() {
   ipcMain.handle("wenker:status", () => ({
@@ -127,24 +237,76 @@ function registerIpc() {
     booted: routerBooted,
     baseUrl: `http://127.0.0.1:${routerPort}`,
     ideUrl: `http://127.0.0.1:${routerPort}/ide/`,
-    workspace: workspaceRoot
+    workspace: workspaceRoot,
+    config: readConfig()
   }));
 
   ipcMain.handle("wenker:pickFolder", async () => {
     const res = await dialog.showOpenDialog(mainWindow, { properties: ["openDirectory", "createDirectory"] });
     if (res.canceled || !res.filePaths[0]) return null;
     workspaceRoot = res.filePaths[0];
-    return { root: workspaceRoot, tree: listDirTree(workspaceRoot, 2, 400) };
+    const recents = rememberWorkspace(workspaceRoot);
+    return { root: workspaceRoot, tree: listDirTree(workspaceRoot, 2, 400), recents };
   });
 
   ipcMain.handle("wenker:openFolder", (_e, abs) => {
     // Cho phep renderer yeu cau mo mot thu muc cu the (vd phuc hoi lan truoc).
     if (typeof abs === "string" && fs.existsSync(abs)) {
       workspaceRoot = abs;
-      return { root: workspaceRoot, tree: listDirTree(workspaceRoot, 2, 400) };
+      const recents = rememberWorkspace(workspaceRoot);
+      return { root: workspaceRoot, tree: listDirTree(workspaceRoot, 2, 400), recents };
     }
     return null;
   });
+
+  ipcMain.handle("wenker:listFiles", (_e, opts) => {
+    if (!workspaceRoot) return [];
+    const max = Math.min(Number((opts && opts.max) || 2000), 5000);
+    return listFilesFlat(workspaceRoot, 6, max, []);
+  });
+
+  ipcMain.handle("wenker:stat", (_e, rel) => {
+    const abs = resolveInWorkspace(rel);
+    const s = fs.statSync(abs);
+    return { path: toRel(abs), dir: s.isDirectory(), size: s.size, mtime: s.mtimeMs };
+  });
+
+  ipcMain.handle("wenker:rename", (_e, payload) => {
+    const { from, to } = payload || {};
+    const a = resolveInWorkspace(from);
+    const b = resolveInWorkspace(to);
+    fs.mkdirSync(path.dirname(b), { recursive: true });
+    fs.renameSync(a, b);
+    return { from: toRel(a), to: toRel(b) };
+  });
+
+  ipcMain.handle("wenker:createEntry", (_e, payload) => {
+    const { rel, dir } = payload || {};
+    const abs = resolveInWorkspace(rel);
+    if (dir) {
+      fs.mkdirSync(abs, { recursive: true });
+    } else {
+      fs.mkdirSync(path.dirname(abs), { recursive: true });
+      if (!fs.existsSync(abs)) fs.writeFileSync(abs, "", "utf8");
+    }
+    return { path: toRel(abs) };
+  });
+
+  ipcMain.handle("wenker:reveal", (_e, rel) => {
+    try { shell.showItemInFolder(resolveInWorkspace(rel)); } catch (e) { return false; }
+    return true;
+  });
+
+  ipcMain.handle("wenker:configSave", (_e, obj) => writeConfig(Object.assign(readConfig(), obj || {})));
+
+  ipcMain.handle("wenker:git", (_e, payload) => {
+    const args = (payload && payload.args) || [];
+    return gitRun(args, payload && payload.cwd);
+  });
+
+  ipcMain.handle("wenker:snapshot", (_e, payload) => snapshotFiles(payload && payload.id, payload && payload.files));
+
+  ipcMain.handle("wenker:restore", (_e, payload) => restoreFiles(payload && payload.id));
 
   ipcMain.handle("wenker:listDir", (_e, rel) => {
     const abs = resolveInWorkspace(rel);
