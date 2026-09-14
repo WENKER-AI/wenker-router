@@ -237,8 +237,41 @@ class ProxyService {
    */
   async handleChatCompletion({ req, res, body, wenkerKey }) {
     const startTime = Date.now();
-    const { model, stream = false, temperature, max_tokens } = body;
+    const { model, stream = false, temperature, max_tokens, tools, tool_choice } = body;
     const messages = freeProxyService.normalizeMessages(body.messages);
+
+    // Tool-calling is only honest on a REAL OpenAI-compatible upstream. The free
+    // no-auth paths (Pollinations / DuckDuckGo) cannot answer with tool_calls -
+    // they would return plain text and every agent loop would silently stall. So
+    // when a client sends tools, refuse up front with an actionable 400 instead
+    // of pretending to support them.
+    const hasTools = Array.isArray(tools) && tools.length > 0;
+    const toolGuardProvider = this.resolveProviderAndModel(model).provider;
+    if (hasTools && toolGuardProvider &&
+        (freeProxyService.isPollinationsProvider(toolGuardProvider) || toolGuardProvider.id === "duckduckgo")) {
+      db.addLog({
+        endpoint: "/v1/chat/completions",
+        model: model || null,
+        resolvedModel: null,
+        providerId: toolGuardProvider.id,
+        status: 400,
+        latencyMs: Date.now() - startTime,
+        promptTokens: 0,
+        completionTokens: 0,
+        stream: Boolean(stream),
+        clientIp: req.ip || "127.0.0.1",
+        error: "tools_not_supported"
+      });
+      return res.status(400).json({
+        error: {
+          message: `Model "${model}" đang đi qua nguồn miễn phí không key (${toolGuardProvider.name}), nguồn này KHÔNG hỗ trợ tool calling. Hãy chọn một model từ provider có API key miễn phí (Groq / OpenRouter / Gemini / NVIDIA - dán key free vào tab "Nhà Cung Cấp") rồi gọi lại.`,
+          type: "invalid_request_error",
+          param: "tools",
+          code: "tools_not_supported",
+          hint: "WENKER Studio / agent loop: dung model groq llama-3.3-70b hoặc openrouter deepseek-r1 - ca hai loai key mien phi."
+        }
+      });
+    }
 
     // Validate required fields instead of crashing later with a 500
     if (messages.length === 0) {
@@ -318,8 +351,11 @@ class ProxyService {
     }
 
     // Cached answers cost no upstream budget: serve them before quota and network.
+    // Requests carrying tools bypass the cache entirely: the key covers only
+    // model+messages (not the tool schema), and a cached plain-text answer would
+    // silently swallow the model's tool_calls on replay.
     const cacheKey = db.cacheKey(targetModel, messages);
-    const cached = db.cacheGet(cacheKey);
+    const cached = hasTools ? null : db.cacheGet(cacheKey);
     if (cached) {
       const cPrompt = cached.usage?.prompt_tokens || this._estimatePromptTokens(messages);
       const cCompletion = cached.usage?.completion_tokens || this._estimateTokens(cached.content);
@@ -554,7 +590,12 @@ class ProxyService {
         messages,
         stream: Boolean(stream),
         ...(temperature !== undefined && { temperature }),
-        ...(max_tokens !== undefined && { max_tokens })
+        ...(max_tokens !== undefined && { max_tokens }),
+        // Forward function/tool calling verbatim (OpenAI-compatible upstreams).
+        // Without this the router silently dropped every agent's tool schema and
+        // the model could never emit tool_calls.
+        ...(hasTools && { tools }),
+        ...(hasTools && tool_choice !== undefined && { tool_choice })
       };
 
       const upstreamRes = await fetch(targetUrl, {
@@ -568,9 +609,11 @@ class ProxyService {
         const errText = await upstreamRes.text();
         console.error(`Upstream error (${provider.name}):`, upstreamRes.status, errText);
 
-        // Fallback to WENKER Cloud if enabled
+        // Fallback to WENKER Cloud if enabled. Skipped for tool requests: the
+        // failover chain replays plain messages (no tool schema), so any answer
+        // it returns would be a lie for an agent loop. Surface the real error.
         const settings = db.getSettings();
-        if (settings.enableSmartFallback && !res.headersSent) {
+        if (settings.enableSmartFallback && !res.headersSent && !hasTools) {
           console.log(`[Failover] Provider ${provider.name} failed with ${upstreamRes.status}. Falling back to WENKER Cloud.`);
           if (!quota.tryConsume(quotaSubject, this._estimatePromptTokens(messages))) {
             return quota.respondExhausted(req, res, quotaSubject);
@@ -704,7 +747,8 @@ class ProxyService {
         db.incrementKeyUsage(wenkerKey, promptTokens, completionTokens);
         if (isMetered) quota.commit(quotaSubject, promptTokens, completionTokens);
         // Cache generic answers too, so a repeated prompt never re-spends upstream budget.
-        if (data.choices) db.cacheSet(cacheKey, data.choices?.[0]?.message?.content || "", data.usage);
+        // Tool results are never cached: they are conversation state, not an answer.
+        if (data.choices && !hasTools) db.cacheSet(cacheKey, data.choices?.[0]?.message?.content || "", data.usage);
 
         return res.json(data);
       }

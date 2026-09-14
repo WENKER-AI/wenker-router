@@ -20,6 +20,7 @@
     "client/dist/",
     "system-prompts/",
     "web/",
+    "studio/",
     "!web/assets/banner.png",
     "!web/assets/icon.png",
     "!web/assets/chữ thường.ttf",

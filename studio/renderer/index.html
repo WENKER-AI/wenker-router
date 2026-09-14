@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data: https://cdn.jsdelivr.net; worker-src 'self' blob: https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self' https://cdn.jsdelivr.net;" />
+  <title>WENKER Studio</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="boot" class="boot">
+    <div class="boot-card">
+      <div class="boot-logo">WENKER <span>Studio</span></div>
+      <div id="boot-msg" class="boot-msg">Dang khoi dong router...</div>
+      <div id="boot-detail" class="boot-detail"></div>
+    </div>
+  </div>
+
+  <div id="app" class="app hidden">
+    <header class="topbar">
+      <div class="brand">WENKER <span>Studio</span></div>
+      <button id="btn-folder" class="tb-btn" title="Mo thu muc workspace">Mo thu muc</button>
+      <div id="ws-label" class="ws-label">chua co workspace</div>
+      <div class="spacer"></div>
+      <select id="model-select" class="model-select" title="Chon model"></select>
+      <label class="toggle" title="Bat/tat agent dung tool (doc/ghi file, chay lenh)">
+        <input type="checkbox" id="tools-enabled" checked />
+        <span>Agent tools</span>
+      </label>
+      <label class="toggle" title="Tu dong cho phep ghi file / chay lenh (khong hoi)">
+        <input type="checkbox" id="auto-allow" />
+        <span>Auto-allow</span>
+      </label>
+      <a id="btn-manage" class="tb-btn ghost" href="#" title="Mo bang dieu khien WENKER">Dashboard</a>
+    </header>
+
+    <div id="notice" class="notice hidden"></div>
+
+    <main class="main">
+      <aside class="sidebar">
+        <div class="panel-title">Explorer</div>
+        <div id="tree" class="tree"><div class="empty">Mo mot thu muc de bat dau.</div></div>
+      </aside>
+
+      <section class="editor-pane">
+        <div id="tabs" class="tabs"></div>
+        <div id="editor" class="editor">
+          <textarea id="fallback-editor" class="fallback-editor hidden" spellcheck="false"></textarea>
+        </div>
+      </section>
+
+      <section class="chat-pane">
+        <div class="panel-title">Chat</div>
+        <div id="chat" class="chat">
+          <div class="chat-hint">
+            <p>WENKER Studio goi thang model qua router cua ban va cho phep no <b>doc/ghi file, chay lenh</b> trong thu muc mo ra.</p>
+            <p class="muted">Model mien phi khong key (Pollinations/DuckDuckGo) <b>khong ho tro tool</b> - router se bao 400 trung thuc. Hay chon Groq / OpenRouter / Gemini da cau hinh key.</p>
+          </div>
+        </div>
+        <div class="composer">
+          <textarea id="prompt" class="prompt" placeholder="Nho agent lam gi do... (Enter gui, Shift+Enter xuong dong)"></textarea>
+          <div class="composer-row">
+            <span id="loop-status" class="loop-status"></span>
+            <button id="btn-stop" class="btn danger hidden">Dung</button>
+            <button id="btn-send" class="btn primary">Gui</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <div id="modal-title" class="modal-title"></div>
+      <pre id="modal-body" class="modal-body"></pre>
+      <div class="modal-actions">
+        <button id="modal-deny" class="btn">Tu choi</button>
+        <button id="modal-allow" class="btn primary">Cho phep</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs/loader.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

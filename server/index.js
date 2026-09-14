@@ -109,6 +109,14 @@ const webPath = path.join(__dirname, '..', 'web');
 app.use('/web', express.static(webPath));
 app.get('/web', (req, res) => res.redirect('/web/'));
 
+// WENKER Studio (IDE Electron) — renderer là static, phục vụ luôn dưới /ide để:
+//   1) app Electron chỉ việc loadURL http://127.0.0.1:PORT/ide/ (chung origin, khỏi CORS);
+//   2) ai chưa cài app vẫn thử được UI trong browser.
+// Thu muc nguon la studio/ (tranh va cham hoa/thuong voi IDE/ cua VS Code extension).
+const idePath = path.join(__dirname, '..', 'studio', 'renderer');
+app.use('/ide', express.static(idePath));
+app.get('/ide', (req, res) => res.redirect('/ide/'));
+
 const fs = require('fs');
 const clientIndex = path.join(clientDistPath, 'index.html');
 const notFoundPage = path.join(webPath, '404.html');

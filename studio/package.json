@@ -1,0 +1,16 @@
+{
+  "name": "wenker-studio",
+  "productName": "WENKER Studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WENKER Studio - desktop AI IDE (Electron) that boots the WENKER router in-process and drives real tool-calling agent loops.",
+  "main": "main.js",
+  "author": "arist999",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^31.3.1"
+  }
+}

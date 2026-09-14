@@ -394,15 +394,28 @@ class FreeProxyService {
     if (!Array.isArray(messages)) return [];
     return messages
       .filter(m => m && typeof m === "object")
-      .map(m => ({
-        role: ["system", "user", "assistant", "tool"].includes(m.role) ? m.role : "user",
-        content: typeof m.content === "string"
+      .map(m => {
+        const role = ["system", "user", "assistant", "tool"].includes(m.role) ? m.role : "user";
+        const content = typeof m.content === "string"
           ? m.content
           : Array.isArray(m.content)
             ? m.content.map(c => (typeof c === "string" ? c : c?.text || "")).join("")
-            : m.content == null ? "" : JSON.stringify(m.content)
-      }))
-      .filter(m => m.content !== "");
+            : m.content == null ? "" : JSON.stringify(m.content);
+        const out = { role, content };
+        // Tool-calling round-trip: an assistant turn may carry tool_calls (often with
+        // content === null) and a tool turn is identified ONLY by tool_call_id.
+        // Stripping these fields used to break every agent loop: the upstream model
+        // never saw its own calls nor their results, so it could not continue.
+        if (role === "assistant" && Array.isArray(m.tool_calls) && m.tool_calls.length) {
+          out.tool_calls = m.tool_calls;
+        }
+        if (role === "tool" && (m.tool_call_id || m.toolCallId)) {
+          out.tool_call_id = String(m.tool_call_id || m.toolCallId);
+          if (m.name) out.name = String(m.name);
+        }
+        return out;
+      })
+      .filter(m => m.content !== "" || m.tool_calls || m.tool_call_id);
   }
 
   /**
