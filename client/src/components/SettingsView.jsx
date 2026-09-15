@@ -10,8 +10,7 @@ import {
   Info,
   Terminal,
   Laptop,
-  Globe,
-  Users
+  Globe
 } from 'lucide-react';
 import { authFetch } from '../session';
 import { useI18n } from '../i18n';
@@ -235,29 +234,6 @@ export default function SettingsView() {
             <p className="text-[10px] text-slate-500 leading-relaxed">
               {t('set.proxySaveNote')}
             </p>
-          </div>
-
-          {/* Card: WENKER Cloud Quota */}
-          <div className="card-glass p-6 rounded-xl space-y-4">
-            <h2 className="font-bold text-sm text-white flex items-center gap-2">
-              <Users className="w-4 h-4 text-cyan-400" />
-              <span>{t('set.quotaTitle')}</span>
-            </h2>
-            <div>
-              <label className="block text-slate-300 font-medium mb-1 text-xs">
-                {t('set.quotaLabel')}
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={settings.wenkerCloudDailyLimit ?? 50}
-                onChange={(e) => setSettings({ ...settings, wenkerCloudDailyLimit: Number(e.target.value) })}
-                className="w-40 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono text-xs focus:border-cyan-500 focus:outline-none"
-              />
-              <p className="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
-                {t('set.quotaHelp')}
-              </p>
-            </div>
           </div>
 
           {/* Card: About */}
