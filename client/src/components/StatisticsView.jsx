@@ -9,7 +9,8 @@ import {
   Timer,
   Route,
   Database,
-  ArrowUpRight
+  Download,
+  PieChart
 } from 'lucide-react';
 import { authFetch } from '../session';
 import { useI18n } from '../i18n';
@@ -64,6 +65,88 @@ function KpiTile({ icon: Icon, label, value, sub, tone = 'cyan' }) {
   );
 }
 
+// Static hex palette for the donut: inline styles bypass Tailwind's purge entirely.
+const DONUT_COLORS = ['#22d3ee', '#818cf8', '#34d399', '#38bdf8', '#fbbf24', '#fb7185', '#a78bfa', '#f472b6'];
+
+// Request-share donut built from pure SVG dash-array circles (no chart library).
+function ProviderDonut({ providers, otherLabel }) {
+  const top = providers.slice(0, 7);
+  const rest = providers.slice(7).reduce((s, p) => s + p.requests, 0);
+  const slices = top.map((p) => ({ name: p.name, value: p.requests }));
+  if (rest > 0) slices.push({ name: otherLabel, value: rest });
+  const sum = slices.reduce((s, x) => s + x.value, 0) || 1;
+  let acc = 0;
+  return (
+    <div className="flex items-center gap-4 mb-4">
+      <svg viewBox="0 0 42 42" className="w-28 h-28 shrink-0">
+        <circle cx="21" cy="21" r="15.915" fill="none" stroke="#1e293b" strokeWidth="4.5" />
+        <g transform="rotate(-90 21 21)">
+          {slices.map((s, i) => {
+            const pct = (s.value / sum) * 100;
+            const off = -acc;
+            acc += pct;
+            return (
+              <circle
+                key={s.name}
+                cx="21" cy="21" r="15.915" fill="none"
+                stroke={DONUT_COLORS[i % DONUT_COLORS.length]}
+                strokeWidth="4.5"
+                strokeDasharray={`${pct.toFixed(3)} ${(100 - pct).toFixed(3)}`}
+                strokeDashoffset={off}
+              >
+                <title>{`${s.name}: ${s.value} · ${Math.round(pct)}%`}</title>
+              </circle>
+            );
+          })}
+        </g>
+      </svg>
+      <ul className="space-y-1 text-[11px] min-w-0 flex-1">
+        {slices.map((s, i) => (
+          <li key={s.name} className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: DONUT_COLORS[i % DONUT_COLORS.length] }} />
+            <span className="truncate text-slate-300" title={s.name}>{s.name}</span>
+            <span className="ml-auto font-mono text-slate-500 shrink-0 pl-2">{Math.round((s.value / sum) * 100)}%</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// Success vs failed per day as two SVG polylines; invisible rects carry hover tooltips.
+function DailyLines({ daily, successLabel, failedLabel }) {
+  const W = 100;
+  const H = 34;
+  const n = daily.length;
+  if (!n) return null;
+  const maxV = Math.max(1, ...daily.map((d) => d.requests));
+  const x = (i) => (n === 1 ? W / 2 : (i / (n - 1)) * W);
+  const y = (v) => H - 1 - (v / maxV) * (H - 2);
+  const pts = (get) => daily.map((d, i) => `${x(i).toFixed(2)},${y(get(d)).toFixed(2)}`).join(' ');
+  const colW = W / n;
+  return (
+    <div>
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="w-full h-32">
+        {[0.25, 0.5, 0.75].map((f) => (
+          <line key={f} x1="0" x2={W} y1={y(maxV * f)} y2={y(maxV * f)} stroke="#334155" strokeWidth="0.5" strokeDasharray="2 3" vectorEffect="non-scaling-stroke" />
+        ))}
+        <polyline points={pts((d) => d.requests - d.failed)} fill="none" stroke="#34d399" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+        <polyline points={pts((d) => d.failed)} fill="none" stroke="#fb7185" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+        {daily.map((d, i) => (
+          <rect key={d.date} x={x(i) - colW / 2} y="0" width={colW} height={H} fill="transparent">
+            <title>{`${d.date}: ${d.requests - d.failed} ${successLabel} · ${d.failed} ${failedLabel}`}</title>
+          </rect>
+        ))}
+      </svg>
+      <div className="flex justify-between text-[9px] font-mono text-slate-500 mt-1">
+        <span>{daily[0].date.slice(5)}</span>
+        {n > 2 && <span>{daily[Math.floor(n / 2)].date.slice(5)}</span>}
+        <span>{daily[n - 1].date.slice(5)}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function StatisticsView() {
   const { t } = useI18n();
   const [days, setDays] = useState(14);
@@ -91,6 +174,42 @@ export default function StatisticsView() {
   useEffect(() => {
     fetchStats(days);
   }, [days]);
+
+  // One CSV with four sections (totals / daily / by provider / by model). BOM +
+  // CRLF so Excel on Windows opens it with correct UTF-8 Vietnamese names.
+  const exportCsv = () => {
+    if (!data) return;
+    const esc = (v) => {
+      const s = String(v ?? '');
+      return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const rows = [];
+    rows.push(['# totals']);
+    rows.push(['metric', 'value']);
+    Object.entries(data.totals || {}).forEach(([k, v]) => rows.push([k, v]));
+    rows.push([]);
+    rows.push(['# daily']);
+    rows.push(['date', 'requests', 'success', 'failed', 'tokens', 'cacheHits', 'fallbacks', 'avgLatencyMs']);
+    (data.daily || []).forEach((d) => rows.push([d.date, d.requests, d.requests - d.failed, d.failed, d.tokens, d.cacheHits, d.fallbacks, d.avgLatencyMs]));
+    rows.push([]);
+    rows.push(['# by_provider']);
+    rows.push(['providerId', 'name', 'requests', 'tokens', 'successRate', 'avgLatencyMs', 'fallbacks']);
+    (data.byProvider || []).forEach((p) => rows.push([p.providerId, p.name, p.requests, p.tokens, p.successRate, p.avgLatencyMs, p.fallbacks]));
+    rows.push([]);
+    rows.push(['# by_model']);
+    rows.push(['model', 'requests', 'tokens']);
+    (data.byModel || []).forEach((m) => rows.push([m.model, m.requests, m.tokens]));
+    const csv = '\uFEFF' + rows.map((r) => r.map(esc).join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `wenker-usage-${days}d-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
 
   const totals = data?.totals;
   const daily = data?.daily || [];
@@ -131,6 +250,10 @@ export default function StatisticsView() {
               </button>
             ))}
           </div>
+          <button onClick={exportCsv} disabled={!data} className="btn-secondary text-xs disabled:opacity-40">
+            <Download className="w-3.5 h-3.5" />
+            <span>{t('stat.exportCsv')}</span>
+          </button>
           <button onClick={() => fetchStats(days)} className="btn-secondary text-xs">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>{t('stat.refresh')}</span>
@@ -204,14 +327,42 @@ export default function StatisticsView() {
             )}
           </div>
 
+          {/* Success vs failed lines */}
+          <div className="card-glass p-5 rounded-2xl">
+            <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
+              <h2 className="text-sm font-bold text-white flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                {t('stat.svTitle')}
+              </h2>
+              <div className="flex items-center gap-3 text-[11px]">
+                <span className="flex items-center gap-1.5 text-emerald-300">
+                  <span className="w-3 h-0.5 rounded bg-emerald-400 inline-block" />
+                  {t('stat.successLine')}
+                </span>
+                <span className="flex items-center gap-1.5 text-rose-300">
+                  <span className="w-3 h-0.5 rounded bg-rose-400 inline-block" />
+                  {t('stat.failedLine')}
+                </span>
+              </div>
+            </div>
+            {daily.length > 0 ? (
+              <DailyLines daily={daily} successLabel={t('stat.successLine')} failedLabel={t('stat.failedLine')} />
+            ) : (
+              <div className="h-32 flex items-center justify-center text-slate-500 text-xs">{t('stat.noData')}</div>
+            )}
+          </div>
+
           {/* Provider + model breakdown */}
           <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
             {/* By provider */}
             <div className="card-glass p-5 rounded-2xl">
               <h2 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
-                <ArrowUpRight className="w-4 h-4 text-cyan-400" />
+                <PieChart className="w-4 h-4 text-cyan-400" />
                 {t('stat.byProvider')}
               </h2>
+              {data && data.byProvider.length > 0 && (
+                <ProviderDonut providers={data.byProvider} otherLabel={t('stat.other')} />
+              )}
               {data && data.byProvider.length === 0 ? (
                 <p className="text-xs text-slate-500 py-6 text-center">{t('stat.noData')}</p>
               ) : (

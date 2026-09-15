@@ -508,7 +508,12 @@ const STRINGS = {
   'stat.colReq': { vi: 'Req', en: 'Req', zh: '请求', fr: 'Req' },
   'stat.colTok': { vi: 'Token', en: 'Tokens', zh: '令牌', fr: 'Jetons' },
   'stat.colRate': { vi: 'OK', en: 'OK', zh: '成功', fr: 'OK' },
-  'stat.colLat': { vi: 'Trễ', en: 'Lat.', zh: '延迟', fr: 'Lat.' },};
+  'stat.colLat': { vi: 'Trễ', en: 'Lat.', zh: '延迟', fr: 'Lat.' },
+  'stat.exportCsv': { vi: 'Xuất CSV', en: 'Export CSV', zh: '导出 CSV', fr: 'Exporter CSV' },
+  'stat.svTitle': { vi: 'Thành công vs thất bại theo ngày', en: 'Success vs failed by day', zh: '每日成功与失败', fr: 'Succès vs échecs par jour' },
+  'stat.successLine': { vi: 'thành công', en: 'success', zh: '成功', fr: 'succès' },
+  'stat.failedLine': { vi: 'thất bại', en: 'failed', zh: '失败', fr: 'échecs' },
+  'stat.other': { vi: 'Khác', en: 'Other', zh: '其他', fr: 'Autre' },};
 
 function detectLang() {
   try {
