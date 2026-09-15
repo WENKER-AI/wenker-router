@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WENKER Router — Một lớp sở hữu AI hoàn toàn mới</title>
+  <meta name="description" content="WENKER Router hợp nhất 181 nhà cung cấp và 560+ model AI sau hai chuẩn mở. Mã nguồn mở MIT, chạy 100% trên máy bạn. Một lớp sở hữu AI hoàn toàn mới." />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon-w.svg" />
+  <link rel="stylesheet" href="assets/landing.css" />
+</head>
+<body>
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- ================= ANNOUNCEMENT ================= -->
+  <a class="announce" href="#bat-dau">
+    <span class="announce-dot"></span>
+    WENKER Router 2.0 — sắp ra mắt · Xem trước tính năng
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+
+  <!-- ================= HEADER ================= -->
+  <header class="site-header" id="siteHeader">
+    <div class="container nav-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
+            <path d="M2 5l4 14 4.5-10L15 19l4-14" stroke="url(#wg)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs><linearGradient id="wg" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#818cf8"/><stop offset="1" stop-color="#67e8f9"/></linearGradient></defs>
+          </svg>
+        </span>
+        <span class="brand-text">WENKER<em>·</em>ROUTER</span>
+      </a>
+      <nav class="nav-links" id="navLinks">
+        <a href="#luong-viec">Luồng việc</a>
+        <a href="#so-sanh">So sánh</a>
+        <a href="#tinh-nang">Tính năng</a>
+        <a href="#tai">Cài đặt</a>
+        <a href="#docs">Tài liệu</a>
+        <a href="#repo">Mã nguồn</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="btn btn-ghost btn-sm" data-video-open>▶ Xem video</button>
+        <a class="btn btn-primary btn-sm" href="#tai">Tải về</a>
+        <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ================= HERO ================= -->
+    <section class="hero">
+      <canvas id="netCanvas" aria-hidden="true"></canvas>
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-grid-lines" aria-hidden="true"></div>
+      <div class="container hero-inner">
+        <span class="eyebrow reveal"><i class="pulse-dot"></i>Mã nguồn mở · MIT · Không telemetry</span>
+        <h1 class="hero-title">
+          <span class="line reveal">Một lớp sở hữu AI</span>
+          <span class="line reveal"><em class="serif">hoàn toàn mới.</em></span>
+        </h1>
+        <p class="lede reveal">Hợp nhất <strong>181 nhà cung cấp</strong> và <strong>560+ model</strong> — OpenAI, Anthropic, DeepSeek, Qwen, Ollama — sau hai chuẩn API mở. Chạy trên máy bạn. <em class="serif-inline">Thuộc về</em> máy bạn.</p>
+        <div class="hero-cta reveal">
+          <a class="btn btn-primary" href="#tai">Bắt đầu trong 30 giây</a>
+          <button class="btn btn-ghost" data-video-open><span class="play-ico">▶</span> Xem video giới thiệu</button>
+        </div>
+
+        <!-- Terminal tự chạy như video -->
+        <div class="terminal reveal">
+          <div class="term-bar">
+            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+            <span class="term-title">wenker — live demo</span>
+            <span class="term-live"><i></i>LIVE</span>
+          </div>
+          <pre id="termDemo" aria-label="Demo terminal"></pre>
+        </div>
+
+        <div class="hero-scroll reveal" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <!-- ================= MARQUEE ================= -->
+    <div class="marquee-band" aria-hidden="true">
+      <div class="marquee">
+        <div class="marquee-track">
+          <span>OpenAI</span><i>◆</i><span>Anthropic</span><i>◆</i><span>Google Gemini</span><i>◆</i><span>DeepSeek</span><i>◆</i><span>Qwen</span><i>◆</i><span>GLM</span><i>◆</i><span>Groq</span><i>◆</i><span>Together AI</span><i>◆</i><span>Fireworks</span><i>◆</i><span>Mistral</span><i>◆</i><span>Ollama</span><i>◆</i><span>LM Studio</span><i>◆</i><span>vLLM</span><i>◆</i><span>Cerebras</span><i>◆</i><span>SambaNova</span><i>◆</i><span>xAI Grok</span><i>◆</i><span>OpenRouter</span><i>◆</i><span>SiliconFlow</span><i>◆</i><span>Moonshot Kimi</span><i>◆</i><span>Azure OpenAI</span><i>◆</i><span>AWS Bedrock</span><i>◆</i><span>GitHub Models</span><i>◆</i>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= STATS ================= -->
+    <section class="stats-band">
+      <div class="container stats-grid">
+        <div class="stat reveal"><div class="stat-num"><span data-count="181">0</span></div><div class="stat-label">Nhà cung cấp có sẵn</div></div>
+        <div class="stat reveal"><div class="stat-num"><span data-count="560">0</span><em>+</em></div><div class="stat-label">Model định tuyến được</div></div>
+        <div class="stat reveal"><div class="stat-num"><span data-count="245">0</span></div><div class="stat-label">Model trần (unique)</div></div>
+        <div class="stat reveal"><div class="stat-num"><span data-count="2">0</span></div><div class="stat-label">Chuẩn API tương thích</div></div>
+        <div class="stat reveal"><div class="stat-num"><span data-count="0">0</span></div><div class="stat-label">Byte telemetry</div></div>
+      </div>
+    </section>
+
+    <!-- ================= WORKFLOW TABS ================= -->
+    <section class="section" id="luong-viec">
+      <div class="container">
+        <span class="section-eyebrow reveal">Tự động hoá cho người dùng thật</span>
+        <h2 class="section-title reveal">Chọn luồng việc.<br/><em class="serif">Xem WENKER</em> đi vào việc.</h2>
+        <p class="section-sub reveal">Cùng một gateway, bốn cách dùng. Mỗi tab là một nhóm công việc mà router xử lý trọn vẹn.</p>
+
+        <div class="wtabs reveal">
+          <div class="wtab-bar" id="wtabBar" role="tablist">
+            <button class="wtab active" role="tab" data-wtab="w-agent">Agent lập trình</button>
+            <button class="wtab" role="tab" data-wtab="w-chat">Ứng dụng chat</button>
+            <button class="wtab" role="tab" data-wtab="w-local">Chạy offline</button>
+            <button class="wtab" role="tab" data-wtab="w-team">Đội nhóm</button>
+            <span class="wtab-indicator" id="wtabIndicator"></span>
+          </div>
+
+          <div class="wpanel active" id="w-agent" role="tabpanel">
+            <div class="wpanel-copy">
+              <h3>Trợ lý code không bao giờ đứng hình.</h3>
+              <p>Claude Code, Cursor, Cline, Roo Code, Aider, Continue — trỏ Base URL về WENKER và toàn bộ agent dùng chung một ngân hàng model với chuỗi dự phòng tự động.</p>
+              <ul class="chip-list"><li>Claude Code CLI</li><li>Cursor</li><li>Cline / Roo Code</li><li>Aider</li><li>Continue.dev</li><li>OpenHands</li></ul>
+            </div>
+            <div class="wpanel-card">
+              <div class="mock-window">
+                <div class="mock-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="mock-title">claude-code — routed</span></div>
+                <div class="mock-body">
+                  <div class="mock-line"><span class="c-dim">$</span> ANTHROPIC_BASE_URL=http://localhost:3600 claude</div>
+                  <div class="mock-line c-dim">› model: wenker-cloud/wenker-deepseek-r1-free</div>
+                  <div class="mock-line"><span class="c-ok">✓ resolved</span> → pollinations/openai-fast <span class="c-dim">(fallback #1)</span></div>
+                  <div class="mock-line"><span class="c-ok">✓ stream</span> 214 tok · 1.2s ttft · 0 errors</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wpanel" id="w-chat" role="tabpanel">
+            <div class="wpanel-copy">
+              <h3>Một OpenWebUI, mọi thế giới model.</h3>
+              <p>OpenWebUI, LibreChat, NextChat hay bất kỳ client chuẩn OpenAI nào cũng nhận toàn bộ 560+ model qua một dòng cấu hình duy nhất.</p>
+              <ul class="chip-list"><li>OpenWebUI</li><li>LibreChat</li><li>NextChat</li><li>Bob / Raycast</li><li>Chatbox</li><li>SDK OpenAI</li></ul>
+            </div>
+            <div class="wpanel-card">
+              <div class="mock-window">
+                <div class="mock-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="mock-title">openwebui — settings</span></div>
+                <div class="mock-body">
+                  <div class="mock-line c-dim">OpenAI API Base URL</div>
+                  <div class="mock-line"><span class="c-hl">http://localhost:3600/v1</span></div>
+                  <div class="mock-line c-dim">Model hiển thị: <span class="c-ok">560+</span> từ 181 nguồn</div>
+                  <div class="mock-line"><span class="c-ok">✓ connected</span> · /v1/models trả về 200</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wpanel" id="w-local" role="tabpanel">
+            <div class="wpanel-copy">
+              <h3>Không mạng? <em class="serif">Không vấn đề.</em></h3>
+              <p>Ollama, LM Studio, vLLM, LocalAI, llama.cpp — mọi runtime cục bộ nằm chung một danh sách model. Tắt mạng vẫn chat được, dữ liệu không rời máy.</p>
+              <ul class="chip-list"><li>Ollama</li><li>LM Studio</li><li>vLLM</li><li>LocalAI</li><li>KoboldCpp</li><li>llama.cpp</li></ul>
+            </div>
+            <div class="wpanel-card">
+              <div class="mock-window">
+                <div class="mock-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="mock-title">ollama — local pool</span></div>
+                <div class="mock-body">
+                  <div class="mock-line"><span class="c-prompt">$</span> curl localhost:3600/v1/models</div>
+                  <div class="mock-line c-dim">{ "data": [</div>
+                  <div class="mock-line">&nbsp;&nbsp;{ "id": <span class="c-hl">"ollama/qwen2.5-coder"</span> },</div>
+                  <div class="mock-line">&nbsp;&nbsp;{ "id": <span class="c-hl">"lmstudio/llama-3.1-8b"</span> } ] }</div>
+                  <div class="mock-line"><span class="c-ok">✓ offline-ready</span> · 0 request ra ngoài</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wpanel" id="w-team" role="tabpanel">
+            <div class="wpanel-copy">
+              <h3>Một gateway cho cả nhà, cả team.</h3>
+              <p>9 tài khoản PIN + hạn mức hằng ngày cho hàng chờ miễn phí. Một máy chạy router, mọi thiết bị trong LAN cùng dùng — mỗi người một quota riêng.</p>
+              <ul class="chip-list"><li>9 PIN users</li><li>Quota hằng ngày</li><li>LAN-wide access</li><li>Key admin cục bộ</li><li>Nhật ký request</li><li>Không cloud</li></ul>
+            </div>
+            <div class="wpanel-card">
+              <div class="mock-window">
+                <div class="mock-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="mock-title">dashboard — quota</span></div>
+                <div class="mock-body">
+                  <div class="mock-line c-dim">user&nbsp;&nbsp;&nbsp;quota hôm nay&nbsp;&nbsp;&nbsp;trạng thái</div>
+                  <div class="mock-line">PIN 1&nbsp;&nbsp;<span class="qbar"><i style="width:70%"></i></span> 70%&nbsp;&nbsp;<span class="c-ok">active</span></div>
+                  <div class="mock-line">PIN 2&nbsp;&nbsp;<span class="qbar"><i style="width:40%"></i></span> 40%&nbsp;&nbsp;<span class="c-ok">active</span></div>
+                  <div class="mock-line">PIN 3&nbsp;&nbsp;<span class="qbar"><i style="width:100%"></i></span> 100% <span class="c-warn">hết hạn mức</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= COMPARISON (TitanGate) ================= -->
+    <section class="section section-alt vs-section" id="so-sanh">
+      <div class="container">
+        <span class="section-eyebrow reveal">WENKER Router · so với · cổng đám mây truyền thống</span>
+        <h2 class="section-title reveal">Minh bạch<br/><em class="serif">vs</em> Mập mờ.</h2>
+
+        <div class="vs-grid">
+          <div class="vs-row reveal">
+            <div class="vs-cell vs-good"><span class="vs-kicker">WENKER Router</span><h3>Sự thật về lỗi</h3><p>Upstream hết hạn mức trả 402, bạn nhận 402 — kèm nguồn gây lỗi trong nhật ký. Không câu trả lời giả được dựng lên.</p></div>
+            <div class="vs-vs" aria-hidden="true">VS</div>
+            <div class="vs-cell vs-bad"><span class="vs-kicker">Thế giới cũ</span><h3>Lỗi được che</h3><p>Model chết im lặng được thay bằng trả lời “tạm ổn”, không ai biết bên dưới đang xảy ra điều gì.</p></div>
+          </div>
+          <div class="vs-row reveal">
+            <div class="vs-cell vs-good"><span class="vs-kicker">WENKER Router</span><h3>Dữ liệu ở máy bạn</h3><p>Key, nhật ký, cấu hình nằm trong <code>~/.wenker</code>. Muốn xoá hết? Xoá một thư mục. Sao lưu? Copy một thư mục.</p></div>
+            <div class="vs-vs" aria-hidden="true">VS</div>
+            <div class="vs-cell vs-bad"><span class="vs-kicker">Thế giới cũ</span><h3>Telemetry mặc định</h3><p>Mọi prompt đi qua máy chủ người khác. Đọc kỹ điều khoản mới biết họ giữ bao lâu, dùng cho việc gì.</p></div>
+          </div>
+          <div class="vs-row reveal">
+            <div class="vs-cell vs-good"><span class="vs-kicker">WENKER Router</span><h3>Miễn phí có giới hạn, nói rõ giới hạn</h3><p>Hàng chờ miễn phí ghi rõ “có hạn mức”. Cần ổn định? Tự gắn key của chính nhà cung cấp đó — quyền quyết định là của bạn.</p></div>
+            <div class="vs-vs" aria-hidden="true">VS</div>
+            <div class="vs-cell vs-bad"><span class="vs-kicker">Thế giới cũ</span><h3>“Free” đến khi không còn free</h3><p>Dùng thử mượt mà, rồi bất ngờ khoá tài khoản hoặc đổi giá. Dữ liệu đã kịp bị khoá vào hệ sinh thái.</p></div>
+          </div>
+          <div class="vs-row reveal">
+            <div class="vs-cell vs-good"><span class="vs-kicker">WENKER Router</span><h3>Một lần cài, thuộc về bạn</h3><p>MIT, không thuê bao, không giấy phép chủ. Nâng cấp khi bạn muốn, đứng im khi bạn muốn — gateway vẫn chạy.</p></div>
+            <div class="vs-vs" aria-hidden="true">VS</div>
+            <div class="vs-cell vs-bad"><span class="vs-kicker">Thế giới cũ</span><h3>Thuê bao khoá-in</h3><p>Ngừng đóng tiền là mất gateway, mất cấu hình, mất lịch sử. Chi phí sở hữu tăng theo từng năm.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FEATURES BENTO ================= -->
+    <section class="section" id="tinh-nang">
+      <div class="container">
+        <span class="section-eyebrow reveal">Gateway cục bộ cho người dùng kỹ tính</span>
+        <h2 class="section-title reveal">Độ chính xác cho<br/>mọi <em class="serif">workflow</em> của bạn.</h2>
+        <p class="section-sub reveal">Không dịch vụ trung gian, không khoá tài khoản. Dữ liệu và key của bạn nằm trên máy bạn.</p>
+
+        <div class="feat-grid">
+          <article class="feat-card reveal">
+            <div class="feat-num">01</div>
+            <h3>Một model id,<br/>mọi nguồn dự phòng</h3>
+            <p>Gọi bằng tên thân thiện; router phân giải sang model thật, tự fallback theo thứ tự bạn đặt, và ghi rõ nguồn nào thực sự trả lời.</p>
+            <div class="feat-tags"><span>SMART FALLBACK</span><span>CIRCUIT BREAKER</span><span>MODEL ALIAS</span></div>
+          </article>
+          <article class="feat-card reveal">
+            <div class="feat-num">02</div>
+            <h3>Trỏ Base URL<br/>về máy bạn là xong</h3>
+            <p>Hai chuẩn OpenAI <code>/v1/chat/completions</code> và Anthropic <code>/v1/messages</code>, kèm SSE streaming truyền thẳng từng token.</p>
+            <div class="feat-tags"><span>OPENAI /V1</span><span>ANTHROPIC</span><span>SSE STREAMING</span></div>
+          </article>
+          <article class="feat-card reveal">
+            <div class="feat-num">03</div>
+            <h3>Key &amp; dữ liệu<br/>không rời máy bạn</h3>
+            <p>Zero database: mọi thứ là file JSON trong <code>~/.wenker</code>. Muốn xoá hết? Xoá một thư mục. Sao lưu? Copy một thư mục.</p>
+            <div class="feat-tags"><span>ZERO DATABASE</span><span>KEY ĐƯỢC CHE</span><span>KHÔNG TELEMETRY</span></div>
+          </article>
+          <article class="feat-card reveal">
+            <div class="feat-num">04</div>
+            <h3>Số liệu thật,<br/>đo từ instance chạy thật</h3>
+            <p>Dashboard quản lý key, ping độ trễ, probe nguồn sống thật; mỗi request ghi lại provider, model đích, token và cờ cache.</p>
+            <div class="feat-tags"><span>PROBE NGUỒN THẬT</span><span>PING ĐỘ TRỄ</span><span>NHẬT KÝ REQUEST</span></div>
+          </article>
+        </div>
+
+        <div class="note reveal"><strong>Nói thẳng về bản miễn phí:</strong> các “tier” WENKER Cloud / VIP là lối tắt cấu hình sẵn, trỏ tới nhà cung cấp bên thứ ba. Nguồn nào cần key thì vẫn cần key của bạn.</div>
+      </div>
+    </section>
+
+    <!-- ================= TESTIMONIALS MARQUEE (V7 style) ================= -->
+    <section class="section section-alt" id="phan-hoi">
+      <div class="container">
+        <span class="section-eyebrow reveal">Tiếng nói từ cộng đồng</span>
+        <h2 class="section-title reveal">Kết quả.<br/><em class="serif">Không phóng đại.</em></h2>
+      </div>
+      <div class="quotes-marquee" aria-hidden="false">
+        <div class="quotes-track">
+          <figure class="quote-card"><div class="quote-metric">4 công cụ → 1 cổng</div><blockquote>“Trước đây mỗi công cụ một key, một base URL. Giờ chỉ còn một dòng <code>localhost:3600</code> cho cả bốn máy trạm.”</blockquote><figcaption><strong>DevOps lead</strong><span>SaaS nhỏ</span></figcaption></figure>
+          <figure class="quote-card"><div class="quote-metric">0 lần đứng hình lúc 2h sáng</div><blockquote>“Hết quota không còn là vấn đề. Chuỗi dự phòng tự nhảy sang nguồn còn sống, log ghi rõ từng bước.”</blockquote><figcaption><strong>Freelancer AI</strong><span>Claude Code hằng ngày</span></figcaption></figure>
+          <figure class="quote-card"><div class="quote-metric">100% offline khả dụng</div><blockquote>“Cái tôi thích nhất: khi nguồn lỗi, nó báo lỗi thật. Không câu trả lời giả, không ma thuật đen.”</blockquote><figcaption><strong>Kỹ sư bảo mật</strong><span>Chạy hoàn toàn offline</span></figcaption></figure>
+          <figure class="quote-card"><div class="quote-metric">560+ model, 1 cấu hình</div><blockquote>“OpenWebUI nhà tôi giờ hiển thị cả Ollama lẫn GPT-4o trong một danh sách. Đặt cấu hình đúng một lần.”</blockquote><figcaption><strong>Người dùng gia đình</strong><span>LAN chung</span></figcaption></figure>
+          <figure class="quote-card"><div class="quote-metric">~157 kB, 3 dependency</div><blockquote>“Gói npm nhẹ đến mức tôi tưởng thiếu gì. Hóa ra toàn bộ gateway chỉ cần thế.”</blockquote><figcaption><strong>Kỹ sư nền tảng</strong><span>Tự host mọi thứ</span></figcaption></figure>
+          <figure class="quote-card"><div class="quote-metric">1 thư mục = cả database</div><blockquote>“Sao lưu cấu hình cho cả team bây giờ là copy <code>~/.wenker</code>. Đơn giản đến mức khó tin.”</blockquote><figcaption><strong>CTO</strong><span>Công ty 12 người</span></figcaption></figure>
+        </div>
+      </div>
+      <p class="honesty-note reveal container">WENKER không nói dối — và trang này cũng vậy: các trích dẫn trên là <strong>minh hoạ thiết kế</strong> theo bố cục V7 Labs. Hãy thay bằng phản hồi thật khi dự án có.</p>
+    </section>
+
+    <!-- ================= STEPS ================= -->
+    <section class="section" id="quy-trinh">
+      <div class="container">
+        <span class="section-eyebrow reveal">Từ lệnh đầu tiên đến vận hành</span>
+        <h2 class="section-title reveal">Bốn bước.<br/><em class="serif">Không bước thứ năm.</em></h2>
+        <div class="steps">
+          <div class="step reveal"><span class="step-num">01</span><h3>Cài đặt</h3><p><code>npm install -g wenker-router</code> rồi gõ <code>wenker</code>. Node.js ≥ 18 là đủ.</p></div>
+          <div class="step reveal"><span class="step-num">02</span><h3>Trỏ Base URL</h3><p>Cấu hình <code>http://localhost:3600/v1</code> trong Cursor, Claude Code, Cline hay OpenWebUI.</p></div>
+          <div class="step reveal"><span class="step-num">03</span><h3>Gọi model</h3><p>Dùng tên <code>provider/model</code> để định tuyến chính xác, hoặc alias miễn phí để router tự phân giải.</p></div>
+          <div class="step reveal"><span class="step-num">04</span><h3>Quan sát &amp; tối ưu</h3><p>Xem nhật ký, ping độ trễ, chỉnh chuỗi dự phòng — mọi thứ trong dashboard trình duyệt.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= INSTALL ================= -->
+    <section class="section section-alt" id="tai">
+      <div class="container">
+        <span class="section-eyebrow reveal">Node.js ≥ 18 · một lệnh là chạy</span>
+        <h2 class="section-title reveal">Cài trong <em class="serif">30 giây.</em></h2>
+
+        <div class="tabs reveal">
+          <div class="tab-bar" id="installTabs" role="tablist">
+            <button class="tab active" role="tab" data-tab="p-npm">npm toàn cục</button>
+            <button class="tab" role="tab" data-tab="p-src">Từ mã nguồn</button>
+            <button class="tab" role="tab" data-tab="p-bat">Windows 1-chạm</button>
+            <button class="tab" role="tab" data-tab="p-npx">Không cài (npx)</button>
+            <span class="tab-indicator" id="tabIndicator"></span>
+          </div>
+          <div class="panel active" id="p-npm" role="tabpanel">
+            <div class="code-block" data-copy="npm install -g wenker-router&#10;wenker">
+              <button class="copy-btn" data-copy-btn data-copy-target="#p-npm .code-block">Sao chép</button>
+              <pre><span class="c-prompt">$</span> npm install -g wenker-router
+<span class="c-prompt">$</span> wenker</pre>
+            </div>
+          </div>
+          <div class="panel" id="p-src" role="tabpanel">
+            <div class="code-block" data-copy="git clone https://github.com/WENKER-AI/wenker-router.git&#10;cd wenker-router&#10;npm run install:all&#10;npm start">
+              <button class="copy-btn" data-copy-btn data-copy-target="#p-src .code-block">Sao chép</button>
+              <pre><span class="c-prompt">$</span> git clone https://github.com/WENKER-AI/wenker-router.git
+<span class="c-prompt">$</span> cd wenker-router
+<span class="c-prompt">$</span> npm run install:all
+<span class="c-prompt">$</span> npm start</pre>
+            </div>
+          </div>
+          <div class="panel" id="p-bat" role="tabpanel">
+            <div class="code-block" data-copy="start.bat">
+              <button class="copy-btn" data-copy-btn data-copy-target="#p-bat .code-block">Sao chép</button>
+              <pre><span class="c-prompt">&gt;</span> start.bat</pre>
+            </div>
+          </div>
+          <div class="panel" id="p-npx" role="tabpanel">
+            <div class="code-block" data-copy="npx wenker-router">
+              <button class="copy-btn" data-copy-btn data-copy-target="#p-npx .code-block">Sao chép</button>
+              <pre><span class="c-prompt">$</span> npx wenker-router</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="env-grid reveal">
+          <h3>Biến môi trường</h3>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Biến</th><th>Mặc định</th><th>Dùng để</th></tr></thead>
+              <tbody>
+                <tr><td><code>PORT</code></td><td><code>3600</code></td><td>Cổng lắng nghe của gateway.</td></tr>
+                <tr><td><code>HOST</code></td><td><code>0.0.0.0</code></td><td>Địa chỉ bind. Đặt <code>127.0.0.1</code> nếu chỉ dùng nội bộ.</td></tr>
+                <tr><td><code>WENKER_HOME</code></td><td><code>~/.wenker</code></td><td>Thư mục cấu hình, key, nhật ký, cache.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DOCS ================= -->
+    <section class="section" id="docs">
+      <div class="container">
+        <span class="section-eyebrow reveal">Từ khóa, endpoint đến gỡ lỗi</span>
+        <h2 class="section-title reveal">Tài liệu, gói gọn<br/>trong <em class="serif">một trang.</em></h2>
+        <div class="doc-grid">
+          <div class="doc-block reveal"><span class="num">01</span><h3>Kiến trúc</h3><p>Một tiến trình Node.js vừa là API gateway vừa là dashboard. Ba khái niệm: <strong>Provider</strong>, <strong>Alias</strong>, <strong>Qualified id</strong> (<code>providerId/model</code>).</p></div>
+          <div class="doc-block reveal"><span class="num">02</span><h3>API tham chiếu</h3>
+            <ul class="endpoint-list">
+              <li><code>POST /v1/chat/completions</code><span>Trò chuyện (OpenAI)</span></li>
+              <li><code>POST /v1/messages</code><span>Trò chuyện (Anthropic)</span></li>
+              <li><code>GET /v1/models</code><span>Liệt kê model</span></li>
+              <li><code>POST /v1/embeddings</code><span>Vector hoá</span></li>
+              <li><code>GET /health</code><span>Health JSON</span></li>
+            </ul>
+          </div>
+          <div class="doc-block reveal"><span class="num">03</span><h3>Tích hợp công cụ</h3><p>Claude Code: đặt <code>ANTHROPIC_BASE_URL</code>. Cursor / Cline / OpenWebUI / Aider: chọn OpenAI Compatible. VS Code: extension WENKER nạp thẳng model của router.</p></div>
+          <div class="doc-block reveal"><span class="num">04</span><h3>Gỡ lỗi</h3><p>401/402 = key sai hoặc hết tiền; 429 = đổi nguồn trong chuỗi dự phòng. Router liệt kê model của mọi provider đã bật — kể cả nguồn chưa gắn key.</p></div>
+        </div>
+        <div class="code-block wide reveal" data-copy="curl http://localhost:3600/v1/chat/completions -H &quot;Authorization: Bearer sk-wenker-local-admin&quot; -H &quot;Content-Type: application/json&quot; -d '{&quot;model&quot;:&quot;wenker-cloud/wenker-deepseek-v3-free&quot;,&quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;Xin chào&quot;}]}'">
+          <button class="copy-btn" data-copy-btn data-copy-target="#docs .code-block.wide">Sao chép</button>
+          <pre><span class="c-prompt">$</span> curl http://localhost:3600/v1/chat/completions \
+  -H "Authorization: Bearer sk-wenker-local-admin" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"wenker-cloud/wenker-deepseek-v3-free","messages":[{"role":"user","content":"Xin chào"}]}'</pre>
+        </div>
+        <div class="faq reveal">
+          <details><summary>Model “miễn phí” có thật sự miễn phí không?</summary><p>Hàng chờ miễn phí có hạn mức và có thể trả về 402/502 thật. Muốn ổn định, hãy gắn key của nhà cung cấp đó.</p></details>
+          <details><summary>Sao lưu / di chuyển cấu hình thế nào?</summary><p>Copy nguyên thư mục <code>~/.wenker</code>. Đó là toàn bộ “database”.</p></details>
+          <details><summary>Có an toàn khi mở cổng 0.0.0.0?</summary><p>API quản trị chỉ chấp nhận request từ vòng lặp cục bộ theo mặc định; endpoint <code>/v1/*</code> dùng key WENKER riêng.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= REPO ================= -->
+    <section class="section section-alt repo" id="repo">
+      <div class="container">
+        <div class="repo-box reveal">
+          <h2>Mã nguồn mở. <em class="serif">Thuộc về mọi người.</em></h2>
+          <p class="muted">Toàn bộ WENKER Router nằm trên GitHub, phát hành theo MIT.</p>
+          <div class="repo-url">https://github.com/WENKER-AI/wenker-router</div>
+          <div class="repo-actions">
+            <button class="btn btn-ghost" data-copy-btn data-copy="git clone https://github.com/WENKER-AI/wenker-router.git">Sao chép lệnh clone</button>
+            <a class="btn btn-primary" href="https://github.com/WENKER-AI/wenker-router" target="_blank" rel="noopener">Mở trên GitHub</a>
+          </div>
+          <div class="repo-stats">
+            <span><b>MIT</b> Giấy phép</span><span><b>Node.js</b> Ngôn ngữ</span><span><b>0</b> Telemetry</span><span><b>181</b> Providers</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CLOSING CTA ================= -->
+    <section class="cta-band" id="bat-dau">
+      <div class="cta-glow" aria-hidden="true"></div>
+      <div class="container">
+        <h2 class="cta-title reveal">Làm chủ AI<br/><em class="serif">của chính bạn.</em></h2>
+        <p class="cta-sub reveal">Cài một lần, chạy trên máy bạn. Trỏ Base URL từ công cụ quen dùng, và gọi 560+ model qua hai chuẩn mở.</p>
+        <div class="cta-actions reveal">
+          <a class="btn btn-primary" href="#tai">Bắt đầu cài đặt</a>
+          <a class="btn btn-ghost" href="https://github.com/WENKER-AI/wenker-router" target="_blank" rel="noopener">Xem mã nguồn</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <a class="brand brand-sm" href="#top">
+          <span class="brand-mark">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+              <path d="M2 5l4 14 4.5-10L15 19l4-14" stroke="url(#wg2)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <defs><linearGradient id="wg2" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#818cf8"/><stop offset="1" stop-color="#67e8f9"/></linearGradient></defs>
+            </svg>
+          </span>
+          <span class="brand-text">WENKER<em>·</em>ROUTER</span>
+        </a>
+        <p class="muted">Cổng AI cục bộ, mã nguồn mở. Không theo dõi, không gọi về máy chủ trung tâm.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#tinh-nang">Tính năng</a><a href="#docs">Tài liệu</a><a href="#repo">Mã nguồn</a><a href="https://github.com/WENKER-AI/wenker-router" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© <span id="year">2026</span> arist999 · MIT</span>
+      <span>Thiết kế tham khảo V7 Labs &amp; TitanGate Equity · Trang tĩnh, không telemetry</span>
+      <a href="#top">Đầu trang ↑</a>
+    </div>
+  </footer>
+
+  <!-- ================= VIDEO MODAL ================= -->
+  <div class="video-modal" id="videoModal" aria-hidden="true" role="dialog" aria-label="Video giới thiệu">
+    <div class="video-backdrop" data-video-close></div>
+    <div class="video-shell">
+      <button class="video-close" data-video-close aria-label="Đóng">✕</button>
+      <video id="promoVideo" controls playsinline preload="metadata">
+        <source src="assets/promo.mp4" type="video/mp4" />
+        Trình duyệt của bạn không hỗ trợ video.
+      </video>
+      <div class="video-fallback">Video đang được chuẩn bị — quay lại sau. Trong lúc chờ, hãy <a href="#tai">cài thử router</a>.</div>
+    </div>
+  </div>
+
+  <script src="assets/landing.js"></script>
+</body>
+</html>

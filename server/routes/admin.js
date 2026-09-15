@@ -19,6 +19,12 @@ router.get('/stats', (req, res) => {
   res.json(db.getStats());
 });
 
+// Usage analytics (Statistics tab). ?days= controls the window, clamped server-side.
+router.get('/usage', (req, res) => {
+  const days = Number.parseInt(req.query.days, 10) || 14;
+  res.json(db.getUsageStats(days));
+});
+
 // Providers
 router.get('/providers', (req, res) => {
   const lang = uiLang(req);

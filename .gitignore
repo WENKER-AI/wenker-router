@@ -12,6 +12,9 @@ data/
 # File build VS Code extension (artifact, khong commit)
 *.vsix
 
+# Artifact của plugin video2code (env diagnostic, không thuộc repo)
+.v2c/
+
 # Rác
 *.tgz
 *.log

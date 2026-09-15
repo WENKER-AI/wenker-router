@@ -476,7 +476,42 @@ const STRINGS = {
   'mf.probeDone': { vi: 'Xong: {ok}/{n} nguồn trả lời thật.', en: 'Done: {ok}/{n} sources really answered.', zh: '完成：{ok}/{n} 个来源真实应答。', fr: 'Terminé : {ok}/{n} sources ont répondu.' },
   'mf.probeFail': { vi: 'Probe thất bại: {msg}', en: 'Probe failed: {msg}', zh: '探测失败：{msg}', fr: 'Échec du probe : {msg}' },
   'mf.errLoadModels': { vi: 'Không đọc được /v1/models', en: 'Could not read /v1/models', zh: '无法读取 /v1/models', fr: 'Impossible de lire /v1/models' },
-  'mf.errConnect': { vi: 'Lỗi kết nối', en: 'Connection error', zh: '连接错误', fr: 'Erreur de connexion' },};
+  'mf.errConnect': { vi: 'Lỗi kết nối', en: 'Connection error', zh: '连接错误', fr: 'Erreur de connexion' },
+
+  // ---------- Statistics tab ----------
+  'nav.stats': { vi: 'Thống Kê', en: 'Statistics', zh: '统计', fr: 'Statistiques' },
+  'stat.title': { vi: 'Thống Kê Sử Dụng', en: 'Usage Statistics', zh: '使用统计', fr: 'Statistiques d\u2019utilisation' },
+  'stat.sub': { vi: 'Tổng hợp từ nhật ký thật đã đi qua router (cache, fallback, token, độ trễ).', en: 'Aggregated from real requests that passed through the router (cache, fallback, tokens, latency).', zh: '汇总自经过路由器的真实请求（缓存、回退、令牌、延迟）。', fr: 'Agrégé à partir des requêtes réelles passées par le routeur (cache, repli, jetons, latence).' },
+  'stat.refresh': { vi: 'Làm mới', en: 'Refresh', zh: '刷新', fr: 'Actualiser' },
+  'stat.lastDays': { vi: '{n} ngày', en: '{n}d', zh: '{n} 天', fr: '{n} j' },
+  'stat.truncated': { vi: 'Bộ đệm nhật ký giữ tối đa 500 dòng; cửa sổ {n} ngày chỉ đếm được {c} request gần nhất còn lưu trữ.', en: 'The log buffer keeps at most 500 rows; the {n}-day window counts only the {c} most recent retained requests.', zh: '日志缓冲区最多保留 500 行；{n} 天窗口仅统计保留的最近 {c} 条请求。', fr: 'Le tampon de journaux conserve au plus 500 lignes ; la fenêtre de {n} jours ne compte que les {c} requêtes récentes retenues.' },
+  'stat.error': { vi: 'Không tải được thống kê', en: 'Could not load statistics', zh: '无法加载统计', fr: 'Impossible de charger les statistiques' },
+  'stat.loading': { vi: 'Đang tải...', en: 'Loading...', zh: '加载中…', fr: 'Chargement...' },
+  'stat.updated': { vi: 'Cập nhật lúc', en: 'Updated at', zh: '更新于', fr: 'Mis à jour à' },
+  'stat.requests': { vi: 'Yêu cầu', en: 'Requests', zh: '请求', fr: 'Requêtes' },
+  'stat.inWindow': { vi: 'trong cửa sổ', en: 'in window', zh: '窗口内', fr: 'dans la fenêtre' },
+  'stat.tokens': { vi: 'Token', en: 'Tokens', zh: '令牌', fr: 'Jetons' },
+  'stat.success': { vi: 'Tỉ lệ thành công', en: 'Success rate', zh: '成功率', fr: 'Taux de réussite' },
+  'stat.failed': { vi: 'Thất bại', en: 'Failed', zh: '失败', fr: 'Échecs' },
+  'stat.cacheHits': { vi: 'Lượt cache', en: 'Cache hits', zh: '缓存命中', fr: 'Hits cache' },
+  'stat.avgLatency': { vi: 'Độ trễ TB', en: 'Avg latency', zh: '平均延迟', fr: 'Latence moy.' },
+  'stat.perRequest': { vi: 'mỗi yêu cầu', en: 'per request', zh: '每请求', fr: 'par requête' },
+  'stat.fallbacks': { vi: 'Dự phòng thật', en: 'Real failovers', zh: '真实回退', fr: 'Replis réels' },
+  'stat.realFailover': { vi: 'lần chuyển nguồn do lỗi', en: 'error-driven re-routes', zh: '因错误改道', fr: 'réacheminements pour erreur' },
+  'stat.dailyTitle': { vi: 'Yêu cầu theo ngày', en: 'Requests by day', zh: '按日请求', fr: 'Requêtes par jour' },
+  'stat.requestsPerDay': { vi: 'yêu cầu / ngày', en: 'requests / day', zh: '请求 / 天', fr: 'requêtes / jour' },
+  'stat.requestsLower': { vi: 'yêu cầu', en: 'requests', zh: '请求', fr: 'requêtes' },
+  'stat.tokenLower': { vi: 'token', en: 'tokens', zh: '令牌', fr: 'jetons' },
+  'stat.cacheLower': { vi: 'cache', en: 'cache', zh: '缓存', fr: 'cache' },
+  'stat.fbLower': { vi: 'dự phòng', en: 'failover', zh: '回退', fr: 'repli' },
+  'stat.byProvider': { vi: 'Theo nhà cung cấp', en: 'By provider', zh: '按服务商', fr: 'Par fournisseur' },
+  'stat.byModel': { vi: 'Theo model (token)', en: 'By model (tokens)', zh: '按模型（令牌）', fr: 'Par modèle (jetons)' },
+  'stat.noData': { vi: 'Chưa có dữ liệu trong cửa sổ này.', en: 'No data in this window yet.', zh: '此窗口暂无数据。', fr: 'Aucune donn\u00e9e dans cette fen\u00eatre.' },
+  'stat.colProvider': { vi: 'Nguồn', en: 'Provider', zh: '来源', fr: 'Fournisseur' },
+  'stat.colReq': { vi: 'Req', en: 'Req', zh: '请求', fr: 'Req' },
+  'stat.colTok': { vi: 'Token', en: 'Tokens', zh: '令牌', fr: 'Jetons' },
+  'stat.colRate': { vi: 'OK', en: 'OK', zh: '成功', fr: 'OK' },
+  'stat.colLat': { vi: 'Trễ', en: 'Lat.', zh: '延迟', fr: 'Lat.' },};
 
 function detectLang() {
   try {

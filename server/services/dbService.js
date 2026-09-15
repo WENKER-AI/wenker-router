@@ -584,6 +584,135 @@ class DbService {
       totalKeys: this.keys.length
     };
   }
+
+  // Usage analytics for the Statistics tab. Aggregates the rolling log buffer
+  // (last 500 requests) into a daily series + per-provider / per-model breakdown.
+  // Honest by design: it only reports what actually flowed through the router,
+  // and the caller is told the window is bounded by the log cap, not by `days`.
+  getUsageStats(days = 14) {
+    const dayMs = 24 * 60 * 60 * 1000;
+    const span = Math.max(1, Math.min(90, days | 0));
+    const now = Date.now();
+    const cutoff = now - span * dayMs;
+
+    // providerId -> display name, so the UI never shows raw ids.
+    const nameById = {};
+    try {
+      for (const p of this.getAllProviders()) nameById[p.id] = p.name;
+    } catch (e) { /* catalog unavailable: fall back to ids */ }
+
+    const inWindow = this.logs.filter((l) => {
+      const t = Date.parse(l.timestamp);
+      return Number.isFinite(t) && t >= cutoff;
+    });
+
+    // Pre-seed one bucket per day (oldest -> newest) so empty days still render.
+    const daily = {};
+    for (let i = span - 1; i >= 0; i--) {
+      const d = new Date(now - i * dayMs);
+      const key = [
+        d.getFullYear(),
+        String(d.getMonth() + 1).padStart(2, '0'),
+        String(d.getDate()).padStart(2, '0')
+      ].join('-');
+      daily[key] = { date: key, requests: 0, tokens: 0, cacheHits: 0, fallbacks: 0, failed: 0, avgLatencySum: 0 };
+    }
+
+    const providerAgg = {};
+    const modelAgg = {};
+
+    let requests = 0, success = 0, failed = 0, cacheHits = 0, fallbacks = 0;
+    let promptTokens = 0, completionTokens = 0, latencySum = 0, latencyCount = 0;
+
+    for (const l of inWindow) {
+      requests++;
+      const ok = l.status >= 200 && l.status < 300;
+      if (ok) success++; else failed++;
+      if (l.cached) cacheHits++;
+      if (l.fallbackFrom) fallbacks++;
+
+      const pt = l.promptTokens || 0;
+      const ct = l.completionTokens || 0;
+      promptTokens += pt;
+      completionTokens += ct;
+      const tok = pt + ct;
+      if (typeof l.latencyMs === 'number') { latencySum += l.latencyMs; latencyCount++; }
+
+      const dayKey = (l.timestamp || '').slice(0, 10);
+      const bucket = daily[dayKey];
+      if (bucket) {
+        bucket.requests++;
+        bucket.tokens += tok;
+        if (l.cached) bucket.cacheHits++;
+        if (l.fallbackFrom) bucket.fallbacks++;
+        if (!ok) bucket.failed++;
+        if (typeof l.latencyMs === 'number') bucket.avgLatencySum += l.latencyMs;
+      }
+
+      const pid = l.providerId || 'unknown';
+      const pa = providerAgg[pid] || (providerAgg[pid] = {
+        providerId: pid, name: nameById[pid] || pid,
+        requests: 0, tokens: 0, ok: 0, fallbacks: 0, latencySum: 0
+      });
+      pa.requests++;
+      pa.tokens += tok;
+      if (ok) pa.ok++;
+      if (l.fallbackFrom) pa.fallbacks++;
+      if (typeof l.latencyMs === 'number') pa.latencySum += l.latencyMs;
+
+      const mid = l.resolvedModel || l.model || 'unknown';
+      const ma = modelAgg[mid] || (modelAgg[mid] = { model: mid, providerId: pid, requests: 0, tokens: 0 });
+      ma.requests++;
+      ma.tokens += tok;
+    }
+
+    const byProvider = Object.values(providerAgg)
+      .map((p) => ({
+        ...p,
+        successRate: p.requests ? Math.round((p.ok / p.requests) * 100) : 0,
+        avgLatencyMs: p.requests ? Math.round(p.latencySum / p.requests) : 0
+      }))
+      .sort((a, b) => b.requests - a.requests);
+
+    const byModel = Object.values(modelAgg)
+      .sort((a, b) => b.requests - a.requests)
+      .slice(0, 12);
+
+    const dailySeries = Object.values(daily).map((d) => ({
+      date: d.date,
+      requests: d.requests,
+      tokens: d.tokens,
+      cacheHits: d.cacheHits,
+      fallbacks: d.fallbacks,
+      failed: d.failed,
+      avgLatencyMs: d.requests ? Math.round(d.avgLatencySum / d.requests) : 0
+    }));
+
+    return {
+      window: {
+        days: span,
+        logCap: this.logs.length,
+        counted: requests,
+        truncated: this.logs.length >= 500 && inWindow.length < this.logs.length
+      },
+      totals: {
+        requests,
+        success,
+        failed,
+        cacheHits,
+        fallbacks,
+        promptTokens,
+        completionTokens,
+        totalTokens: promptTokens + completionTokens,
+        avgLatencyMs: latencyCount ? Math.round(latencySum / latencyCount) : 0,
+        successRate: requests ? Math.round((success / requests) * 100) : 0,
+        cacheHitRate: requests ? Math.round((cacheHits / requests) * 100) : 0
+      },
+      daily: dailySeries,
+      byProvider,
+      byModel
+    };
+  }
   // ---- Sessions (login gate) ----
   getSessions() {
     return this.sessions;

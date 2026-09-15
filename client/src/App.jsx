@@ -9,6 +9,7 @@ import LogsView from './components/LogsView';
 import SettingsView from './components/SettingsView';
 import ModelFinder from './components/ModelFinder';
 import AddonsView from './components/AddonsView';
+import StatisticsView from './components/StatisticsView';
 import LoginScreen from './components/LoginScreen';
 import { useSession, authFetch } from './session';
 import { useI18n } from './i18n';
@@ -104,6 +105,9 @@ export default function App() {
         )}
         {activeTab === 'logs' && (
           <LogsView />
+        )}
+        {activeTab === 'stats' && (
+          <StatisticsView />
         )}
         {activeTab === 'settings' && (
           <SettingsView />

@@ -14,6 +14,7 @@ import {
   Compass,
   Puzzle,
   Globe,
+  BarChart3,
   ChevronLeft,
   Menu,
   X,
@@ -65,6 +66,7 @@ export default function Navbar({ activeTab, setActiveTab, stats }) {
       label: t('nav.sectionSystem'),
       items: [
         { id: 'addons', label: t('nav.addons'), icon: Puzzle, badge: 'NEW' },
+        { id: 'stats', label: t('nav.stats'), icon: BarChart3 },
         { id: 'keys', label: t('nav.keys'), icon: Key },
         { id: 'logs', label: t('nav.logs'), icon: Terminal },
         { id: 'settings', label: t('nav.settings'), icon: Settings },
