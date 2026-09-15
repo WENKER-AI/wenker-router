@@ -11,7 +11,10 @@ import ModelFinder from './components/ModelFinder';
 import AddonsView from './components/AddonsView';
 import StatisticsView from './components/StatisticsView';
 import LoginScreen from './components/LoginScreen';
+import UpdateBanner from './components/UpdateBanner';
+import CommandPalette from './components/CommandPalette';
 import { useSession, authFetch } from './session';
+import { connectServerEvents, disconnectServerEvents } from './sse';
 import { useI18n } from './i18n';
 import { Zap } from 'lucide-react';
 
@@ -20,6 +23,7 @@ export default function App() {
   const { t } = useI18n();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [stats, setStats] = useState(null);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   // Model picked in Model Finder; handed to Playground as a prop because tabs are
   // conditionally mounted and a window event fired before mount is simply lost.
   const [requestedModel, setRequestedModel] = useState(null);
@@ -49,6 +53,24 @@ export default function App() {
     return () => clearInterval(interval);
   }, [token]);
 
+  // Mo/ngat ket noi SSE (Live tail + banner cap nhat) theo trang thai dang nhap.
+  useEffect(() => {
+    if (token) connectServerEvents();
+    else disconnectServerEvents();
+  }, [token]);
+
+  // Phim tat toan cuc Ctrl+K / Cmd+K de mo Command Palette.
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        setPaletteOpen((v) => !v);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   // Boot: verifying a stored session token.
   if (checking) {
     return (
@@ -72,6 +94,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col lg:flex-row selection:bg-cyan-500 selection:text-white font-sans">
+      <UpdateBanner />
       {/* Left sidebar (desktop) / top bar (mobile) */}
       <Navbar 
         activeTab={activeTab} 
@@ -79,7 +102,7 @@ export default function App() {
         stats={stats} 
       />
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 pb-[64px] lg:pb-0">
       {/* Main Content Area */}
       <main className="flex-1">
         {activeTab === 'dashboard' && (
@@ -130,6 +153,8 @@ export default function App() {
         </div>
       </footer>
       </div>
+
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} setActiveTab={setActiveTab} />
     </div>
   );
 }

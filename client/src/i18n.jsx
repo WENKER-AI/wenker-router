@@ -200,6 +200,10 @@ const STRINGS = {
   'nav.collapse': { vi: 'Thu gọn thanh bên', en: 'Collapse sidebar', zh: '收起侧边栏', fr: 'Réduire la barre latérale' },
   'nav.expand': { vi: 'Mở rộng thanh bên', en: 'Expand sidebar', zh: '展开侧边栏', fr: 'Développer la barre latérale' },
   'nav.menu': { vi: 'Menu', en: 'Menu', zh: '菜单', fr: 'Menu' },
+  'nav.more': { vi: 'Khác', en: 'More', zh: '更多', fr: 'Plus' },
+  'nav.dashboardShort': { vi: 'Trang chủ', en: 'Home', zh: '首页', fr: 'Accueil' },
+  'nav.playgroundShort': { vi: 'Thử ngay', en: 'Try', zh: '试用', fr: 'Essayer' },
+  'nav.logsShort': { vi: 'Nhật ký', en: 'Logs', zh: '日志', fr: 'Journal' },
 
   // ---------- Login ----------
   'login.tagline': { vi: 'Cổng proxy AI cục bộ', en: 'Local AI proxy gateway', zh: '本地 AI 代理网关', fr: 'Passerelle proxy IA locale' },
@@ -404,6 +408,38 @@ const STRINGS = {
   'logs.fallbackTip': { vi: 'Dự phòng từ "{from}" ({reason})', en: 'Fallback from "{from}" ({reason})', zh: '从“{from}”回退（{reason}）', fr: 'Repli depuis « {from} » ({reason})' },
   'logs.fallbackLabel': { vi: 'dự phòng', en: 'fallback', zh: '回退', fr: 'repli' },
   'logs.upstreamErr': { vi: 'upstream lỗi', en: 'upstream error', zh: '上游错误', fr: 'erreur amont' },
+  'logs.liveTip': { vi: 'Bật/tắt nhận log mới theo thời gian thực (SSE)', en: 'Toggle real-time log streaming (SSE)', zh: '切换实时日志推送（SSE）', fr: 'Activer/désactiver le flux de journaux en temps réel (SSE)' },
+  'logs.liveOn': { vi: 'Trực tiếp', en: 'Live', zh: '实时', fr: 'En direct' },
+  'logs.liveOff': { vi: 'Tạm dừng', en: 'Paused', zh: '已暂停', fr: 'En pause' },
+  'logs.exportCsv': { vi: 'Xuất CSV', en: 'Export CSV', zh: '导出 CSV', fr: 'Exporter CSV' },
+  'logs.exportTip': { vi: 'Tải danh sách log đang hiển thị ra file CSV', en: 'Download the currently shown logs as a CSV file', zh: '将当前显示的日志下载为 CSV 文件', fr: 'Télécharger les journaux affichés au format CSV' },
+  'logs.searchPh': { vi: 'Tìm theo model, endpoint, provider, trạng thái…', en: 'Search by model, endpoint, provider, status…', zh: '按模型、端点、服务商、状态搜索…', fr: 'Rechercher par modèle, endpoint, fournisseur, statut…' },
+  'logs.fAll': { vi: 'Tất cả', en: 'All', zh: '全部', fr: 'Tous' },
+  'logs.fOk': { vi: 'Thành công', en: 'Success', zh: '成功', fr: 'Succès' },
+  'logs.fErr': { vi: 'Lỗi', en: 'Error', zh: '错误', fr: 'Erreur' },
+  'logs.fFallback': { vi: 'Dự phòng', en: 'Fallback', zh: '回退', fr: 'Repli' },
+  'logs.noMatch': { vi: 'Không có log khớp bộ lọc hoặc từ khóa.', en: 'No logs match the filter or search.', zh: '没有符合筛选或搜索条件的日志。', fr: 'Aucun journal ne correspond au filtre ou à la recherche.' },
+
+  // ---------- Command Palette (Ctrl+K) ----------
+  'cmd.placeholder': { vi: 'Đi tới tab hoặc chạy hành động…', en: 'Go to a tab or run an action…', zh: '前往标签或执行操作…', fr: 'Aller à un onglet ou exécuter une action…' },
+  'cmd.empty': { vi: 'Không có kết quả khớp.', en: 'No matching results.', zh: '没有匹配结果。', fr: 'Aucun résultat correspondant.' },
+  'cmd.go': { vi: 'đi tới', en: 'go', zh: '前往', fr: 'aller' },
+  'cmd.action': { vi: 'hành động', en: 'action', zh: '操作', fr: 'action' },
+  'cmd.copyBase': { vi: 'Sao chép Base URL', en: 'Copy Base URL', zh: '复制 Base URL', fr: 'Copier l\u2019URL de base' },
+  'cmd.reload': { vi: 'Tải lại trang', en: 'Reload page', zh: '重新加载页面', fr: 'Recharger la page' },
+  'cmd.docs': { vi: 'Mở tài liệu (docs)', en: 'Open documentation', zh: '打开文档', fr: 'Ouvrir la documentation' },
+
+  // ---------- Update banner ----------
+  'upd.title': { vi: 'Có bản WENKER mới: v{v}', en: 'A new WENKER version is available: v{v}', zh: '有新版本 WENKER：v{v}', fr: 'Nouvelle version WENKER disponible : v{v}' },
+  'upd.sub': { vi: 'Bạn đang chạy v{cur}. Cập nhật để nhận tính năng và bản vá mới nhất.', en: 'You are running v{cur}. Update to get the latest features and fixes.', zh: '当前版本 v{cur}。请更新以获取最新功能与修复。', fr: 'Vous utilisez la v{cur}. Mettez à jour pour obtenir les dernières nouveautés et correctifs.' },
+  'upd.view': { vi: 'Xem trên npm', en: 'View on npm', zh: '在 npm 查看', fr: 'Voir sur npm' },
+  'upd.recheck': { vi: 'Kiểm tra lại', en: 'Re-check', zh: '重新检查', fr: 'Revérifier' },
+  'upd.later': { vi: 'Để sau', en: 'Later', zh: '稍后', fr: 'Plus tard' },
+
+  // ---------- Accent picker ----------
+  'accent.title': { vi: 'Màu nhấn giao diện', en: 'Interface accent', zh: '界面强调色', fr: 'Couleur d\u2019accent' },
+  'accent.sub': { vi: 'Đổi ngay màu nhấn toàn console, giữ nguyên nền tối.', en: 'Instantly retint the whole console while keeping the dark background.', zh: '即时更改整个控制台的强调色，保留深色背景。', fr: 'Recolorer toute la console instantanément en gardant le fond sombre.' },
+  'accent.reset': { vi: 'Về Cyan gốc', en: 'Back to default Cyan', zh: '恢复默认青色', fr: 'Revenir au Cyan par défaut' },
 
   // ---------- Settings ----------
   'set.localTitle': { vi: 'Máy Chủ Cục Bộ (Local Server)', en: 'Local server', zh: '本地服务器', fr: 'Serveur local' },

@@ -3,6 +3,8 @@ const os = require('os');
 const crypto = require('crypto');
 const path = require('path');
 const { PROVIDERS } = require('../config/providers-data');
+// eventBus khong require nguoc lai dbService -> khong vong tron; phat 'log' khi co request moi.
+const eventBus = require('./eventBus');
 
 // All persistent state lives in the user home folder (~/.wenker), NOT inside the repo.
 const DATA_DIR = process.env.WENKER_HOME
@@ -544,6 +546,9 @@ class DbService {
       this.logs = this.logs.slice(-500);
     }
     writeJsonFile(LOGS_FILE, this.logs);
+    // Day log moi nguoc ve moi dashboard dang mo Live tail (SSE). Khong cho loi
+    // ghi log that bai lam roi vong goi chinh cua proxy.
+    try { eventBus.broadcast('log', logItem); } catch (e) { /* stream optional */ }
     return logItem;
   }
 

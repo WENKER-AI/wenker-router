@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../services/dbService');
+const eventBus = require('../services/eventBus');
+const updateService = require('../services/updateService');
 const proxyService = require('../services/proxyService');
 const healthService = require('../services/healthService');
 const addonService = require('../services/addonService');
@@ -158,6 +160,22 @@ router.post('/routing', (req, res) => {
 router.get('/logs', (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 100;
   res.json(db.getLogs(limit));
+});
+
+// Live tail: Server-Sent Events stream. Client mo mot EventSource duy nhat va
+// nhan su kien 'log' (moi request) + 'update' (ban moi npm) day nguoc tu server.
+// EventSource khong gui duoc header, nen danh danh cai (guard o index.js) cho phep
+// token qua ?token= ben canh header.
+router.get('/events', (req, res) => {
+  eventBus.subscribe(req, res);
+  // Trang thai update hien co de client hien banner ngay khi ket noi.
+  res.write(`event: update\ndata: ${JSON.stringify(updateService.getState())}\n\n`);
+});
+
+// Kiem tra cap nhat theo yeu cau (nut "Kiem tra ban moi" tren UI). ?force=1 buoc goi registry.
+router.get('/update', async (req, res) => {
+  const state = await updateService.checkNow({ force: req.query.force === '1' });
+  res.json(state);
 });
 
 // Settings

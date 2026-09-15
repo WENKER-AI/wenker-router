@@ -6,6 +6,7 @@ import {
 import { authFetch } from '../session';
 import { useTheme } from '../theme';
 import { useI18n } from '../i18n';
+import { ACCENTS } from '../accents';
 
 const TYPE_META = {
   theme: { label: 'addon.typeTheme', icon: Palette, tone: 'text-cyan-300 bg-cyan-500/10 border-cyan-500/30' },
@@ -48,7 +49,7 @@ function Swatches({ theme }) {
 
 export default function AddonsView() {
   const { t } = useI18n();
-  const { addons, loading, reload, activeId, setTheme } = useTheme();
+  const { addons, loading, reload, activeId, setTheme, accentId, setAccent } = useTheme();
   const [tab, setTab] = useState('all');
   const [source, setSource] = useState('');
   const [busy, setBusy] = useState(false);
@@ -170,6 +171,50 @@ export default function AddonsView() {
           {msg.text}
         </div>
       )}
+
+      {/* Accent picker: doi mau nhan toan he thong, khong can add-on theme */}
+      <div className="card-glass p-4 mb-6">
+        <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+          <div>
+            <h2 className="text-sm font-bold text-white flex items-center gap-2">
+              <Palette className="w-4 h-4 text-cyan-400" /> {t('accent.title')}
+            </h2>
+            <p className="text-[11px] text-slate-500 mt-0.5">{t('accent.sub')}</p>
+          </div>
+          {accentId !== 'cyan' && (
+            <button
+              onClick={() => setAccent('cyan')}
+              className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-300 text-[11px] flex items-center gap-1.5 transition"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> {t('accent.reset')}
+            </button>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {ACCENTS.map((a) => {
+            const active = accentId === a.id;
+            return (
+              <button
+                key={a.id}
+                onClick={() => setAccent(a.id)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-[12px] font-medium transition ${
+                  active
+                    ? 'border-cyan-500/60 bg-cyan-500/10 text-white'
+                    : 'border-slate-800 bg-slate-950/60 text-slate-400 hover:border-slate-600 hover:text-slate-200'
+                }`}
+                title={a.label}
+              >
+                <span
+                  className="w-4 h-4 rounded-full ring-1 ring-white/20"
+                  style={{ background: a.swatch }}
+                />
+                <span>{a.label}</span>
+                {active && <Check className="w-3.5 h-3.5 text-cyan-300" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Write / install */}
       <div className="card-glass p-4 mb-6">

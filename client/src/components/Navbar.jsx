@@ -27,6 +27,9 @@ import PixelW from './PixelW';
 
 const COLLAPSE_KEY = 'wenker.ui.sidebar';
 
+// Version that tu package.json goc (Vite define __APP_VERSION__ trong vite.config.js).
+const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '2.0';
+
 export default function Navbar({ activeTab, setActiveTab, stats }) {
   const [copied, setCopied] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
@@ -73,8 +76,6 @@ export default function Navbar({ activeTab, setActiveTab, stats }) {
       ],
     },
   ];
-
-  const allItems = groups.flatMap((g) => g.items);
 
   const NavButton = ({ item }) => {
     const Icon = item.icon;
@@ -152,7 +153,7 @@ export default function Navbar({ activeTab, setActiveTab, stats }) {
             <div className="flex items-center gap-1.5">
               <span className="brand-pixel font-extrabold text-[15px] tracking-tight text-white leading-none">WENKER</span>
               <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 whitespace-nowrap">
-                v2.0
+                v{APP_VERSION}
               </span>
             </div>
             <p className="text-[10px] text-slate-500 font-mono truncate mt-0.5">{t('nav.tagline')}</p>
@@ -264,7 +265,7 @@ export default function Navbar({ activeTab, setActiveTab, stats }) {
                 <div className="flex items-center gap-1.5">
                   <span className="brand-pixel font-extrabold text-[15px] tracking-tight text-white leading-none">WENKER</span>
                   <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 whitespace-nowrap">
-                    v2.0
+                    v{APP_VERSION}
                   </span>
                 </div>
                 <p className="text-[10px] text-slate-500 font-mono truncate mt-0.5">{t('nav.tagline')}</p>
@@ -316,28 +317,6 @@ export default function Navbar({ activeTab, setActiveTab, stats }) {
             </div>
           )}
 
-          {/* Horizontal nav strip */}
-          <div className="flex overflow-x-auto pb-2 gap-1 border-t border-slate-800/60 pt-2">
-            {allItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs whitespace-nowrap font-medium transition ${
-                    isActive
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
           {/* Slide-down grouped menu */}
           {mobileOpen && (
             <div className="border-t border-slate-800/70 py-3 space-y-4 bg-slate-950/95">
@@ -353,6 +332,44 @@ export default function Navbar({ activeTab, setActiveTab, stats }) {
           )}
         </div>
       </header>
+
+      {/* ============ BOTTOM BAR (mobile only) ============ */}
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800/80 pb-[env(safe-area-inset-bottom)]">
+        <div className="grid grid-cols-5">
+          {[
+            { id: 'dashboard', label: t('nav.dashboardShort'), icon: Activity },
+            { id: 'playground', label: t('nav.playgroundShort'), icon: Sparkles },
+            { id: 'finder', label: t('nav.finder'), icon: Compass },
+            { id: 'logs', label: t('nav.logsShort'), icon: Terminal },
+          ].map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => { setActiveTab(item.id); setMobileOpen(false); }}
+                className={`flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium transition ${
+                  isActive ? 'text-cyan-300' : 'text-slate-500'
+                }`}
+              >
+                <Icon className={`w-5 h-5 ${isActive ? 'text-cyan-400' : ''}`} />
+                <span className="truncate max-w-[64px]">{item.label}</span>
+              </button>
+            );
+          })}
+          <button
+            onClick={() => setMobileOpen((v) => !v)}
+            className={`flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium transition ${
+              mobileOpen || !['dashboard', 'playground', 'finder', 'logs'].includes(activeTab)
+                ? 'text-cyan-300'
+                : 'text-slate-500'
+            }`}
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            <span>{t('nav.more')}</span>
+          </button>
+        </div>
+      </nav>
     </>
   );
 }

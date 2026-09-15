@@ -22,6 +22,10 @@ for (const stream of [process.stdout, process.stderr]) {
 // khi nguoi dung bat trong Settings (co bypass loopback/private cho model local).
 require('./services/proxyFetch').install();
 
+// Kiem tra npm registry dinh ky: neu co ban WENKER moi hon, day su kien 'update'
+// qua SSE den TOAN BO dashboard dang mo cua server nay (banner bao cap nhat).
+require('./services/updateService').start();
+
 const app = express();
 const settings = db.getSettings();
 const PORT = process.env.PORT || settings.port || 3600;
@@ -69,6 +73,13 @@ app.use('/api', (req, res, next) => {
   const sessionToken = String(req.headers['x-wenker-session'] || '').trim();
   if (sessionToken && db.validateSession(sessionToken)) return next();
 
+  // 1b) EventSource (Live tail) cannot send headers, so /api/events also accepts the
+  // session token via ?token=. Same validation as the header path, nothing weaker.
+  if (req.path === '/events') {
+    const qs = String(req.query.token || '').trim();
+    if (qs && db.validateSession(qs)) return next();
+  }
+
   // 2) an admin API key (for scripts and remote tooling)
   const presented = String(req.headers['x-wenker-admin-key'] || req.headers.authorization || '')
     .replace(/^Bearer\s+/i, '')
@@ -103,11 +114,12 @@ app.all('/v1/*', (req, res) => {
 });
 
 // Health check endpoint
+const PKG = require('../package.json');
 app.get('/health', (req, res) => {
   res.json({
     status: 'online',
     app: 'WENKER Router',
-    version: '2.0.0',
+    version: PKG.version,
     uptime: process.uptime(),
     timestamp: new Date().toISOString()
   });
@@ -229,7 +241,7 @@ app.listen(PORT, HOST, () => {
        ██║███╗██║██╔══╝  ██║╚██╗██║██╔═██╗ ██╔══╝  ██╔══██╗
        ╚███╔███╔╝███████╗██║ ╚████║██║  ██╗███████╗██║  ██║
         ╚══╝╚══╝ ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
-              Local AI Proxy Router Gateway v2.0
+              Local AI Proxy Router Gateway v${PKG.version}
 ============================================================
   Core Server Running at:    http://localhost:${PORT}
   OpenAI API Base:           http://localhost:${PORT}/v1

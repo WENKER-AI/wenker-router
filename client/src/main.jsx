@@ -4,6 +4,7 @@ import App from './App.jsx';
 import { SessionProvider } from './session.jsx';
 import { ThemeProvider } from './theme.jsx';
 import { I18nProvider } from './i18n.jsx';
+import { ToastProvider } from './toast.jsx';
 import './styles/index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -11,7 +12,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <SessionProvider>
       <ThemeProvider>
         <I18nProvider>
-          <App />
+          <ToastProvider>
+            <App />
+          </ToastProvider>
         </I18nProvider>
       </ThemeProvider>
     </SessionProvider>

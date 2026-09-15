@@ -1,7 +1,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { authFetch } from './session';
+import { accentVars, DEFAULT_ACCENT } from './accents';
 
 const THEME_KEY = 'wenker.activeTheme';
+const ACCENT_KEY = 'wenker.ui.accent';
 
 const ThemeContext = createContext(null);
 
@@ -32,9 +34,21 @@ export function ThemeProvider({ children }) {
   const [activeId, setActiveId] = useState(() => {
     try { return localStorage.getItem(THEME_KEY) || ''; } catch (e) { return ''; }
   });
+  const [accentId, setAccentIdState] = useState(() => {
+    try { return localStorage.getItem(ACCENT_KEY) || DEFAULT_ACCENT; } catch (e) { return DEFAULT_ACCENT; }
+  });
   const [loading, setLoading] = useState(true);
 
   const themes = useMemo(() => addons.filter((a) => a.type === 'theme'), [addons]);
+
+  const setAccent = useCallback((id) => {
+    const next = id || DEFAULT_ACCENT;
+    setAccentIdState(next);
+    try {
+      if (next === DEFAULT_ACCENT) localStorage.removeItem(ACCENT_KEY);
+      else localStorage.setItem(ACCENT_KEY, next);
+    } catch (e) { /* storage disabled */ }
+  }, []);
 
   const reload = useCallback(async () => {
     try {
@@ -53,9 +67,7 @@ export function ThemeProvider({ children }) {
     reload();
   }, [reload]);
 
-  // Apply the active theme whenever it (or the store) changes.
-  // The previously applied vars are kept in a ref: when the active theme is deleted,
-  // it is no longer present in `themes`, so looking it up there would never clear it.
+  // Bien CSS dang ap dung cho lan truoc (de clear dung cac key da thay doi).
   const appliedRef = useRef(null);
   useEffect(() => {
     const next = activeId ? themes.find((t) => t.id === activeId) : null;
@@ -64,10 +76,13 @@ export function ThemeProvider({ children }) {
       setActiveId('');
       return;
     }
+    // Gop accent + add-on theme. Add-on theme (co the chua chinh --color-cyan-*)
+    // duoc merge SAU de no toan quyen de len accent khi nguoi dung bat theme.
+    const merged = { ...accentVars(accentId), ...((next && next.resolved) || {}) };
     const prev = appliedRef.current;
-    if (prev && prev.id !== (next ? next.id : '')) clearVars(prev.vars);
-    if (next && next.resolved) applyVars(next.resolved);
-    appliedRef.current = next ? { id: next.id, vars: next.resolved } : null;
+    if (prev) clearVars(prev.vars);
+    applyVars(merged);
+    appliedRef.current = { vars: merged };
     try {
       if (activeId) localStorage.setItem(THEME_KEY, activeId);
       else localStorage.removeItem(THEME_KEY);
@@ -75,13 +90,13 @@ export function ThemeProvider({ children }) {
       /* storage disabled */
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeId, themes]);
+  }, [activeId, themes, accentId]);
 
   const setTheme = useCallback((id) => setActiveId(id || ''), []);
 
   const value = useMemo(
-    () => ({ addons, themes, activeId, setTheme, reload, loading }),
-    [addons, themes, activeId, setTheme, reload, loading]
+    () => ({ addons, themes, activeId, setTheme, accentId, setAccent, reload, loading }),
+    [addons, themes, activeId, setTheme, accentId, setAccent, reload, loading]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
@@ -90,7 +105,7 @@ export function ThemeProvider({ children }) {
 export function useTheme() {
   const ctx = useContext(ThemeContext);
   if (!ctx) {
-    return { addons: [], themes: [], activeId: '', setTheme: () => {}, reload: async () => {}, loading: false };
+    return { addons: [], themes: [], activeId: '', setTheme: () => {}, accentId: DEFAULT_ACCENT, setAccent: () => {}, reload: async () => {}, loading: false };
   }
   return ctx;
 }
