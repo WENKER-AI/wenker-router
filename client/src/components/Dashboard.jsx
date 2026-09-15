@@ -66,7 +66,7 @@ export default function Dashboard({ stats, setActiveTab }) {
               <Sparkles className="w-3.5 h-3.5" />
               <span>WENKER Router Core 2.0 • {t('dash.readyBadge')}</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-heading tracking-tight">
               {t('dash.title')}
             </h1>
             <p className="text-slate-300 text-sm mt-2 leading-relaxed">{t('dash.sub')}</p>
@@ -98,7 +98,7 @@ export default function Dashboard({ stats, setActiveTab }) {
             <span className="text-xs font-semibold text-slate-400">{t('dash.statProviders')}</span>
             <Network className="w-4 h-4 text-cyan-400" />
           </div>
-          <p className="text-2xl font-extrabold text-white mt-2">
+          <p className="text-2xl font-extrabold text-heading mt-2">
             {stats?.totalProviders ?? '—'}
           </p>
           <div className="text-[11px] text-cyan-400 mt-1 flex items-center gap-1 font-medium">
@@ -124,7 +124,7 @@ export default function Dashboard({ stats, setActiveTab }) {
             <span className="text-xs font-semibold text-slate-400">{t('dash.statRequests')}</span>
             <Activity className="w-4 h-4 text-blue-400" />
           </div>
-          <p className="text-2xl font-extrabold text-white mt-2">
+          <p className="text-2xl font-extrabold text-heading mt-2">
             {stats?.totalRequests || 0}
           </p>
           <div className="text-[11px] text-emerald-400 mt-1">
@@ -150,7 +150,7 @@ export default function Dashboard({ stats, setActiveTab }) {
       <div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <h2 className="text-lg font-bold text-heading flex items-center gap-2">
               <Code2 className="w-5 h-5 text-cyan-400" />
               <span>{t('dash.quickSetup')}</span>
             </h2>
@@ -200,7 +200,7 @@ export default function Dashboard({ stats, setActiveTab }) {
             <Sparkles className="w-5 h-5 text-cyan-400" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-white">{t('dash.cloudQueue')}</h3>
+            <h3 className="text-base font-bold text-heading">{t('dash.cloudQueue')}</h3>
             <p className="text-xs text-slate-400">{t('dash.cloudQueueSub')}</p>
           </div>
         </div>

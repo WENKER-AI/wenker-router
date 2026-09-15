@@ -132,7 +132,7 @@ export default function AddonsView() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-5">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold tracking-tight text-heading flex items-center gap-2">
             <Puzzle className="w-6 h-6 text-cyan-400" />
             {t('addon.title')}
           </h1>
@@ -176,7 +176,7 @@ export default function AddonsView() {
       <div className="card-glass p-4 mb-6">
         <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
           <div>
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
+            <h2 className="text-sm font-bold text-heading flex items-center gap-2">
               <Palette className="w-4 h-4 text-cyan-400" /> {t('accent.title')}
             </h2>
             <p className="text-[11px] text-slate-500 mt-0.5">{t('accent.sub')}</p>
@@ -199,7 +199,7 @@ export default function AddonsView() {
                 onClick={() => setAccent(a.id)}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-[12px] font-medium transition ${
                   active
-                    ? 'border-cyan-500/60 bg-cyan-500/10 text-white'
+                    ? 'border-cyan-500/60 bg-cyan-500/10 text-heading'
                     : 'border-slate-800 bg-slate-950/60 text-slate-400 hover:border-slate-600 hover:text-slate-200'
                 }`}
                 title={a.label}
@@ -219,7 +219,7 @@ export default function AddonsView() {
       {/* Write / install */}
       <div className="card-glass p-4 mb-6">
         <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
+          <h2 className="text-sm font-bold text-heading flex items-center gap-2">
             <Code2 className="w-4 h-4 text-cyan-400" /> {t('addon.installFileTitle')}
           </h2>
           <div className="flex items-center gap-2">
@@ -300,7 +300,7 @@ export default function AddonsView() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <Icon className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <h3 className="text-sm font-bold text-white truncate" title={a.name}>{a.name}</h3>
+                      <h3 className="text-sm font-bold text-heading truncate" title={a.name}>{a.name}</h3>
                     </div>
                     <p className="text-[10px] font-mono text-slate-500 truncate mt-0.5" title={a.id}>{a.id}</p>
                   </div>
@@ -383,7 +383,7 @@ export default function AddonsView() {
 
       {/* Cheat sheet */}
       <div className="card-glass p-4 mt-6">
-        <h2 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+        <h2 className="text-sm font-bold text-heading mb-2 flex items-center gap-2">
           <Code2 className="w-4 h-4 text-cyan-400" /> {t('addon.howToTitle')}
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 text-[11px] text-slate-400 leading-relaxed">

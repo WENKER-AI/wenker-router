@@ -70,7 +70,7 @@ export default function LoginScreen() {
                 <PixelW className="w-7 h-7 text-cyan-400" />
               </div>
             </div>
-            <h1 className="mt-3 text-xl font-extrabold tracking-wide text-white">
+            <h1 className="mt-3 text-xl font-extrabold tracking-wide text-heading">
               <span className="brand-pixel">WENKER</span> <span className="gradient-text">ROUTER</span>
             </h1>
             <p className="text-[11px] text-slate-400 font-mono mt-0.5">{t('login.tagline')}</p>

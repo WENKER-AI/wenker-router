@@ -83,6 +83,11 @@ export function ThemeProvider({ children }) {
     if (prev) clearVars(prev.vars);
     applyVars(merged);
     appliedRef.current = { vars: merged };
+    // Add-on themes may declare --wenker-mode: light to activate the light-mode
+    // fine-tuning CSS (scrollbar, status colours). Dark skins never set it.
+    const root = document.documentElement;
+    if (merged['--wenker-mode'] === 'light') root.dataset.theme = 'light';
+    else delete root.dataset.theme;
     try {
       if (activeId) localStorage.setItem(THEME_KEY, activeId);
       else localStorage.removeItem(THEME_KEY);

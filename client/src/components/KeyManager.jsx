@@ -96,7 +96,7 @@ export default function KeyManager() {
       {/* Top Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold text-heading flex items-center gap-2">
             <Key className="w-6 h-6 text-cyan-400" />
             <span>{t('keys.title')}</span>
           </h1>
@@ -118,7 +118,7 @@ export default function KeyManager() {
       <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3 text-xs text-slate-300">
         <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
         <div>
-          <strong className="text-white block mb-0.5">{t('keys.secTitle')}</strong>
+          <strong className="text-heading block mb-0.5">{t('keys.secTitle')}</strong>
           {t('keys.secBody')}
         </div>
       </div>
@@ -213,7 +213,7 @@ export default function KeyManager() {
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="card-glass bg-slate-900 border-slate-700 w-full max-w-md p-6 rounded-2xl shadow-2xl">
-            <h2 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-heading mb-1 flex items-center gap-2">
               <Plus className="w-5 h-5 text-cyan-400" />
               <span>{t('keys.createTitle')}</span>
             </h2>

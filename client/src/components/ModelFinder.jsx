@@ -294,7 +294,7 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-5">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold tracking-tight text-heading flex items-center gap-2">
             <Search className="w-6 h-6 text-cyan-400" />
             {t('finder.title')}
           </h1>
@@ -474,7 +474,7 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 min-w-0">
                       {m.wenker_free && <PixelStar className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
-                      <h3 className="text-sm font-bold text-white truncate" title={m.wenker_display_name}>
+                      <h3 className="text-sm font-bold text-heading truncate" title={m.wenker_display_name}>
                         {m.wenker_display_name}
                       </h3>
                     </div>

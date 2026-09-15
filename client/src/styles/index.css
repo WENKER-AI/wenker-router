@@ -252,6 +252,9 @@ code, pre, .font-mono {
   --sea-shadow: 0 1px 2px rgba(0, 0, 0, 0.30);
   --sea-shadow-lg: 0 10px 30px -12px rgba(0, 0, 0, 0.50);
 
+  /* heading/value token: trang o skin toi; add-on light (Paper) override sang muc toi */
+  --color-heading: 255 255 255;
+
   /* slate → thang trung tinh zinc */
   --color-slate-50: 250 250 250;
   --color-slate-100: 244 244 245;
@@ -356,6 +359,55 @@ body {
 /* Thanh cuộn trung tinh */
 ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 6px; border: 2px solid #09090b; }
 ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+/* ============================================================
+   LIGHT THEME FINE-TUNING — chi chay khi <html data-theme="light">
+   (add-on theme khai bao "--wenker-mode": "light", vi du Paper Light).
+   Skin mac dinh (toi) khong bao gio khop cac selector nay.
+   ============================================================ */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="light"] ::-webkit-scrollbar-thumb { background: #d4d4d8; border-color: #fafafa; }
+:root[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+/* Cac mau trang thai (emerald/rose/amber/...) shade 200-500 ky cho nen toi;
+   tren nen sang thi toi xuong bang shade 600/700 goc cua chung. */
+:root[data-theme="light"] .text-emerald-200,
+:root[data-theme="light"] .text-emerald-300,
+:root[data-theme="light"] .text-emerald-400 { color: #047857; }
+:root[data-theme="light"] .text-rose-200,
+:root[data-theme="light"] .text-rose-300,
+:root[data-theme="light"] .text-rose-400 { color: #be123c; }
+:root[data-theme="light"] .text-amber-200,
+:root[data-theme="light"] .text-amber-300,
+:root[data-theme="light"] .text-amber-300\/90,
+:root[data-theme="light"] .text-amber-400,
+:root[data-theme="light"] .text-amber-400\/80,
+:root[data-theme="light"] .text-amber-500 { color: #b45309; }
+:root[data-theme="light"] .text-sky-200,
+:root[data-theme="light"] .text-sky-300,
+:root[data-theme="light"] .text-sky-400 { color: #0369a1; }
+:root[data-theme="light"] .text-blue-200,
+:root[data-theme="light"] .text-blue-300,
+:root[data-theme="light"] .text-blue-400 { color: #1d4ed8; }
+:root[data-theme="light"] .text-violet-200,
+:root[data-theme="light"] .text-violet-300,
+:root[data-theme="light"] .text-violet-400 { color: #6d28d9; }
+:root[data-theme="light"] .text-purple-200,
+:root[data-theme="light"] .text-purple-300,
+:root[data-theme="light"] .text-purple-400 { color: #7e22ce; }
+:root[data-theme="light"] .text-indigo-200,
+:root[data-theme="light"] .text-indigo-300,
+:root[data-theme="light"] .text-indigo-400 { color: #4338ca; }
+/* Chu gradient (login brand): indigo dam de nhin tren nen sang */
+:root[data-theme="light"] .gradient-text {
+  background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+/* Vung chon: sang nen thi dung indigo dam + chu toi */
+:root[data-theme="light"] ::selection { background: rgba(79, 70, 229, 0.22); color: #18181b; }
+/* Card/modal kinh mau: gan trang den de khong bi overlay toi lam xam */
+:root[data-theme="light"] .card-glass { background: rgb(var(--color-slate-900) / 0.92); }
 
 @media (prefers-reduced-motion: reduce) {
   .card-glass, .btn-primary, .btn-secondary, .btn-ghost { transition: none; }

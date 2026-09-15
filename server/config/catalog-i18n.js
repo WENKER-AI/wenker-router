@@ -630,6 +630,11 @@ const ADDON_DESCRIPTIONS = {
     zh: '深棕背景上的暖琥珀色,夜班护眼。',
     fr: 'Ambre chaud sur fond brun sombre, doux pour les yeux en poste de nuit.'
   },
+  'wenker.theme.paper': {
+    en: 'Clean, elegant paper white: inverts the zinc ramp to a light background while keeping the indigo accent - opt-in light mode.',
+    zh: '简洁优雅的纸白色:将锌灰色阶反转为浅色背景,保留靛蓝强调色 —— 可选浅色模式。',
+    fr: 'Blanc papier sobre et élégant : inverse la rampe zinc en fond clair tout en gardant l’accent indigo - mode clair optionnel.'
+  },
   'wenker.addon.copyids': {
     en: 'Adds a “Copy all live IDs” button inside Model Finder.',
     zh: '在 Model Finder 中添加“复制全部在线 ID”按钮。',

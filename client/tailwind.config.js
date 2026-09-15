@@ -41,7 +41,10 @@ export default {
           800: 'rgb(var(--color-slate-800) / <alpha-value>)',
           900: 'rgb(var(--color-slate-900) / <alpha-value>)',
           950: 'rgb(var(--color-slate-950) / <alpha-value>)'
-        }
+        },
+        // Heading/value token: white in the default (dark) skin, overridden to a
+        // dark ink by light add-on themes (see --color-heading in index.css).
+        heading: 'rgb(var(--color-heading) / <alpha-value>)'
       }
     }
   },

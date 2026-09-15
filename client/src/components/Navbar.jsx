@@ -151,7 +151,7 @@ export default function Navbar({ activeTab, setActiveTab, stats }) {
           </div>
           <div className={`min-w-0 ${collapsed ? 'hidden' : ''}`}>
             <div className="flex items-center gap-1.5">
-              <span className="brand-pixel font-extrabold text-[15px] tracking-tight text-white leading-none">WENKER</span>
+              <span className="brand-pixel font-extrabold text-[15px] tracking-tight text-heading leading-none">WENKER</span>
               <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 whitespace-nowrap">
                 v{APP_VERSION}
               </span>
@@ -263,7 +263,7 @@ export default function Navbar({ activeTab, setActiveTab, stats }) {
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="brand-pixel font-extrabold text-[15px] tracking-tight text-white leading-none">WENKER</span>
+                  <span className="brand-pixel font-extrabold text-[15px] tracking-tight text-heading leading-none">WENKER</span>
                   <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 whitespace-nowrap">
                     v{APP_VERSION}
                   </span>

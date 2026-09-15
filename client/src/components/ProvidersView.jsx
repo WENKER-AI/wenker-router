@@ -263,7 +263,7 @@ export default function ProvidersView() {
       {/* Top Header & Search */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold text-heading flex items-center gap-2">
             <span>{t('prov.title')}</span>
             <span className="text-sm font-semibold px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
               {providers.length} Providers
@@ -540,7 +540,7 @@ export default function ProvidersView() {
       {selectedProvider && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="card-glass bg-slate-900 border-slate-700 w-full max-w-lg p-6 rounded-2xl shadow-2xl">
-            <h2 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-heading mb-1 flex items-center gap-2">
               <Key className="w-5 h-5 text-cyan-400" />
               <span>{t('prov.configTitle')} {selectedProvider.name}</span>
             </h2>
@@ -673,7 +673,7 @@ export default function ProvidersView() {
                     )}
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-white leading-tight">{dp.name}</h2>
+                    <h2 className="text-lg font-bold text-heading leading-tight">{dp.name}</h2>
                     <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                       <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">{dp.category}</span>
                       {dp.isFree && <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">{t('prov.free')}</span>}
@@ -689,7 +689,7 @@ export default function ProvidersView() {
                 </div>
                 <button
                   onClick={() => { setDetailProvider(null); setModelSearch(''); }}
-                  className="text-slate-500 hover:text-white text-xl leading-none px-1"
+                  className="text-slate-500 hover:text-heading text-xl leading-none px-1"
                   title={t('common.close')}
                 >
                   ✕
@@ -834,7 +834,7 @@ export default function ProvidersView() {
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="card-glass bg-slate-900 border-slate-700 w-full max-w-lg p-6 rounded-2xl shadow-2xl">
-            <h2 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-heading mb-1 flex items-center gap-2">
               <Plus className="w-5 h-5 text-cyan-400" />
               <span>{t('prov.addTitle')}</span>
             </h2>

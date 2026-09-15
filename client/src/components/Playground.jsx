@@ -422,7 +422,7 @@ export default function Playground({ requestedModel, onModelConsumed }) {
                 <button
                   onClick={() => handleCopyMessage(msg.content, index)}
                   className={`absolute top-2 right-2 p-1 rounded transition opacity-0 group-hover:opacity-100 ${
-                    isUser ? "bg-white/10 text-white hover:bg-white/20" : "bg-slate-800 text-slate-400 hover:text-white"
+                    isUser ? "bg-white/10 text-white hover:bg-white/20" : "bg-slate-800 text-slate-400 hover:text-heading"
                   }`}
                   title={t('pg.copyContent')}
                 >

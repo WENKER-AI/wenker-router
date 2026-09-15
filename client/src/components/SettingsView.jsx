@@ -79,7 +79,7 @@ export default function SettingsView() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       
       <div>
-        <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
+        <h1 className="text-2xl font-extrabold text-heading flex items-center gap-2">
           <Settings className="w-6 h-6 text-cyan-400" />
           <span>{t('set.title')}</span>
         </h1>
@@ -97,7 +97,7 @@ export default function SettingsView() {
           
           {/* Card: Core Settings */}
           <div className="card-glass p-6 rounded-xl space-y-4">
-            <h2 className="font-bold text-sm text-white flex items-center gap-2">
+            <h2 className="font-bold text-sm text-heading flex items-center gap-2">
               <Server className="w-4 h-4 text-cyan-400" />
               <span>{t('set.localTitle')}</span>
             </h2>
@@ -139,7 +139,7 @@ export default function SettingsView() {
 
           {/* Card: Smart Fallback */}
           <div className="card-glass p-6 rounded-xl space-y-4">
-            <h2 className="font-bold text-sm text-white flex items-center gap-2">
+            <h2 className="font-bold text-sm text-heading flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
               <span>{t('set.failoverTitle')}</span>
             </h2>
@@ -165,7 +165,7 @@ export default function SettingsView() {
 
           {/* Card: Outbound VPN / HTTP proxy */}
           <div className="card-glass p-6 rounded-xl space-y-4">
-            <h2 className="font-bold text-sm text-white flex items-center gap-2">
+            <h2 className="font-bold text-sm text-heading flex items-center gap-2">
               <Globe className="w-4 h-4 text-violet-400" />
               <span>{t('set.proxyTitle')}</span>
             </h2>
@@ -238,7 +238,7 @@ export default function SettingsView() {
 
           {/* Card: About */}
           <div className="card-glass p-6 rounded-xl space-y-3">
-            <h2 className="font-bold text-sm text-white flex items-center gap-2">
+            <h2 className="font-bold text-sm text-heading flex items-center gap-2">
               <Info className="w-4 h-4 text-blue-400" />
               <span>{t('set.aboutTitle')}</span>
             </h2>

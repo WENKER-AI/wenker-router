@@ -59,7 +59,7 @@ function KpiTile({ icon: Icon, label, value, sub, tone = 'cyan' }) {
         <Icon className={`w-4 h-4 shrink-0 ${ICON_TONES[tone] || ICON_TONES.cyan}`} />
         <span className="text-[11px] font-medium uppercase tracking-wide truncate">{label}</span>
       </div>
-      <div className="text-2xl font-extrabold text-white leading-none truncate">{value}</div>
+      <div className="text-2xl font-extrabold text-heading leading-none truncate">{value}</div>
       {sub && <div className="text-[11px] text-slate-500 truncate">{sub}</div>}
     </div>
   );
@@ -227,7 +227,7 @@ export default function StatisticsView() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold text-heading flex items-center gap-2">
             <BarChart3 className="w-6 h-6 text-cyan-400" />
             <span>{t('stat.title')}</span>
           </h1>
@@ -295,7 +295,7 @@ export default function StatisticsView() {
           {/* Daily bar chart */}
           <div className="card-glass p-5 rounded-2xl">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-bold text-white flex items-center gap-2">
+              <h2 className="text-sm font-bold text-heading flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-cyan-400" />
                 {t('stat.dailyTitle')}
               </h2>
@@ -330,7 +330,7 @@ export default function StatisticsView() {
           {/* Success vs failed lines */}
           <div className="card-glass p-5 rounded-2xl">
             <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
-              <h2 className="text-sm font-bold text-white flex items-center gap-2">
+              <h2 className="text-sm font-bold text-heading flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 {t('stat.svTitle')}
               </h2>
@@ -356,7 +356,7 @@ export default function StatisticsView() {
           <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
             {/* By provider */}
             <div className="card-glass p-5 rounded-2xl">
-              <h2 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+              <h2 className="text-sm font-bold text-heading mb-3 flex items-center gap-2">
                 <PieChart className="w-4 h-4 text-cyan-400" />
                 {t('stat.byProvider')}
               </h2>
@@ -406,7 +406,7 @@ export default function StatisticsView() {
 
             {/* By model */}
             <div className="card-glass p-5 rounded-2xl">
-              <h2 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+              <h2 className="text-sm font-bold text-heading mb-3 flex items-center gap-2">
                 <Coins className="w-4 h-4 text-cyan-400" />
                 {t('stat.byModel')}
               </h2>

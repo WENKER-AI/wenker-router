@@ -123,7 +123,7 @@ export default function LogsView() {
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold text-heading flex items-center gap-2">
             <Terminal className="w-6 h-6 text-cyan-400" />
             <span>{t('logs.title')}</span>
           </h1>

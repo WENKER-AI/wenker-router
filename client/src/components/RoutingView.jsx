@@ -86,7 +86,7 @@ export default function RoutingView() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold text-heading flex items-center gap-2">
             <Route className="w-6 h-6 text-cyan-400" />
             <span>{t('route.title')}</span>
           </h1>
@@ -115,7 +115,7 @@ export default function RoutingView() {
           <div className="card-glass p-6 rounded-xl space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="font-bold text-sm text-white flex items-center gap-2">
+                <h2 className="font-bold text-sm text-heading flex items-center gap-2">
                   <SlidersHorizontal className="w-4 h-4 text-cyan-400" />
                   <span>{t('route.aliasTitle')}</span>
                 </h2>
@@ -183,7 +183,7 @@ export default function RoutingView() {
           {/* Section 2: Smart Failover & Fallback Info */}
           <div className="card-glass p-6 rounded-xl space-y-4 flex flex-col justify-between">
             <div>
-              <h2 className="font-bold text-sm text-white flex items-center gap-2">
+              <h2 className="font-bold text-sm text-heading flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4 text-amber-400" />
                 <span>{t('route.failoverTitle')}</span>
               </h2>
