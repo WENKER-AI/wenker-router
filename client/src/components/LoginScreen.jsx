@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Lock, Eye, Delete } from 'lucide-react';
 import PixelW from './PixelW';
 import { useSession } from '../session';
+import { useI18n } from '../i18n';
 
 const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
 export default function LoginScreen() {
   const { login } = useSession();
+  const { t } = useI18n();
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -14,7 +16,7 @@ export default function LoginScreen() {
   const submit = async (value) => {
     const pin = String(value).trim();
     if (!DIGITS.includes(pin)) {
-      setError('Mật khẩu là một chữ số từ 1 đến 9.');
+      setError(t('login.errDigit'));
       return;
     }
     setBusy(true);
@@ -71,21 +73,20 @@ export default function LoginScreen() {
             <h1 className="mt-3 text-xl font-extrabold tracking-wide text-white">
               <span className="brand-pixel">WENKER</span> <span className="gradient-text">ROUTER</span>
             </h1>
-            <p className="text-[11px] text-slate-400 font-mono mt-0.5">Local AI Proxy Gateway</p>
+            <p className="text-[11px] text-slate-400 font-mono mt-0.5">{t('login.tagline')}</p>
           </div>
 
           <div className="flex items-center gap-2 justify-center mb-1">
             <Lock className="w-3.5 h-3.5 text-cyan-400" />
-            <h2 className="text-sm font-bold text-slate-100">Xác minh bạn không phải bot</h2>
+            <h2 className="text-sm font-bold text-slate-100">{t('login.verifyTitle')}</h2>
           </div>
           <p className="text-xs text-slate-400 text-center leading-relaxed mb-5">
-            Không cần tên tài khoản. Nhập <span className="text-slate-200 font-semibold">mật khẩu gồm 1 chữ số</span> được
-            in sẵn bên dưới (mỗi số là một người dùng).
+            {t('login.verifySubA')} <span className="text-slate-200 font-semibold">{t('login.verifySubB')}</span> {t('login.verifySubC')}
           </p>
 
           {/* Passcode display */}
           <div className="flex items-center justify-center gap-3 mb-5">
-            <span className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">Mật khẩu</span>
+            <span className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">{t('login.passwordLabel')}</span>
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-950/80 border border-cyan-500/30">
               {DIGITS.map((d) => (
                 <span key={d} className="text-lg font-mono font-bold text-cyan-300">{d}</span>
@@ -110,15 +111,15 @@ export default function LoginScreen() {
           {/* Status line */}
           <div className="mt-4 h-5 text-center">
             {busy ? (
-              <span className="text-xs text-cyan-400 animate-pulse">Đang xác minh...</span>
+              <span className="text-xs text-cyan-400 animate-pulse">{t('login.verifying')}</span>
             ) : error ? (
               <span className="text-xs text-rose-400">{error}</span>
             ) : code ? (
               <span className="text-xs text-slate-400 flex items-center gap-1 justify-center">
-                <Eye className="w-3 h-3" /> Đã chọn: {code}
+                <Eye className="w-3 h-3" /> {t('login.selected')} {code}
               </span>
             ) : (
-              <span className="text-[11px] text-slate-500">Bấm một chữ số (1-9) để vào</span>
+              <span className="text-[11px] text-slate-500">{t('login.hint')}</span>
             )}
           </div>
 
@@ -127,12 +128,12 @@ export default function LoginScreen() {
             className="mt-2 w-full flex items-center justify-center gap-1.5 text-[11px] text-slate-500 hover:text-slate-300 transition"
           >
             <Delete className="w-3 h-3" />
-            Nhập lại
+            {t('login.reenter')}
           </button>
         </div>
 
         <p className="text-center text-[10px] text-slate-600 mt-4 font-mono">
-          Mỗi số 1-9 là một người dùng riêng với hạn mức WENKER Cloud theo ngày.
+          {t('login.footNote')}
         </p>
       </div>
     </div>

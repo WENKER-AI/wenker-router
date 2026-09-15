@@ -70,14 +70,15 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-cyan-500 selection:text-white font-sans">
-      {/* Navbar Header */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col lg:flex-row selection:bg-cyan-500 selection:text-white font-sans">
+      {/* Left sidebar (desktop) / top bar (mobile) */}
       <Navbar 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
         stats={stats} 
       />
 
+      <div className="flex-1 flex flex-col min-w-0">
       {/* Main Content Area */}
       <main className="flex-1">
         {activeTab === 'dashboard' && (
@@ -124,6 +125,7 @@ export default function App() {
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 }

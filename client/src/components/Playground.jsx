@@ -35,25 +35,17 @@ const FREE_MODELS = [
   { id: "pollinations/pollinations-qwen-coder", name: "Pollinations Qwen Coder", tag: "Pollinations", desc: "Gọi thẳng upstream Pollinations với model qwen-coder." }
 ];
 
-const SUGGESTIONS = [
-  "Giải thích thuật toán Dijkstra bằng code JavaScript có chú thích chi tiết",
-  "Viết một REST API bằng Express.js quản lý giỏ hàng với JWT",
-  "So sánh sự khác nhau giữa React Server Components và Client Components",
-  "Viết prompt tối ưu cho Claude Code CLI để refactor codebase lớn"
-];
+const SUGGESTIONS = ['pg.s1', 'pg.s2', 'pg.s3', 'pg.s4'];
 
 export default function Playground({ requestedModel, onModelConsumed }) {
   const { t } = useI18n();
   const [messages, setMessages] = useState([
-    {
-      role: "assistant",
-      content: "Xin chào! Đây là **WENKER Free Playground** - các yêu cầu được gửi trực tiếp tới nhà cung cấp miễn phí (tier ẩn danh của bên thứ ba).\n\nLưu ý: hàng đợi ẩn danh có giới hạn, nếu upstream hết hạn mức bạn sẽ nhận được **thông báo lỗi thật** (502/402) thay vì nội dung mô phỏng. Nguồn cần key thì vẫn phải cấu hình key của bạn. Chọn mô hình phía trên và bắt đầu trò chuyện!"
-    }
+    { role: "assistant", content: t('pg.welcome') }
   ]);
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState(requestedModel || "wenker-deepseek-r1-free");
   const [temperature, setTemperature] = useState(0.7);
-  const [systemPrompt, setSystemPrompt] = useState("Bạn là trợ lý AI thông minh từ WENKER Router, trả lời ngắn gọn, chính xác và định dạng code đẹp.");
+  const [systemPrompt, setSystemPrompt] = useState(t('pg.sysDefault'));
   const [showSettings, setShowSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [latencyMs, setLatencyMs] = useState(null);
@@ -74,7 +66,7 @@ export default function Playground({ requestedModel, onModelConsumed }) {
       ...prev,
       {
         role: 'assistant',
-        content: `Đã chuyển sang model \`${requestedModel}\` (gửi từ **Model Finder**). Gõ tin nhắn để bắt đầu — WENKER sẽ tự định tuyến tới nhà cung cấp phù hợp.`
+        content: t('pg.modelSwitched', { model: requestedModel })
       }
     ]);
     onModelConsumed?.();
@@ -143,7 +135,7 @@ export default function Playground({ requestedModel, onModelConsumed }) {
           const newArr = [...prev];
           newArr[assistantMessageIndex] = {
             role: "assistant",
-            content: `${errJson.error?.message || "You have used up your quota for today; please try a different model."}\n\n${errJson.error?.hint || "Ban da dung het luot WENKER Cloud hom nay. Xem quang cao de nhan them luot hoac doi sang model khac."}`
+            content: `${errJson.error?.message || t('pg.quotaExhausted')}\n\n${errJson.error?.hint || t('pg.quotaExhausted')}`
           };
           return newArr;
         });
@@ -157,10 +149,10 @@ export default function Playground({ requestedModel, onModelConsumed }) {
         const lines = [`[!] [HTTP ${res.status}] ${e.message || `Server error: ${res.status}`}`];
         if (e.hint) lines.push(`[>] ${e.hint}`);
         if (Array.isArray(e.available_models) && e.available_models.length) {
-          lines.push(`Model khả dụng: ${e.available_models.slice(0, 8).join(', ')}${e.available_models.length > 8 ? ' …' : ''}`);
+          lines.push(`${t('pg.availableModels')} ${e.available_models.slice(0, 8).join(', ')}${e.available_models.length > 8 ? ' …' : ''}`);
         }
         if (Array.isArray(e.providers_currently_alive) && e.providers_currently_alive.length) {
-          lines.push(`Nguồn đang sống: ${e.providers_currently_alive.join(', ')}`);
+          lines.push(`${t('pg.aliveSources')} ${e.providers_currently_alive.join(', ')}`);
         }
         throw Object.assign(new Error(lines.join('\n\n')), { handled: true });
       }
@@ -218,7 +210,7 @@ export default function Playground({ requestedModel, onModelConsumed }) {
       console.error("Playground Chat Error:", err);
       const detail = err?.handled
         ? err.message
-        : `**Lỗi kết nối**: ${err.message}\n\n*Gợi ý*: Kiểm tra tab "Nhà Cung Cấp" hoặc thử chọn mô hình khác trong danh sách miễn phí!`;
+        : t('pg.connError', { msg: err.message });
       setMessages(prev => {
         const newArr = [...prev];
         newArr[assistantMessageIndex] = {
@@ -240,10 +232,7 @@ export default function Playground({ requestedModel, onModelConsumed }) {
 
   const handleClearChat = () => {
     setMessages([
-      {
-        role: "assistant",
-        content: "Cuộc trò chuyện đã được làm mới. Hãy chọn mô hình và bắt đầu gửi tin nhắn!"
-      }
+      { role: "assistant", content: t('pg.cleared') }
     ]);
   };
 
@@ -253,17 +242,17 @@ export default function Playground({ requestedModel, onModelConsumed }) {
     const result = await watchAd();
     setAdBusy(false);
     if (result.success && result.granted) {
-      setAdMessage(`Da nhan them +${result.bonus} luot chat.`);
+      setAdMessage(t('pg.adGranted', { n: result.bonus }));
       setQuotaExhausted(false);
     } else if (result.success) {
-      setAdMessage(result.reason || 'Hom nay da het luot xem quang cao.');
+      setAdMessage(result.reason || t('pg.adNone'));
     } else {
-      setAdMessage(result.error || 'Khong the mo trang quang cao.');
+      setAdMessage(result.error || t('pg.adFail'));
     }
   };
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col bg-slate-950">
+    <div className="h-[calc(100dvh-9.5rem)] lg:h-[calc(100vh-3.5rem)] flex flex-col bg-slate-950">
       
       {/* Top Controls Bar */}
       <div className="border-b border-slate-800/80 bg-slate-900/60 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
@@ -346,7 +335,7 @@ export default function Playground({ requestedModel, onModelConsumed }) {
           <div className="flex items-center gap-2 text-xs text-amber-300">
             <AlertTriangle className="w-4 h-4 shrink-0" />
             <span>
-              Bạn đã dùng hết lượt WENKER Cloud hôm nay. Đổi model khác hoặc xem quảng cáo để nhận thêm lượt.
+              {t('pg.quotaExhausted')}
               {adMessage && <span className="text-slate-400"> {adMessage}</span>}
             </span>
           </div>
@@ -358,7 +347,7 @@ export default function Playground({ requestedModel, onModelConsumed }) {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500 text-white hover:bg-cyan-400 active:scale-95 transition disabled:opacity-60"
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span>{adBusy ? 'Đang mở...' : `Xem quảng cáo (+${quota.adCreditAmount || 10})`}</span>
+                <span>{adBusy ? t('pg.opening') : t('pg.watchAd', { n: quota.adCreditAmount || 10 })}</span>
               </button>
             )}
             <button
@@ -366,7 +355,7 @@ export default function Playground({ requestedModel, onModelConsumed }) {
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700 hover:text-cyan-300 transition"
             >
               <RefreshCw className="w-3 h-3" />
-              <span>Thử lại</span>
+              <span>{t('common.retry')}</span>
             </button>
           </div>
         </div>
@@ -376,19 +365,19 @@ export default function Playground({ requestedModel, onModelConsumed }) {
       {showSettings && (
         <div className="bg-slate-900/90 border-b border-slate-800 px-6 py-3 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs animate-in slide-in-from-top-2">
           <div>
-            <label className="block text-slate-300 font-medium mb-1">System Prompt (Chỉ dẫn hệ thống):</label>
+            <label className="block text-slate-300 font-medium mb-1">{t('pg.sysLabel')}</label>
             <textarea
               rows={2}
               value={systemPrompt}
               onChange={(e) => setSystemPrompt(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none focus:border-cyan-500 font-mono text-xs"
-              placeholder="Nhập vai AI..."
+              placeholder={t('pg.sysPh')}
             />
           </div>
           <div className="flex flex-col justify-center">
             <div className="flex justify-between items-center mb-1">
-              <label className="text-slate-300 font-medium">Temperature (Sự sáng tạo): {temperature}</label>
-              <span className="text-slate-500 text-[10px]">0.0 = Chính xác, 1.0 = Sáng tạo</span>
+              <label className="text-slate-300 font-medium">{t('pg.tempLabel')} {temperature}</label>
+              <span className="text-slate-500 text-[10px]">{t('pg.tempHint')}</span>
             </div>
             <input
               type="range"
@@ -472,10 +461,10 @@ export default function Playground({ requestedModel, onModelConsumed }) {
           {SUGGESTIONS.map((s, idx) => (
             <button
               key={idx}
-              onClick={() => handleSend(s)}
+              onClick={() => handleSend(t(s))}
               className="text-[11px] bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-cyan-300 border border-slate-800 hover:border-cyan-500/40 rounded-full px-3 py-1 transition text-left"
             >
-              <span className="text-cyan-400 mr-1">&gt;</span>{s}
+              <span className="text-cyan-400 mr-1">&gt;</span>{t(s)}
             </button>
           ))}
         </div>

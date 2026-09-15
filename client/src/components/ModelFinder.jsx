@@ -49,10 +49,10 @@ const STATUS_TONE = {
   unknown: 'bg-slate-500/10 text-slate-400 border-slate-600/40'
 };
 const STATUS_LABEL = {
-  alive: 'Dang song',
-  down: 'Da tay',
-  needs_key: 'Can key',
-  unknown: 'Chua kiem tra'
+  alive: 'mf.statusAlive',
+  down: 'mf.statusDown',
+  needs_key: 'mf.statusNeedsKey',
+  unknown: 'mf.statusUnknown'
 };
 const STATUS_DOT = {
   alive: 'bg-emerald-400',
@@ -154,14 +154,14 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
       const mData = await mRes.json();
       const hData = await hRes.json().catch(() => ({ health: {} }));
       const aData = await aRes.json().catch(() => ({ addons: [] }));
-      if (!mRes.ok) throw new Error('Khong doc duoc /v1/models');
+      if (!mRes.ok) throw new Error(t('mf.errLoadModels'));
       // Keep only the plain (non-prefixed) ids; the prefixed form is offered as a copy button.
       const models = (mData.data || []).filter((m) => !m.id.includes('/'));
       setRaw(models);
       setHealth(hData.health || {});
       setSnippets((aData.addons || []).filter((a) => a.type === 'snippet'));
     } catch (e) {
-      setError(e.message || 'Loi ket noi');
+      setError(e.message || t('mf.errConnect'));
     } finally {
       setLoading(false);
     }
@@ -272,15 +272,15 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
 
   const probeAll = async () => {
     setProbing(true);
-    setProbeMsg('Dang goi thu that toi tung nguon (khoang 15-40 giay)...');
+    setProbeMsg(t('mf.probing'));
     try {
       const res = await authFetch('/api/health/probe', { method: 'POST' });
       const data = await res.json();
       const ok = (data.results || []).filter((r) => r.ok).length;
-      setProbeMsg(`Xong: ${ok}/${(data.results || []).length} nguon tra loi that.`);
+      setProbeMsg(t('mf.probeDone', { ok, n: (data.results || []).length }));
       await load();
     } catch (e) {
-      setProbeMsg('Probe that bai: ' + e.message);
+      setProbeMsg(t('mf.probeFail', { msg: e.message }));
     } finally {
       setProbing(false);
     }
@@ -302,28 +302,28 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
         </div>
         <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
           <span className="px-2.5 py-1 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-300">
-            {stats.total} model / {stats.providers} nguon
+            {t('mf.modelsSources', { n: stats.total, m: stats.providers })}
           </span>
           <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-            {stats.alive} song
+            {t('mf.aliveCount', { n: stats.alive })}
           </span>
           <span className="px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300">
-            {stats.free} mien phi
+            {t('mf.freeCount', { n: stats.free })}
           </span>
           <button
             onClick={load}
             className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-300 hover:text-cyan-300 flex items-center gap-1.5 transition"
-            title="Tai lai danh muc"
+            title={t('mf.reloadTitle')}
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Tai lai
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> {t('mf.reload')}
           </button>
           <button
             onClick={probeAll}
             disabled={probing}
             className="px-2.5 py-1 rounded-lg bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/25 flex items-center gap-1.5 transition disabled:opacity-50"
-            title="Gui 1 request that toi tung nguon de biet nguon nao song"
+            title={t('prov.probeAllTitle')}
           >
-            <Zap className={`w-3.5 h-3.5 ${probing ? 'animate-pulse' : ''}`} /> Test nguon song
+            <Zap className={`w-3.5 h-3.5 ${probing ? 'animate-pulse' : ''}`} /> {t('prov.probeAll')}
           </button>
         </div>
       </div>
@@ -336,7 +336,7 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
 
       {error && (
         <div className="mb-4 text-sm px-3 py-2 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300">
-          {error} — kiem tra server dang chay o port 3600.
+          {error} — {t('mf.errServer')}
         </div>
       )}
 
@@ -348,7 +348,7 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
             ref={searchRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Vi du: lap trinh python mien phi khong can key / doc tai lieu dai 1m / local tren may toi..."
+            placeholder={t('mf.searchPh')}
             className="w-full bg-slate-950/70 border border-slate-800 focus:border-cyan-500/60 rounded-xl pl-10 pr-10 py-3 text-sm text-slate-100 placeholder:text-slate-600 outline-none transition"
           />
           {query && (
@@ -372,7 +372,7 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
                     : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:text-slate-200 hover:border-slate-700'
                 }`}
               >
-                {c.label}
+                {c.id === 'all' ? t('mf.catAll') : c.id === 'wenker' ? t('mf.catWenker') : c.id === 'free' ? t('mf.catFree') : c.label}
               </button>
             );
           })}
@@ -382,23 +382,23 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
         <div className="flex flex-wrap items-center gap-4 mt-3">
           <label className="flex items-center gap-2 text-[11px] text-slate-400 cursor-pointer select-none">
             <input type="checkbox" checked={effFree} onChange={(e) => setFreeOnly(e.target.checked)} className="accent-cyan-500 w-3.5 h-3.5" />
-            <Unlock className="w-3.5 h-3.5" /> Chi mien phi (khong can key)
+            <Unlock className="w-3.5 h-3.5" /> {t('mf.onlyFree')}
             {inferred.free && !freeOnly && <span className="text-[9px] px-1 rounded bg-cyan-500/15 text-cyan-300">AI</span>}
           </label>
           <label className="flex items-center gap-2 text-[11px] text-slate-400 cursor-pointer select-none">
             <input type="checkbox" checked={effAlive} onChange={(e) => setAliveOnly(e.target.checked)} className="accent-cyan-500 w-3.5 h-3.5" />
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Chi nguon dang song
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> {t('mf.onlyAlive')}
             {inferred.alive && !aliveOnly && <span className="text-[9px] px-1 rounded bg-cyan-500/15 text-cyan-300">AI</span>}
           </label>
           <label className="flex items-center gap-2 text-[11px] text-slate-400 cursor-pointer select-none">
             <Filter className="w-3.5 h-3.5" />
-            Context toi thieu
+            {t('mf.minContext')}
             <select
               value={String(minCtx)}
               onChange={(e) => setMinCtx(Number(e.target.value))}
               className="bg-slate-950 border border-slate-800 rounded-md px-1.5 py-1 text-[11px] text-slate-200 outline-none focus:border-cyan-500/60"
             >
-              <option value="0">Khong gioi han</option>
+              <option value="0">{t('mf.noLimit')}</option>
               <option value="8000">8K</option>
               <option value="32000">32K</option>
               <option value="128000">128K</option>
@@ -416,7 +416,7 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
               onClick={() => { setQuery(''); setCategory('all'); setFreeOnly(false); setAliveOnly(false); setMinCtx(0); }}
               className="ml-auto text-[11px] text-slate-500 hover:text-cyan-300 flex items-center gap-1"
             >
-              <X className="w-3 h-3" /> Xoa bo loc
+              <X className="w-3 h-3" /> {t('mf.clearFilters')}
             </button>
           )}
         </div>
@@ -425,23 +425,23 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
       {/* Results */}
       <div className="flex items-center justify-between mb-3">
         <div className="text-xs text-slate-400 font-mono">
-          <span className="text-cyan-300 font-semibold">{rows.length}</span> model khop
+          <span className="text-cyan-300 font-semibold">{rows.length}</span> {t('mf.modelsMatch')}
           {relaxedUsed && (
-            <span className="text-amber-400"> • da noi bo loc tu suy ra (khong ai khop tuyen doi)</span>
+            <span className="text-amber-400">{t('mf.relaxed')}</span>
           )}
           {rows.length > 0 && rows[0].score > 0 && (
-            <span className="text-slate-600"> • xep theo do phu hop</span>
+            <span className="text-slate-600">{t('mf.sortedFit')}</span>
           )}
         </div>
         {showCopyAlive && (
           <button
             onClick={copyAliveIds}
             className="text-[11px] px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-300 hover:text-cyan-300 flex items-center gap-1.5 transition"
-            title="Add-on: Copy All Live IDs"
+            title={t('mf.copyAliveTitle')}
           >
             {copiedId === '__alive__' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-            Copy toan bo ID dang song
-            <span className="text-[9px] px-1 rounded bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">add-on</span>
+            {t('mf.copyAliveBtn')}
+            <span className="text-[9px] px-1 rounded bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">{t('mf.addon')}</span>
           </button>
         )}
       </div>
@@ -459,8 +459,8 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
       ) : rows.length === 0 ? (
         <div className="card-glass p-8 text-center">
           <Cpu className="w-8 h-8 text-slate-600 mx-auto mb-3" />
-          <p className="text-sm text-slate-300">Khong tim thay model nao voi bo loc hien tai.</p>
-          <p className="text-xs text-slate-500 mt-1">Thu bo bo loc "chi nguon dang song", ho goi it tu hon.</p>
+          <p className="text-sm text-slate-300">{t('mf.emptyTitle')}</p>
+          <p className="text-xs text-slate-500 mt-1">{t('mf.emptySub')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
@@ -486,7 +486,7 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
                   </div>
                   <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full border flex items-center gap-1 ${STATUS_TONE[st]}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[st]} ${st === 'alive' ? 'animate-pulse' : ''}`} />
-                    {STATUS_LABEL[st]}
+                    {t(STATUS_LABEL[st])}
                   </span>
                 </div>
 
@@ -495,7 +495,7 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
                   <span className="px-1.5 py-0.5 rounded bg-slate-900/80 border border-slate-800 text-slate-400">ctx {fmtCtx(m.wenker_context)}</span>
                   <span className={`px-1.5 py-0.5 rounded border flex items-center gap-1 ${m.wenker_requires_key ? 'bg-slate-900/80 border-slate-800 text-slate-500' : 'bg-emerald-500/5 border-emerald-500/20 text-emerald-400'}`}>
                     {m.wenker_requires_key ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
-                    {m.wenker_requires_key ? 'can key' : 'no key'}
+                    {m.wenker_requires_key ? t('mf.needKey') : t('mf.noKey')}
                   </span>
                   {h && typeof h.latencyMs === 'number' && h.latencyMs > 0 && (
                     <span className="px-1.5 py-0.5 rounded bg-slate-900/80 border border-slate-800 text-slate-400">{h.latencyMs}ms</span>
@@ -520,7 +520,7 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
                     onClick={() => useInPlayground(m.id)}
                     className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-[11px] font-bold hover:from-cyan-400 hover:to-blue-500 transition"
                   >
-                    <Sparkles className="w-3.5 h-3.5" /> Dung ngay
+                    <Sparkles className="w-3.5 h-3.5" /> {t('mf.useNow')}
                   </button>
                   <button
                     onClick={() => copy(fullId, fullId)}
@@ -532,7 +532,7 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
                   <button
                     onClick={() => copy(m.id, m.id)}
                     className="px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-300 transition"
-                    title="Copy chi ten model (khong prefix)"
+                    title={t('mf.copyIdTitle')}
                   >
                     {copiedId === m.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <span className="text-[10px] font-mono">id</span>}
                   </button>
@@ -542,7 +542,7 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
                       target="_blank"
                       rel="noreferrer"
                       className="px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-400 hover:text-cyan-300 transition"
-                      title="Mo trang nha cung cap"
+                      title={t('mf.openProviderTitle')}
                     >
                       <Globe className="w-3.5 h-3.5" />
                     </a>
@@ -560,17 +560,13 @@ export default function ModelFinder({ setActiveTab, onUseModel }) {
             onClick={() => setLimit((n) => n + 30)}
             className="px-4 py-2 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-300 text-xs flex items-center gap-2 transition"
           >
-            Xem them {Math.min(30, rows.length - limit)} model <ArrowRight className="w-3.5 h-3.5" />
+            {t('mf.showMore', { n: Math.min(30, rows.length - limit) })} <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
 
       <p className="text-[11px] text-slate-600 mt-6 font-mono">
-        Meo: go <span className="text-cyan-400">"code mien phi"</span>,
-        {' '}<span className="text-cyan-400">"doc tai lieu dai 1m"</span>,
-        {' '}<span className="text-cyan-400">"local"</span>,
-        {' '}<span className="text-cyan-400">"reasoning"</span> — WENKER tu dich ra bo loc.
-        {' '}Model tra ve theo <span className="text-slate-400">provider/model</span> la goi duoc ngay qua <span className="text-slate-400">/v1/chat/completions</span>.
+        <span className="text-cyan-400">{t('mf.tipLabel')}</span> {t('mf.tipBody')}
       </p>
     </div>
   );

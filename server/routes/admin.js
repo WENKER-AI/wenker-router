@@ -5,6 +5,14 @@ const proxyService = require('../services/proxyService');
 const healthService = require('../services/healthService');
 const addonService = require('../services/addonService');
 const proxyFetch = require('../services/proxyFetch');
+const catalogI18n = require('../config/catalog-i18n');
+
+// The console UI language (vi/en/zh/fr) travels in the x-wenker-lang header set
+// by authFetch(); catalog text (provider descriptions / add-on descriptions) is
+// localized server-side so non-Vietnamese UIs are not left with Vietnamese data.
+function uiLang(req) {
+  return catalogI18n.resolveLang(req.headers['x-wenker-lang']);
+}
 
 // Stats
 router.get('/stats', (req, res) => {
@@ -13,7 +21,8 @@ router.get('/stats', (req, res) => {
 
 // Providers
 router.get('/providers', (req, res) => {
-  const providers = db.getPublicProviders();
+  const lang = uiLang(req);
+  const providers = db.getPublicProviders().map((p) => catalogI18n.localizeProvider(p, lang));
   res.json({
     total: providers.length,
     providers
@@ -166,7 +175,8 @@ router.post('/settings/proxy-test', async (req, res) => {
 
 // ---- Add-on engine (kho .addon: theme / provider / snippet) ----
 router.get('/addons', (req, res) => {
-  res.json({ addons: addonService.list() });
+  const lang = uiLang(req);
+  res.json({ addons: addonService.list().map((a) => catalogI18n.localizeAddon(a, lang)) });
 });
 
 // Install from a pasted/uploaded manifest. Accepts raw JSON body or { manifest } or { source: "<json text>" }.

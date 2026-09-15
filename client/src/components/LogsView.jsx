@@ -63,7 +63,7 @@ export default function LogsView() {
               onChange={(e) => setAutoRefresh(e.target.checked)}
               className="rounded bg-slate-950 border-slate-800 text-cyan-500 focus:ring-cyan-500"
             />
-            <span>Tự Động Làm Mới (3s)</span>
+            <span>{t('logs.autoRefresh')}</span>
           </label>
 
           <button
@@ -71,7 +71,7 @@ export default function LogsView() {
             className="btn-secondary text-xs"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            <span>Làm Mới</span>
+            <span>{t('logs.refresh')}</span>
           </button>
         </div>
       </div>
@@ -83,7 +83,7 @@ export default function LogsView() {
       ) : logs.length === 0 ? (
         <div className="card-glass p-12 text-center text-slate-400 text-xs">
           <Activity className="w-8 h-8 text-slate-600 mx-auto mb-2" />
-          Chưa có yêu cầu nào được ghi nhận. Hãy gửi thử 1 tin nhắn trong tab "Playground Miễn Phí" hoặc kết nối Cursor/Claude Code!
+          {t('logs.empty')}
         </div>
       ) : (
         <div className="card-glass rounded-xl overflow-hidden border border-slate-800">
@@ -91,14 +91,14 @@ export default function LogsView() {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider text-[10px]">
                 <tr>
-                  <th className="px-4 py-3">Thời Gian</th>
-                  <th className="px-4 py-3">Endpoint</th>
-                  <th className="px-4 py-3">Model Yêu Cầu</th>
-                  <th className="px-4 py-3">Model Thực Trả Lời</th>
-                  <th className="px-4 py-3">Provider Xử Lý</th>
-                  <th className="px-4 py-3">Độ Trễ</th>
-                  <th className="px-4 py-3">Tokens</th>
-                  <th className="px-4 py-3">Trạng Thái</th>
+                  <th className="px-4 py-3">{t('logs.colTime')}</th>
+                  <th className="px-4 py-3">{t('logs.colEndpoint')}</th>
+                  <th className="px-4 py-3">{t('logs.colReqModel')}</th>
+                  <th className="px-4 py-3">{t('logs.colRealModel')}</th>
+                  <th className="px-4 py-3">{t('logs.colProvider')}</th>
+                  <th className="px-4 py-3">{t('logs.colLatency')}</th>
+                  <th className="px-4 py-3">{t('logs.colTokens')}</th>
+                  <th className="px-4 py-3">{t('logs.colStatus')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
@@ -126,7 +126,7 @@ export default function LogsView() {
                           {served || '—'}
                         </span>
                         {differs && (
-                          <span className="ml-1 text-[9px] text-amber-500/80" title="Model bạn gọi là alias; đây là model upstream thực sự trả lời.">(alias)</span>
+                          <span className="ml-1 text-[9px] text-amber-500/80" title={t('logs.aliasTip')}>(alias)</span>
                         )}
                       </td>
                       <td className="px-4 py-2.5 text-slate-300">
@@ -136,9 +136,9 @@ export default function LogsView() {
                         {isFallback && (
                           <span
                             className="ml-1 px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[9px]"
-                            title={`Dự phòng từ "${log.fallbackFrom}" (${log.fallbackReason || 'upstream lỗi'})`}
+                            title={t('logs.fallbackTip', { from: log.fallbackFrom, reason: log.fallbackReason || t('logs.upstreamErr') })}
                           >
-                            dự phòng
+                            {t('logs.fallbackLabel')}
                           </span>
                         )}
                       </td>

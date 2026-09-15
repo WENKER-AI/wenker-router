@@ -1,557 +1,597 @@
-/* ============================================================
-   WENKER Router — pixel theme (cá voi xanh)
-   Bảng màu lấy trực tiếp từ banner.png: navy + xanh cá voi #4aa8ff
-   + xanh lá #7ee787, viền đen, đổ khối cứng (hard shadow),
-   animation "khớp" kiểu 8-bit + tab trượt kiểu Mistral.
-   Không framework, không CDN. Chạy được cả khi mở bằng file:// .
-   ============================================================ */
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WENKER Router — Một cổng. Mọi model AI.</title>
+  <meta name="description" content="WENKER Router quy tụ 181 nhà cung cấp AI và 560+ model sau chuẩn OpenAI & Anthropic. Mã nguồn mở, MIT, chạy 100% trên máy bạn." />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon-w.svg" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <div class="scroll-progress" id="scrollProgress"></div>
 
-@font-face {
-  font-family: "WenkerPixel";
-  src: url("pixel-regular.ttf") format("truetype");
-  font-weight: 400 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "WenkerPixel";
-  src: url("pixel-bold.ttf") format("truetype");
-  font-weight: 800 900;
-  font-style: normal;
-  font-display: swap;
-}
+  <!-- ================= HEADER ================= -->
+  <header class="site-header" id="siteHeader">
+    <div class="container nav-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
+            <path d="M2 5l4 14 4.5-10L15 19l4-14" stroke="url(#wg)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs><linearGradient id="wg" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#4aa8ff"/><stop offset="1" stop-color="#7ee787"/></linearGradient></defs>
+          </svg>
+        </span>
+        <span class="brand-text">WENKER<em>·</em>ROUTER</span>
+      </a>
+      <nav class="nav-links" id="navLinks">
+        <a href="#tinh-nang">Tính năng</a>
+        <a href="#luong-viec">Luồng việc</a>
+        <a href="#so-sanh">So sánh</a>
+        <a href="#tai">Cách tải</a>
+        <a href="#docs">Tài liệu</a>
+        <a href="#he-sinh-thai">Hệ sinh thái</a>
+        <a href="#repo">Mã nguồn</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="btn btn-primary btn-sm" href="#tai">Tải về</a>
+        <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
 
-:root {
-  /* Biển sâu tối dịu (deep-sea) — nền navy xám, chữ sáng, điểm xanh biển + ngọc. */
-  --bg: #0a1420;
-  --bg-2: #0d1a29;
-  --surface: #12202f;
-  --surface-2: #182a3d;
-  --line: #24384e;
-  --line-2: #2f4a66;
-  --text: #e8f0f8;
-  --muted: #93a9c0;
-  --blue: #5aa7e8;
-  --blue-2: #3d84c6;
-  --green: #7fd8a4;
-  --green-2: #4cb87c;
-  --ok: #4cb87c;
-  --warn: #e8c37a;
-  --danger: #e88a8a;
-  --ink: #071019;
+  <main id="top">
+    <!-- ================= HERO ================= -->
+    <section class="hero">
+      <canvas id="netCanvas" aria-hidden="true"></canvas>
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="container hero-inner">
+        <span class="eyebrow reveal"><i class="pulse-dot"></i>Mã nguồn mở · MIT · Chạy 100% trên máy bạn</span>
+        <h1 class="hero-title">
+          <span class="line reveal">Mọi model AI.</span>
+          <span class="line reveal grad">Một cổng duy nhất.</span>
+        </h1>
+        <p class="lede reveal">WENKER Router hợp nhất <strong>181 nhà cung cấp</strong> và <strong>560+ model</strong> — từ OpenAI, Anthropic, Google đến DeepSeek, Qwen, Ollama — sau hai chuẩn API quen thuộc. Cursor, Claude Code, Cline hay OpenWebUI chỉ cần trỏ về <code>http://localhost:3600/v1</code>.</p>
+        <div class="hero-cta reveal">
+          <a class="btn btn-primary" href="#tai">Bắt đầu trong 30 giây</a>
+          <a class="btn btn-ghost" href="#docs">Xem tài liệu</a>
+        </div>
+        <div class="terminal reveal" data-copy="npm install -g wenker-router&#10;wenker">
+          <div class="term-bar">
+            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+            <span class="term-title">terminal — wenker</span>
+            <button class="copy-btn" data-copy-btn data-copy-target=".terminal">Sao chép</button>
+          </div>
+          <pre><span class="c-prompt">$</span> npm install -g wenker-router
+<span class="c-prompt">$</span> wenker
+<span class="c-dim">────────────────────────────────────────</span>
+<span class="c-ok">✓</span> WENKER Router đang chạy tại <span class="c-hl">http://localhost:3600</span>
+<span class="c-dim">  OpenAI    → /v1/chat/completions</span>
+<span class="c-dim">  Anthropic → /v1/messages</span></pre>
+        </div>
+        <div class="hero-scroll reveal" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
 
-  --grad: linear-gradient(90deg, var(--blue), var(--green));
-  /* Bóng mềm kiểu biển sương — bỏ hẳn hard-shadow cyberpunk */
-  --shadow-hard: 0 10px 28px rgba(3, 10, 20, 0.45);
-  --shadow-hard-sm: 0 4px 14px rgba(3, 10, 20, 0.4);
-  --shadow-pop: 0 18px 48px rgba(3, 10, 20, 0.55);
+    <!-- ================= MARQUEE ================= -->
+    <div class="marquee-band" aria-hidden="true">
+      <div class="marquee" id="marquee">
+        <div class="marquee-track">
+          <span>OpenAI</span><i>◆</i><span>Anthropic</span><i>◆</i><span>Google Gemini</span><i>◆</i><span>DeepSeek</span><i>◆</i><span>Qwen</span><i>◆</i><span>GLM</span><i>◆</i><span>Groq</span><i>◆</i><span>Together AI</span><i>◆</i><span>Fireworks</span><i>◆</i><span>Mistral</span><i>◆</i><span>Ollama</span><i>◆</i><span>LM Studio</span><i>◆</i><span>vLLM</span><i>◆</i><span>Cerebras</span><i>◆</i><span>SambaNova</span><i>◆</i><span>xAI Grok</span><i>◆</i><span>OpenRouter</span><i>◆</i><span>SiliconFlow</span><i>◆</i><span>Moonshot Kimi</span><i>◆</i><span>Azure OpenAI</span><i>◆</i><span>AWS Bedrock</span><i>◆</i><span>GitHub Models</span><i>◆</i>
+        </div>
+      </div>
+    </div>
 
-  --radius: 14px;
-  --radius-sm: 10px;
-  --maxw: 1140px;
+    <!-- ================= STATS ================= -->
+    <section class="stats-band">
+      <div class="container stats-grid">
+        <div class="stat reveal"><div class="stat-num"><span data-count="181">0</span></div><div class="stat-label">Nhà cung cấp có sẵn</div></div>
+        <div class="stat reveal"><div class="stat-num"><span data-count="560">0</span><em>+</em></div><div class="stat-label">Model định tuyến được</div></div>
+        <div class="stat reveal"><div class="stat-num"><span data-count="245">0</span></div><div class="stat-label">Model trần (unique)</div></div>
+        <div class="stat reveal"><div class="stat-num"><span data-count="8">0</span></div><div class="stat-label">Danh mục nhà cung cấp</div></div>
+        <div class="stat reveal"><div class="stat-num"><span data-count="2">0</span></div><div class="stat-label">Chuẩn API tương thích</div></div>
+      </div>
+    </section>
 
-  --font-pixel: "WenkerPixel", "Segoe UI", system-ui, -apple-system, "PingFang SC",
-    "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans", sans-serif;
-  --font-body: "Segoe UI", system-ui, -apple-system, "Helvetica Neue",
-    "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans", Arial, sans-serif;
-  --font-mono: "JetBrains Mono", "Cascadia Code", Consolas, "SF Mono", monospace;
-}
+    <!-- ================= WORKFLOW TABS (kiểu V7) ================= -->
+    <section class="section" id="luong-viec">
+      <div class="container">
+        <span class="section-eyebrow reveal">Tự động hoá cho người dùng thật</span>
+        <h2 class="section-title reveal">Chọn luồng việc.<br/>Xem WENKER đi vào việc.</h2>
+        <p class="section-sub reveal">Cùng một gateway, bốn cách dùng. Mỗi tab là một nhóm công việc mà router xử lý trọn vẹn.</p>
 
-* { box-sizing: border-box; }
+        <div class="wtabs reveal">
+          <div class="wtab-bar" id="wtabBar" role="tablist">
+            <button class="wtab active" role="tab" data-wtab="w-agent">Agent lập trình</button>
+            <button class="wtab" role="tab" data-wtab="w-chat">Ứng dụng chat</button>
+            <button class="wtab" role="tab" data-wtab="w-local">Chạy hoàn toàn offline</button>
+            <button class="wtab" role="tab" data-wtab="w-team">Đội nhóm &amp; gia đình</button>
+            <span class="wtab-indicator" id="wtabIndicator"></span>
+          </div>
 
-html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+          <div class="wpanel active" id="w-agent" role="tabpanel">
+            <div class="wpanel-copy">
+              <h3>Trợ lý code không bao giờ đứng hình.</h3>
+              <p>Claude Code, Cursor, Cline, Roo Code, Aider, Continue — trỏ Base URL về WENKER và toàn bộ agent dùng chung một ngân hàng model với chuỗi dự phòng tự động.</p>
+              <ul class="chip-list">
+                <li>Claude Code CLI</li><li>Cursor</li><li>Cline / Roo Code</li><li>Aider</li><li>Continue.dev</li><li>OpenHands</li>
+              </ul>
+            </div>
+            <div class="wpanel-card">
+              <div class="mock-window">
+                <div class="mock-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="mock-title">claude-code — routed</span></div>
+                <div class="mock-body">
+                  <div class="mock-line"><span class="c-dim">$</span> ANTHROPIC_BASE_URL=http://localhost:3600 claude</div>
+                  <div class="mock-line c-dim">› model: wenker-cloud/wenker-deepseek-r1-free</div>
+                  <div class="mock-line"><span class="c-ok">✓ resolved</span> → pollinations/openai-fast <span class="c-dim">(fallback #1)</span></div>
+                  <div class="mock-line"><span class="c-ok">✓ stream</span> 214 tok · 1.2s ttft · 0 errors</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-body {
-  margin: 0;
-  background-color: var(--bg);
-  background-image:
-    linear-gradient(0deg, rgba(90, 167, 232, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(90, 167, 232, 0.028) 1px, transparent 1px),
-    radial-gradient(1200px 520px at 80% -10%, rgba(90, 167, 232, 0.10), transparent 60%),
-    radial-gradient(900px 480px at 6% 0%, rgba(127, 216, 164, 0.07), transparent 55%);
-  background-size: 28px 28px, 28px 28px, 100% 100%, 100% 100%;
-  color: var(--text);
-  font-family: var(--font-body);
-  line-height: 1.65;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-}
+          <div class="wpanel" id="w-chat" role="tabpanel">
+            <div class="wpanel-copy">
+              <h3>Một OpenWebUI, mọi thế giới model.</h3>
+              <p>OpenWebUI, LibreChat, NextChat hay bất kỳ client chuẩn OpenAI nào cũng nhận toàn bộ 560+ model qua một dòng cấu hình duy nhất.</p>
+              <ul class="chip-list">
+                <li>OpenWebUI</li><li>LibreChat</li><li>NextChat</li><li>Bob / Raycast</li><li>Chatbox</li><li>SDK OpenAI</li>
+              </ul>
+            </div>
+            <div class="wpanel-card">
+              <div class="mock-window">
+                <div class="mock-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="mock-title">openwebui — settings</span></div>
+                <div class="mock-body">
+                  <div class="mock-line c-dim">OpenAI API Base URL</div>
+                  <div class="mock-line"><span class="c-hl">http://localhost:3600/v1</span></div>
+                  <div class="mock-line c-dim">Model hiển thị: <span class="c-ok">560+</span> từ 181 nguồn</div>
+                  <div class="mock-line"><span class="c-ok">✓ connected</span> · /v1/models trả về 200</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-a { color: inherit; text-decoration: none; }
-code, pre { font-family: var(--font-mono); }
-img { image-rendering: pixelated; }
+          <div class="wpanel" id="w-local" role="tabpanel">
+            <div class="wpanel-copy">
+              <h3>Không mạng? Không vấn đề.</h3>
+              <p>Ollama, LM Studio, vLLM, LocalAI, llama.cpp — mọi runtime cục bộ được đưa vào cùng danh sách model. Tắt mạng vẫn chat được, dữ liệu không rờ tới đâu.</p>
+              <ul class="chip-list">
+                <li>Ollama</li><li>LM Studio</li><li>vLLM</li><li>LocalAI</li><li>KoboldCpp</li><li>llama.cpp</li>
+              </ul>
+            </div>
+            <div class="wpanel-card">
+              <div class="mock-window">
+                <div class="mock-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="mock-title">ollama — local pool</span></div>
+                <div class="mock-body">
+                  <div class="mock-line"><span class="c-prompt">$</span> curl localhost:3600/v1/models</div>
+                  <div class="mock-line c-dim">{ "data": [</div>
+                  <div class="mock-line">&nbsp;&nbsp;{ "id": <span class="c-hl">"ollama/qwen2.5-coder"</span> },</div>
+                  <div class="mock-line">&nbsp;&nbsp;{ "id": <span class="c-hl">"lmstudio/llama-3.1-8b"</span> } ] }</div>
+                  <div class="mock-line"><span class="c-ok">✓ offline-ready</span> · 0 request ra ngoài</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-.container { width: min(var(--maxw), 92vw); margin-inline: auto; }
-.muted { color: var(--muted); }
+          <div class="wpanel" id="w-team" role="tabpanel">
+            <div class="wpanel-copy">
+              <h3>Chia sẻ gateway cho cả nhà, cả team.</h3>
+              <p>9 tài khoản PIN + hạn mức hằng ngày cho hàng chờ miễn phí. Một máy chạy router, mọi thiết bị trong LAN cùng dùng — mỗi người một quota riêng.</p>
+              <ul class="chip-list">
+                <li>9 PIN users</li><li>Quota hằng ngày</li><li>LAN-wide access</li><li>Key admin cục bộ</li><li>Nhật ký từng request</li><li>Không tài khoản cloud</li>
+              </ul>
+            </div>
+            <div class="wpanel-card">
+              <div class="mock-window">
+                <div class="mock-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="mock-title">dashboard — quota</span></div>
+                <div class="mock-body">
+                  <div class="mock-line c-dim">user&nbsp;&nbsp;&nbsp;&nbsp;quota hôm nay&nbsp;&nbsp;&nbsp;trạng thái</div>
+                  <div class="mock-line">PIN 1&nbsp;&nbsp;███████░░░ 70%&nbsp;&nbsp;<span class="c-ok">active</span></div>
+                  <div class="mock-line">PIN 2&nbsp;&nbsp;████░░░░░░ 40%&nbsp;&nbsp;<span class="c-ok">active</span></div>
+                  <div class="mock-line">PIN 3&nbsp;&nbsp;██████████ 100% <span class="c-warn">hết hạn mức</span></div>
+                  <div class="mock-line c-dim">admin API chỉ mở từ 127.0.0.1</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-/* Pixel icon (SVG render từ bitmap trong icons.js) */
-.px { display: inline-block; width: 1em; height: 1em; line-height: 0; color: inherit; vertical-align: -0.12em; }
-.px svg { width: 100%; height: 100%; display: block; shape-rendering: crispEdges; }
-.px svg * { fill: currentColor; }
+    <!-- ================= FEATURES ================= -->
+    <section class="section section-alt" id="tinh-nang">
+      <div class="container">
+        <span class="section-eyebrow reveal">Gateway cục bộ cho người dùng kỹ tính</span>
+        <h2 class="section-title reveal">Vì sao chọn<br/>WENKER Router?</h2>
+        <p class="section-sub reveal">Không dịch vụ trung gian, không khóa tài khoản. Dữ liệu và key của bạn nằm trên máy bạn.</p>
 
-/* ---------- Header ---------- */
-.site-header {
-  position: sticky; top: 0; z-index: 60;
-  background: rgba(5, 7, 15, 0.92);
-  border-bottom: 2px solid var(--line);
-}
-.nav-inner { display: flex; align-items: center; gap: 16px; height: 70px; }
-.brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-pixel); font-weight: 900; }
-.brand-mark {
-  display: grid; place-items: center; width: 34px; height: 34px;
-  background: var(--grad); color: var(--ink); font-size: 20px;
-  border: 2px solid var(--ink); box-shadow: var(--shadow-hard-sm);
-}
-.brand-text { font-size: 18px; letter-spacing: 0.5px; }
-.brand-text em { font-style: normal; color: var(--green); }
-.brand-sm .brand-text { font-size: 16px; }
+        <div class="feat-grid">
+          <article class="feat-card reveal">
+            <div class="feat-num">01</div>
+            <h3>Một model id,<br/>mọi nguồn dự phòng</h3>
+            <p>Gọi bằng tên thân thiện; router phân giải sang model thật, tự fallback theo thứ tự bạn đặt, và ghi rõ nguồn nào thực sự trả lời trong nhật ký.</p>
+            <div class="feat-tags"><span>SMART FALLBACK</span><span>CIRCUIT BREAKER</span><span>MODEL ALIAS</span></div>
+          </article>
+          <article class="feat-card reveal">
+            <div class="feat-num">02</div>
+            <h3>Trỏ Base URL<br/>về máy bạn là xong</h3>
+            <p>Hai chuẩn OpenAI <code>/v1/chat/completions</code> và Anthropic <code>/v1/messages</code>, kèm SSE streaming truyền thẳng từng token.</p>
+            <div class="feat-tags"><span>OPENAI /V1</span><span>ANTHROPIC /V1/MESSAGES</span><span>SSE STREAMING</span></div>
+          </article>
+          <article class="feat-card reveal">
+            <div class="feat-num">03</div>
+            <h3>Key &amp; dữ liệu<br/>không rời máy bạn</h3>
+            <p>Zero database: mọi thứ là file JSON trong <code>~/.wenker</code>. Muốn xoá hết? Xoá một thư mục. Sao lưu? Copy một thư mục.</p>
+            <div class="feat-tags"><span>ZERO DATABASE</span><span>KEY ĐƯỢC CHE</span><span>KHÔNG TELEMETRY</span></div>
+          </article>
+          <article class="feat-card reveal">
+            <div class="feat-num">04</div>
+            <h3>Số liệu thật,<br/>đo từ instance đang chạy</h3>
+            <p>Dashboard quản lý key, ping độ trễ, probe nguồn sống thật; mỗi request ghi lại provider, model đích, token và cờ cache.</p>
+            <div class="feat-tags"><span>PROBE NGUỒN THẬT</span><span>PING ĐỘ TRỄ</span><span>NHẬT KÝ REQUEST</span></div>
+          </article>
+        </div>
 
-.nav-links { display: flex; gap: 2px; margin-left: auto; }
-.nav-links a {
-  padding: 9px 12px; font-family: var(--font-pixel); font-size: 13px; letter-spacing: 0.3px;
-  color: var(--muted); border: 2px solid transparent; transition: color 0.12s, background 0.12s;
-}
-.nav-links a:hover { color: var(--text); background: var(--surface); border-color: var(--line); }
-.nav-actions { display: flex; align-items: center; gap: 10px; }
+        <div class="note reveal"><strong>Nói thẳng về bản miễn phí:</strong> các “tier” WENKER Cloud / VIP là lối tắt cấu hình sẵn, trỏ tới nhà cung cấp bên thứ ba. Nguồn nào cần key thì vẫn cần key của bạn.</div>
+      </div>
+    </section>
 
-/* Language menu */
-.lang { position: relative; }
-.lang-btn {
-  display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 12px;
-  font-family: var(--font-pixel); font-size: 13px; color: var(--text);
-  background: var(--surface); border: 2px solid var(--line); cursor: pointer;
-}
-.lang-btn:hover { border-color: var(--blue); }
-.lang-btn .caret { font-size: 10px; color: var(--muted); }
-.lang-menu {
-  position: absolute; right: 0; top: calc(100% + 8px); min-width: 176px; z-index: 70;
-  background: var(--surface); border: 2px solid var(--line-2); box-shadow: var(--shadow-hard);
-  padding: 6px; display: none;
-}
-.lang-menu.open { display: block; }
-.lang-menu button {
-  display: flex; width: 100%; align-items: center; gap: 10px; padding: 9px 10px;
-  background: transparent; border: 0; color: var(--muted); cursor: pointer;
-  font-family: var(--font-pixel); font-size: 13px; text-align: left;
-}
-.lang-menu button:hover { background: var(--surface-2); color: var(--text); }
-.lang-menu button[aria-current="true"] { color: var(--green); }
-.lang-menu button .code { margin-left: auto; color: var(--muted); font-size: 11px; }
+    <!-- ================= COMPARISON (kiểu TitanGate) ================= -->
+    <section class="section vs-section" id="so-sanh">
+      <div class="container">
+        <span class="section-eyebrow reveal">WENKER Router · so với · cổng đám mây truyền thống</span>
+        <h2 class="section-title reveal">Minh bạch<br/>vs Mập mờ.</h2>
 
-.burger {
-  display: none; flex-direction: column; gap: 5px; width: 42px; height: 40px;
-  align-items: center; justify-content: center; border: 2px solid var(--line);
-  background: var(--surface); cursor: pointer;
-}
-.burger span { width: 18px; height: 3px; background: var(--text); transition: transform 0.15s, opacity 0.15s; }
-.burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-.burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
-.burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+        <div class="vs-grid">
+          <div class="vs-row reveal">
+            <div class="vs-cell vs-good">
+              <span class="vs-kicker">WENKER Router</span>
+              <h3>Sự thật về lỗi</h3>
+              <p>Upstream hết hạn mức trả 402, bạn nhận 402 — kèm nguồn nào gây lỗi trong nhật ký. Không câu trả lời giả được dựng lên.</p>
+            </div>
+            <div class="vs-vs" aria-hidden="true">VS</div>
+            <div class="vs-cell vs-bad">
+              <span class="vs-kicker">Thế giới cũ</span>
+              <h3>Lỗi được che</h3>
+              <p>Model chết im lặng được thay bằng trả lời “tạm ổn”, dù không ai biết bên dưới đang xảy ra điều gì.</p>
+            </div>
+          </div>
+          <div class="vs-row reveal">
+            <div class="vs-cell vs-good">
+              <span class="vs-kicker">WENKER Router</span>
+              <h3>Dữ liệu ở máy bạn</h3>
+              <p>Key, nhật ký, cấu hình nằm trong <code>~/.wenker</code>. Muốn xoá hết? Xoá một thư mục. Sao lưu? Copy một thư mục.</p>
+            </div>
+            <div class="vs-vs" aria-hidden="true">VS</div>
+            <div class="vs-cell vs-bad">
+              <span class="vs-kicker">Thế giới cũ</span>
+              <h3>Telemetry mặc định</h3>
+              <p>Mọi prompt đi qua máy chủ người khác. Đọc kỹ điều khoản thì mới biết họ giữ bao lâu, dùng cho việc gì.</p>
+            </div>
+          </div>
+          <div class="vs-row reveal">
+            <div class="vs-cell vs-good">
+              <span class="vs-kicker">WENKER Router</span>
+              <h3>Miễn phí có giới hạn, nói rõ giới hạn</h3>
+              <p>Hàng chờ miễn phí ghi rõ “có hạn mức”. Cần ổn định? Tự gắn key của chính nhà cung cấp đó — quyền quyết định thuộc về bạn.</p>
+            </div>
+            <div class="vs-vs" aria-hidden="true">VS</div>
+            <div class="vs-cell vs-bad">
+              <span class="vs-kicker">Thế giới cũ</span>
+              <h3>“Free” đến khi không còn free</h3>
+              <p>Dùng thử mượt mà, rồi bất ngờ khoá tài khoản hoặc đổi giá. Dữ liệu và thói quen đã kịp bị khoá vào hệ sinh thái.</p>
+            </div>
+          </div>
+          <div class="vs-row reveal">
+            <div class="vs-cell vs-good">
+              <span class="vs-kicker">WENKER Router</span>
+              <h3>Một lần cài, thuộc về bạn</h3>
+              <p>MIT, không thuê bao, không giấy phép chủ. Nâng cấp khi bạn muốn, đứng im khi bạn muốn — gateway vẫn chạy.</p>
+            </div>
+            <div class="vs-vs" aria-hidden="true">VS</div>
+            <div class="vs-cell vs-bad">
+              <span class="vs-kicker">Thế giới cũ</span>
+              <h3>Thuê bao khoá-in</h3>
+              <p>Ngừng đóng tiền là mất gateway, mất cấu hình, mất lịch sử. Tổng chi phí sở hữu tăng theo từng năm.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-/* ---------- Buttons ---------- */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px 20px; font-family: var(--font-pixel); font-weight: 800; font-size: 14px;
-  letter-spacing: 0.4px; border: 2px solid var(--ink); cursor: pointer;
-  transition: transform 0.08s, box-shadow 0.08s, background 0.15s, filter 0.15s;
-  box-shadow: var(--shadow-hard);
-}
-.btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
-.btn-primary { background: var(--grad); color: var(--ink); }
-.btn-primary:hover { filter: brightness(1.08); }
-.btn-ghost { background: var(--surface); color: var(--text); border-color: var(--line-2); }
-.btn-ghost:hover { background: var(--surface-2); border-color: var(--blue); }
+    <!-- ================= STEPS ================= -->
+    <section class="section section-alt" id="quy-trinh">
+      <div class="container">
+        <span class="section-eyebrow reveal">Từ lệnh đầu tiên đến vận hành</span>
+        <h2 class="section-title reveal">Bốn bước.<br/>Không bước thứ năm.</h2>
+        <div class="steps">
+          <div class="step reveal"><span class="step-num">01</span><h3>Cài đặt</h3><p><code>npm install -g wenker-router</code> rồi gõ <code>wenker</code>. Node.js ≥ 18 là đủ.</p></div>
+          <div class="step reveal"><span class="step-num">02</span><h3>Trỏ Base URL</h3><p>Cấu hình <code>http://localhost:3600/v1</code> trong Cursor, Claude Code, Cline hay OpenWebUI.</p></div>
+          <div class="step reveal"><span class="step-num">03</span><h3>Gọi model</h3><p>Dùng tên <code>provider/model</code> để định tuyến chính xác, hoặc alias miễn phí để router tự phân giải.</p></div>
+          <div class="step reveal"><span class="step-num">04</span><h3>Quan sát &amp; tối ưu</h3><p>Xem nhật ký, ping độ trễ, chỉnh chuỗi dự phòng — mọi thứ trong dashboard trình duyệt.</p></div>
+        </div>
+      </div>
+    </section>
 
-/* ---------- Hero ---------- */
-.hero { position: relative; padding: 72px 0 56px; text-align: center; }
-.hero-banner {
-  display: block; width: min(560px, 82vw); height: auto; margin: 0 auto 26px;
-  border: 2px solid var(--line-2); box-shadow: var(--shadow-pop);
-}
-.eyebrow {
-  display: inline-block; font-family: var(--font-pixel); font-size: 12px; letter-spacing: 0.6px;
-  color: var(--blue); padding: 7px 14px; border: 2px solid var(--line);
-  background: var(--surface); margin-bottom: 20px;
-}
-.hero h1 { font-family: var(--font-pixel); font-size: clamp(24px, 4.6vw, 44px); line-height: 1.25; margin: 0 0 18px; font-weight: 900; }
-.grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.lede { max-width: 720px; margin: 0 auto 28px; font-size: clamp(15px, 2vw, 18px); color: #c3d4ea; }
-.lede code, .note code, td code, li code, p code {
-  background: var(--surface-2); padding: 2px 6px; border: 1px solid var(--line); font-size: 0.9em; color: #d7e6ff;
-}
-.hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
+    <!-- ================= INSTALL ================= -->
+    <section class="section" id="tai">
+      <div class="container">
+        <span class="section-eyebrow reveal">Node.js ≥ 18 · một lệnh là chạy</span>
+        <h2 class="section-title reveal">Cách tải &amp; cài đặt</h2>
+        <p class="section-sub reveal">Bốn đường dẫn, cùng một đích đến. Chọn cách hợp với bạn nhất.</p>
 
-/* ---------- Terminal / code ---------- */
-.terminal, .code-block {
-  background: #04070f; border: 2px solid var(--line); box-shadow: var(--shadow-hard);
-  text-align: left; overflow: hidden;
-}
-.terminal { max-width: 720px; margin: 0 auto; }
-.term-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 2px solid var(--line); background: var(--surface); }
-.dot { width: 11px; height: 11px; border: 1px solid var(--ink); }
-.dot.red { background: var(--danger); } .dot.yellow { background: var(--warn); } .dot.green { background: var(--ok); }
-.term-title { font-family: var(--font-pixel); font-size: 11px; color: var(--muted); margin-left: 6px; }
-.terminal pre, .code-block pre { margin: 0; padding: 16px 18px; overflow-x: auto; font-size: 13px; line-height: 1.7; }
-.c-prompt { color: var(--green); font-weight: 700; }
-.c-out { color: #9fb8d6; }
-.c-ok { color: var(--green); }
-.c-comment { color: #5b7392; font-style: italic; }
+        <div class="tabs reveal">
+          <div class="tab-bar" id="installTabs" role="tablist">
+            <button class="tab active" role="tab" data-tab="p-npm">npm toàn cục</button>
+            <button class="tab" role="tab" data-tab="p-src">Từ mã nguồn</button>
+            <button class="tab" role="tab" data-tab="p-bat">Windows 1-chạm</button>
+            <button class="tab" role="tab" data-tab="p-npx">Không cài (npx)</button>
+            <span class="tab-indicator" id="tabIndicator"></span>
+          </div>
 
-/* ---------- Stats ---------- */
-.stats-band { border-block: 2px solid var(--line); background: var(--bg-2); }
-.stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 34px 0; }
-.stat { text-align: center; }
-.stat-num { font-family: var(--font-pixel); font-size: clamp(26px, 4vw, 40px); font-weight: 900; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1; }
-.stat-label { margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+          <div class="panel active" id="p-npm" role="tabpanel">
+            <p class="panel-desc">Cách nhanh nhất — gói <code>wenker-router</code> (~157 kB, chỉ 3 dependency runtime).</p>
+            <div class="code-block" data-copy="npm install -g wenker-router&#10;wenker">
+              <button class="copy-btn" data-copy-btn data-copy-target="#p-npm .code-block">Sao chép</button>
+              <pre><span class="c-prompt">$</span> npm install -g wenker-router
+<span class="c-prompt">$</span> wenker</pre>
+            </div>
+          </div>
+          <div class="panel" id="p-src" role="tabpanel">
+            <p class="panel-desc">Dành cho người muốn đọc mã nguồn hoặc tự vá.</p>
+            <div class="code-block" data-copy="git clone https://github.com/WENKER-AI/wenker-router.git&#10;cd wenker-router&#10;npm run install:all&#10;npm start">
+              <button class="copy-btn" data-copy-btn data-copy-target="#p-src .code-block">Sao chép</button>
+              <pre><span class="c-prompt">$</span> git clone https://github.com/WENKER-AI/wenker-router.git
+<span class="c-prompt">$</span> cd wenker-router
+<span class="c-prompt">$</span> npm run install:all
+<span class="c-prompt">$</span> npm start</pre>
+            </div>
+          </div>
+          <div class="panel" id="p-bat" role="tabpanel">
+            <p class="panel-desc">Trên Windows: nhấp đúp <code>start.bat</code>. File kiểm tra Node, mở trình duyệt và bật server.</p>
+            <div class="code-block" data-copy="start.bat">
+              <button class="copy-btn" data-copy-btn data-copy-target="#p-bat .code-block">Sao chép</button>
+              <pre><span class="c-prompt">&gt;</span> start.bat</pre>
+            </div>
+          </div>
+          <div class="panel" id="p-npx" role="tabpanel">
+            <p class="panel-desc">Chạy thử một lần mà không cài gì cả.</p>
+            <div class="code-block" data-copy="npx wenker-router">
+              <button class="copy-btn" data-copy-btn data-copy-target="#p-npx .code-block">Sao chép</button>
+              <pre><span class="c-prompt">$</span> npx wenker-router</pre>
+            </div>
+          </div>
+        </div>
 
-/* ---------- Sections ---------- */
-.section { padding: 76px 0; }
-.section.alt { background: var(--bg-2); border-block: 2px solid var(--line); }
-.section-title { font-family: var(--font-pixel); font-size: clamp(22px, 3.6vw, 32px); font-weight: 900; margin: 0 0 10px; letter-spacing: 0.3px; }
-.section-sub { color: var(--muted); max-width: 700px; margin: 0 auto 40px; font-size: 16px; text-align: center; }
-.section h3 { font-family: var(--font-pixel); font-size: 16px; margin: 0 0 14px; letter-spacing: 0.3px; }
+        <div class="env-grid reveal">
+          <h3>Biến môi trường</h3>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Biến</th><th>Mặc định</th><th>Dùng để</th></tr></thead>
+              <tbody>
+                <tr><td><code>PORT</code></td><td><code>3600</code></td><td>Cổng lắng nghe của gateway.</td></tr>
+                <tr><td><code>HOST</code></td><td><code>0.0.0.0</code></td><td>Địa chỉ bind. Đặt <code>127.0.0.1</code> nếu chỉ muốn dùng nội bộ.</td></tr>
+                <tr><td><code>WENKER_HOME</code></td><td><code>~/.wenker</code></td><td>Thư mục chứa cấu hình, key, nhật ký, cache.</td></tr>
+                <tr><td><code>WENKER_ADMIN_OPEN_LOCALHOST</code></td><td><code>1</code></td><td>1: API quản trị mở cho máy cục bộ; 0: bắt buộc key admin.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
 
-/* ---------- Feature cards ---------- */
-.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-.card {
-  background: var(--surface); border: 2px solid var(--line); padding: 22px;
-  box-shadow: var(--shadow-hard-sm); transition: transform 0.1s, box-shadow 0.1s, border-color 0.15s;
-}
-.card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); border-color: var(--blue); }
-.card-icon {
-  width: 46px; height: 46px; display: grid; place-items: center; font-size: 26px; color: var(--blue);
-  background: var(--bg); border: 2px solid var(--line); margin-bottom: 14px;
-}
-.card h3 { margin: 0 0 8px; font-size: 15px; }
-.card p { margin: 0; color: var(--muted); font-size: 14px; }
+    <!-- ================= DOCS ================= -->
+    <section class="section section-alt" id="docs">
+      <div class="container">
+        <span class="section-eyebrow reveal">Từ khóa, endpoint, tích hợp đến gỡ lỗi</span>
+        <h2 class="section-title reveal">Tài liệu</h2>
+        <p class="section-sub reveal">Mọi thứ cần để chạy WENKER Router, gói gọn trong một trang.</p>
 
-.note {
-  margin-top: 32px; padding: 18px 22px; border: 2px solid var(--warn);
-  background: rgba(251, 191, 36, 0.08); color: #f0e0ac; font-size: 15px; box-shadow: var(--shadow-hard-sm);
-}
-.note strong { color: #ffe08a; }
+        <div class="doc-grid">
+          <div class="doc-block reveal">
+            <span class="num">01</span>
+            <h3>Kiến trúc &amp; khái niệm</h3>
+            <p>Một tiến trình Node.js vừa là API gateway vừa là dashboard. Ba khái niệm chính: <strong>Provider</strong>, <strong>Alias</strong> và <strong>Qualified id</strong> (<code>providerId/model</code>).</p>
+          </div>
+          <div class="doc-block reveal">
+            <span class="num">02</span>
+            <h3>Cấu hình &amp; key</h3>
+            <p>Mở dashboard → tab Nhà Cung Cấp → bấm vào card → Chỉnh sửa cấu hình. Mọi thứ nằm trong <code>~/.wenker</code> (đổi bằng biến <code>WENKER_HOME</code>).</p>
+          </div>
+          <div class="doc-block reveal">
+            <span class="num">03</span>
+            <h3>API tham chiếu</h3>
+            <p>Năm endpoint phủ gần như mọi công cụ:</p>
+            <ul class="endpoint-list">
+              <li><code>POST /v1/chat/completions</code><span>Trò chuyện (OpenAI)</span></li>
+              <li><code>POST /v1/messages</code><span>Trò chuyện (Anthropic)</span></li>
+              <li><code>GET /v1/models</code><span>Liệt kê model</span></li>
+              <li><code>POST /v1/embeddings</code><span>Vector hoá văn bản</span></li>
+              <li><code>GET /health</code><span>Health JSON, không cần auth</span></li>
+            </ul>
+          </div>
+          <div class="doc-block reveal">
+            <span class="num">04</span>
+            <h3>Tích hợp công cụ</h3>
+            <p>Claude Code CLI: đặt <code>ANTHROPIC_BASE_URL</code>. Cursor / Cline / OpenWebUI / Aider: chọn OpenAI Compatible. VS Code: extension WENKER nạp thẳng model của router.</p>
+          </div>
+          <div class="doc-block reveal">
+            <span class="num">05</span>
+            <h3>Bảo mật &amp; mạng</h3>
+            <p>Mặc định bind <code>0.0.0.0</code> để thiết bị khác trong LAN dùng; API quản trị chỉ tin tưởng vòng lặp cục bộ trừ khi bạn truyền admin key.</p>
+          </div>
+          <div class="doc-block reveal">
+            <span class="num">06</span>
+            <h3>Gỡ lỗi</h3>
+            <p>Model báo chết? Router liệt kê model của mọi provider đã bật. Lỗi thường gặp: 401/402 = key sai hoặc hết tiền; 429 = đổi nguồn trong chuỗi dự phòng.</p>
+          </div>
+        </div>
 
-/* ---------- Docs long ---------- */
-.doc-block { max-width: 860px; margin: 0 auto 34px; }
-.doc-block h3 { display: flex; align-items: center; gap: 10px; font-size: 17px; margin: 34px 0 12px; color: var(--text); }
-.doc-block h3 .num { color: var(--green); }
-.doc-block p { color: var(--muted); margin: 0 0 12px; }
-.doc-block ul { color: var(--muted); margin: 0 0 12px; padding-left: 22px; }
-.doc-block li { margin-bottom: 6px; }
-.kbd { font-family: var(--font-mono); font-size: 12.5px; background: var(--surface-2); border: 1px solid var(--line-2); border-bottom-width: 3px; padding: 1px 7px; color: #d7e6ff; }
+        <div class="code-block wide reveal" data-copy="curl http://localhost:3600/v1/chat/completions &#10;  -H &quot;Authorization: Bearer sk-wenker-local-admin&quot; &#10;  -H &quot;Content-Type: application/json&quot; &#10;  -d '{&quot;model&quot;:&quot;wenker-cloud/wenker-deepseek-v3-free&quot;,&quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;Xin chào&quot;}]}'">
+          <button class="copy-btn" data-copy-btn data-copy-target="#docs .code-block.wide">Sao chép</button>
+          <pre><span class="c-prompt">$</span> curl http://localhost:3600/v1/chat/completions \
+  -H "Authorization: Bearer sk-wenker-local-admin" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"wenker-cloud/wenker-deepseek-v3-free","messages":[{"role":"user","content":"Xin chào"}]}'</pre>
+        </div>
 
-/* ---------- Tabs (indicator trượt kiểu Mistral) ---------- */
-.tabs { max-width: 860px; margin: 0 auto; }
-.tab-bar {
-  position: relative; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
-  margin-bottom: 22px; padding-bottom: 12px; border-bottom: 2px solid var(--line);
-}
-.tab {
-  position: relative; z-index: 1; padding: 9px 16px; background: transparent; border: 2px solid transparent;
-  color: var(--muted); font-family: var(--font-pixel); font-size: 13px; font-weight: 700;
-  letter-spacing: 0.3px; cursor: pointer; transition: color 0.18s, background 0.18s;
-}
-.tab:hover { color: var(--text); }
-.tab.active { color: var(--ink); background: var(--grad); border-color: var(--ink); box-shadow: var(--shadow-hard-sm); }
-.tab-indicator {
-  position: absolute; bottom: -14px; left: 0; height: 4px; width: 0;
-  background: var(--grad); border: 1px solid var(--ink);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.panel { display: none; }
-.panel.active { display: block; animation: panelIn 0.3s steps(4); }
-@keyframes panelIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-.panel p { margin: 0 0 14px; }
-.code-block { position: relative; margin-bottom: 14px; }
-.copy-btn {
-  position: absolute; top: 8px; right: 8px; z-index: 2; padding: 5px 11px;
-  font-family: var(--font-pixel); font-size: 11px; cursor: pointer;
-  border: 2px solid var(--line-2); background: var(--surface); color: var(--muted); transition: all 0.12s;
-}
-.terminal .copy-btn { position: static; margin-left: auto; }
-.copy-btn:hover { color: var(--text); border-color: var(--blue); }
-.copy-btn.done { color: var(--ink); background: var(--green); border-color: var(--ink); }
+        <div class="faq reveal">
+          <h3>Câu hỏi thường gặp</h3>
+          <details><summary>Model “miễn phí” có thật sự miễn phí không?</summary><p>Không phải lúc nào cũng vậy. Hàng chờ miễn phí có hạn mức và có thể trả về 402/502 thật. Muốn ổn định, hãy gắn key của nhà cung cấp đó.</p></details>
+          <details><summary>Tôi có buộc phải dùng key mặc định trong README không?</summary><p>Không. Mọi key đều do bạn tự cung cấp; router chỉ giữ và dùng chúng trên máy bạn.</p></details>
+          <details><summary>Sao lưu / di chuyển cấu hình thế nào?</summary><p>Copy nguyên thư mục <code>~/.wenker</code>. Đó là toàn bộ “database”.</p></details>
+          <details><summary>Có an toàn khi mở cổng 0.0.0.0?</summary><p>API quản trị chỉ chấp nhận request từ vòng lặp cục bộ theo mặc định; endpoint <code>/v1/*</code> dùng key WENKER riêng.</p></details>
+          <details><summary>Sao một số model trong danh sách báo chết?</summary><p>Router liệt kê model của mọi provider đã bật — kể cả nguồn bạn chưa gắn key. Đó là tính năng minh bạch, không phải lỗi.</p></details>
+        </div>
+      </div>
+    </section>
 
-/* ---------- Tables ---------- */
-.config-grid { max-width: 860px; margin: 40px auto 0; }
-.table-wrap { overflow-x: auto; border: 2px solid var(--line); box-shadow: var(--shadow-hard-sm); }
-.table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 520px; }
-.table th, .table td { text-align: left; padding: 12px 15px; border-bottom: 1px solid var(--line); vertical-align: top; }
-.table th { background: var(--surface-2); color: #cfe0f5; font-family: var(--font-pixel); font-weight: 700; font-size: 12.5px; letter-spacing: 0.3px; }
-.table tr:last-child td { border-bottom: none; }
-.table td:first-child { white-space: nowrap; }
+    <!-- ================= ECOSYSTEM ================= -->
+    <section class="section" id="he-sinh-thai">
+      <div class="container">
+        <span class="section-eyebrow reveal">Một router, ba cách dùng</span>
+        <h2 class="section-title reveal">Hệ sinh thái</h2>
+        <div class="eco-grid">
+          <div class="eco-card reveal"><span class="eco-tag">CLI / Server</span><h3>wenker-router</h3><p>Gateway chính + dashboard quản trị. Chạy bằng một lệnh <code>wenker</code>.</p></div>
+          <div class="eco-card reveal"><span class="eco-tag">VS Code</span><h3>WENKER cho VS Code</h3><p>Nạp toàn bộ model của router thẳng vào Chat / Inline của editor.</p></div>
+          <div class="eco-card reveal"><span class="eco-tag">Web / Docs</span><h3>Trang này</h3><p>Static, không build, không CDN, không telemetry — mở bằng <code>file://</code> cũng chạy.</p></div>
+        </div>
+      </div>
+    </section>
 
-/* ---------- Two column + steps ---------- */
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 36px; }
-.steps { margin: 0; padding-left: 2px; color: var(--muted); font-size: 14.5px; list-style: none; counter-reset: s; }
-.steps li { margin-bottom: 10px; padding-left: 34px; position: relative; counter-increment: s; }
-.steps li::before {
-  content: counter(s); position: absolute; left: 0; top: -1px; width: 24px; height: 24px;
-  display: grid; place-items: center; font-family: var(--font-pixel); font-size: 12px; color: var(--ink);
-  background: var(--grad); border: 2px solid var(--ink);
-}
+    <!-- ================= TESTIMONIALS ================= -->
+    <section class="section section-alt" id="phan-hoi">
+      <div class="container">
+        <span class="section-eyebrow reveal">Tiếng nói từ cộng đồng</span>
+        <h2 class="section-title reveal">Người dùng nói gì?</h2>
+        <div class="quote-grid">
+          <figure class="quote-card reveal">
+            <blockquote>“Trước đây mỗi công cụ một key, một base URL. Giờ chỉ còn một dòng <code>localhost:3600</code> cho cả bốn máy trạm.”</blockquote>
+            <figcaption><strong>DevOps lead</strong><span>Công ty SaaS nhỏ · minh hoạ</span></figcaption>
+          </figure>
+          <figure class="quote-card reveal">
+            <blockquote>“Hết quota lúc 2 giờ sáng không còn là vấn đề. Chuỗi dự phòng tự nhảy sang nguồn còn sống, log ghi rõ từng bước.”</blockquote>
+            <figcaption><strong>Freelancer AI</strong><span>Dùng Claude Code hằng ngày · minh hoạ</span></figcaption>
+          </figure>
+          <figure class="quote-card reveal">
+            <blockquote>“Cái tôi thích nhất: khi nguồn lỗi, nó báo lỗi thật. Không câu trả lời giả, không ma thuật đen.”</blockquote>
+            <figcaption><strong>Kỹ sư bảo mật</strong><span>Chạy hoàn toàn offline · minh hoạ</span></figcaption>
+          </figure>
+        </div>
+        <p class="honesty-note reveal">WENKER không nói dối — và trang này cũng vậy: các trích dẫn trên là <strong>minh hoạ thiết kế</strong>, để bạn thấy bố cục trông thế nào. Hãy thay bằng phản hồi thật từ người dùng khi dự án có.</p>
+      </div>
+    </section>
 
-/* ---------- FAQ ---------- */
-.faq { max-width: 860px; margin: 44px auto 0; }
-.faq details { border: 2px solid var(--line); background: var(--surface); margin-bottom: 10px; }
-.faq summary { cursor: pointer; padding: 15px 18px; font-family: var(--font-pixel); font-size: 14px; font-weight: 700; list-style: none; position: relative; }
-.faq summary::-webkit-details-marker { display: none; }
-.faq summary::after { content: "+"; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: var(--green); font-size: 20px; }
-.faq details[open] summary { border-bottom: 2px solid var(--line); }
-.faq details[open] summary::after { content: "\2013"; }
-.faq details p { margin: 0; padding: 0 18px 16px; color: var(--muted); font-size: 15px; }
+    <!-- ================= REPO ================= -->
+    <section class="section repo" id="repo">
+      <div class="container">
+        <div class="repo-box reveal">
+          <h2>Mã nguồn mở.</h2>
+          <p class="muted">Toàn bộ WENKER Router nằm trên GitHub, phát hành theo MIT.</p>
+          <div class="repo-url">https://github.com/WENKER-AI/wenker-router</div>
+          <div class="repo-actions">
+            <button class="btn btn-ghost" data-copy-btn data-copy="git clone https://github.com/WENKER-AI/wenker-router.git">Sao chép lệnh clone</button>
+            <a class="btn btn-primary" href="https://github.com/WENKER-AI/wenker-router" target="_blank" rel="noopener">Mở trên GitHub</a>
+          </div>
+          <div class="repo-stats">
+            <span><b>MIT</b> Giấy phép</span>
+            <span><b>Node.js</b> Ngôn ngữ</span>
+            <span><b>0</b> Telemetry</span>
+            <span><b>181</b> Providers</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-/* ---------- Ecosystem ---------- */
-.eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.eco-card { background: var(--surface); border: 2px solid var(--line); padding: 24px; box-shadow: var(--shadow-hard-sm); transition: transform 0.1s, border-color 0.15s; }
-.eco-card:hover { transform: translate(-2px, -2px); border-color: var(--green); }
-.eco-tag { display: inline-block; font-family: var(--font-pixel); font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--green); background: rgba(126, 231, 135, 0.1); border: 2px solid var(--line); padding: 4px 10px; margin-bottom: 12px; }
-.eco-card h3 { margin: 0 0 8px; }
-.eco-card p { color: var(--muted); font-size: 14.5px; margin: 0 0 14px; }
+    <!-- ================= LINKS ================= -->
+    <section class="section section-alt" id="link">
+      <div class="container">
+        <h2 class="section-title reveal">Liên kết nhanh</h2>
+        <p class="section-sub reveal">Nhà cung cấp upstream được nhắc tới là sản phẩm của bên thứ ba, thương hiệu thuộc về chủ sở hữu tương ứng.</p>
+        <div class="link-grid">
+          <a class="link-card reveal" href="https://github.com/WENKER-AI/wenker-router" target="_blank" rel="noopener"><strong>Mã nguồn</strong><small>github.com/WENKER-AI/wenker-router</small></a>
+          <a class="link-card reveal" href="https://www.npmjs.com/package/wenker-router" target="_blank" rel="noopener"><strong>npm package</strong><small>wenker-router</small></a>
+          <a class="link-card reveal" href="https://github.com/WENKER-AI/wenker-router/issues" target="_blank" rel="noopener"><strong>Báo lỗi / Góp ý</strong><small>GitHub Issues</small></a>
+          <a class="link-card reveal" href="http://localhost:3600/" rel="noopener"><strong>Dashboard cục bộ</strong><small>http://localhost:3600</small></a>
+          <a class="link-card reveal" href="http://localhost:3600/v1/models" rel="noopener"><strong>Danh sách model</strong><small>/v1/models</small></a>
+          <a class="link-card reveal" href="http://localhost:3600/health" rel="noopener"><strong>Sức khoẻ server</strong><small>/health</small></a>
+        </div>
+      </div>
+    </section>
 
-/* ---------- Repo CTA ---------- */
-.repo { text-align: center; }
-.repo-box { max-width: 760px; margin: 0 auto; padding: 34px 28px; background: var(--surface); border: 2px solid var(--line-2); box-shadow: var(--shadow-pop); }
-.repo-box h2 { font-family: var(--font-pixel); font-size: clamp(22px, 3.6vw, 30px); margin: 0 0 10px; }
-.repo-url { display: inline-block; margin: 6px 0 20px; padding: 10px 16px; font-family: var(--font-mono); font-size: 14px; color: var(--green); background: var(--bg); border: 2px solid var(--line); word-break: break-all; }
-.repo-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-.repo-stats { display: flex; gap: 26px; justify-content: center; flex-wrap: wrap; margin-top: 22px; font-family: var(--font-pixel); font-size: 13px; color: var(--muted); }
-.repo-stats b { color: var(--text); }
+    <!-- ================= CREDIT ================= -->
+    <section class="section" id="credit">
+      <div class="container">
+        <h2 class="section-title reveal">Credit &amp; giấy phép</h2>
+        <div class="credit-grid">
+          <div class="reveal">
+            <h3>Tác giả &amp; maintainer</h3>
+            <span class="author-chip">arist999</span>
+            <h3>Đóng góp</h3>
+            <p class="muted">Bạn mở issue/PR đầu tiên? Tên bạn sẽ có ở đây.</p>
+            <h3>Giấy phép</h3>
+            <p class="muted">Phát hành theo MIT License.</p>
+          </div>
+          <div class="reveal">
+            <h3>Cảm ơn</h3>
+            <ul class="credit-list">
+              <li>OmniRouter và One API — nguồn cảm hứng cho kiến trúc gateway.</li>
+              <li>Express, React, Vite, Tailwind CSS.</li>
+              <li>Cộng đồng Cline, Cursor, Claude Code, OpenWebUI.</li>
+              <li>Các nhà cung cấp model được hỗ trợ.</li>
+            </ul>
+            <h3>Ghi chú minh bạch</h3>
+            <p class="muted">Mọi con số trên trang này được đo trực tiếp từ một instance đang chạy.</p>
+          </div>
+        </div>
+        <div class="stack">
+          <span>Node.js</span><span>Express</span><span>React</span><span>Vite</span><span>Tailwind</span><span>OpenAI API</span><span>Anthropic API</span>
+        </div>
+      </div>
+    </section>
 
-/* ---------- Links ---------- */
-.link-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.link-card {
-  display: flex; align-items: center; gap: 14px; padding: 16px 18px;
-  background: var(--surface); border: 2px solid var(--line); box-shadow: var(--shadow-hard-sm);
-  transition: transform 0.1s, border-color 0.15s;
-}
-.link-card:hover { transform: translate(-2px, -2px); border-color: var(--blue); }
-.link-ico { font-size: 24px; color: var(--blue); }
-.link-card strong { display: block; font-size: 14.5px; font-family: var(--font-pixel); }
-.link-card small { color: var(--muted); font-size: 12.5px; }
+    <!-- ================= CLOSING CTA ================= -->
+    <section class="cta-band" id="bat-dau">
+      <div class="cta-glow" aria-hidden="true"></div>
+      <div class="container">
+        <h2 class="cta-title reveal">Làm chủ AI<br/>của chính bạn.</h2>
+        <p class="cta-sub reveal">Cài một lần, chạy trên máy bạn. Trỏ Base URL từ công cụ quen dùng, và gọi 560+ model qua hai chuẩn mở.</p>
+        <div class="cta-actions reveal">
+          <a class="btn btn-primary" href="#tai">Bắt đầu cài đặt</a>
+          <a class="btn btn-ghost" href="https://github.com/WENKER-AI/wenker-router" target="_blank" rel="noopener">Xem mã nguồn</a>
+        </div>
+      </div>
+    </section>
+  </main>
 
-/* ---------- Credit ---------- */
-.credit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
-.credit-list { list-style: none; padding: 0; margin: 0 0 8px; color: var(--muted); font-size: 15px; }
-.credit-list li { padding: 8px 0 8px 24px; position: relative; border-bottom: 1px dashed var(--line); }
-.credit-list li::before { content: ""; position: absolute; left: 0; top: 13px; width: 10px; height: 10px; background: var(--grad); border: 1px solid var(--ink); }
-.credit-list li:last-child { border-bottom: none; }
-.credit-list strong { color: var(--text); }
-.author-chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; margin-top: 6px; font-family: var(--font-pixel); font-size: 13px; color: var(--ink); background: var(--grad); border: 2px solid var(--ink); box-shadow: var(--shadow-hard-sm); }
-.stack { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 40px; }
-.stack span { font-family: var(--font-pixel); font-size: 12px; padding: 7px 13px; border: 2px solid var(--line); background: var(--surface); color: #b9cde6; }
+  <!-- ================= FOOTER ================= -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <a class="brand brand-sm" href="#top">
+          <span class="brand-mark">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+              <path d="M2 5l4 14 4.5-10L15 19l4-14" stroke="url(#wg2)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <defs><linearGradient id="wg2" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#4aa8ff"/><stop offset="1" stop-color="#7ee787"/></linearGradient></defs>
+            </svg>
+          </span>
+          <span class="brand-text">WENKER<em>·</em>ROUTER</span>
+        </a>
+        <p class="muted">Cổng AI cục bộ, mã nguồn mở. Không theo dõi, không gọi về máy chủ trung tâm.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#tinh-nang">Tính năng</a>
+        <a href="#docs">Tài liệu</a>
+        <a href="#repo">Mã nguồn</a>
+        <a href="https://github.com/WENKER-AI/wenker-router" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© <span id="year">2026</span> arist999 · MIT</span>
+      <span>Trang tĩnh, không telemetry.</span>
+      <a href="#top">Đầu trang ↑</a>
+    </div>
+  </footer>
 
-/* ---------- Footer ---------- */
-.site-footer { border-top: 2px solid var(--line); background: var(--bg-2); padding: 42px 0 24px; }
-.footer-inner { display: flex; justify-content: space-between; gap: 30px; flex-wrap: wrap; }
-.footer-inner p { max-width: 420px; margin: 12px 0 0; font-size: 14px; }
-.footer-links { display: flex; flex-direction: column; gap: 8px; }
-.footer-links a { color: var(--muted); font-size: 14px; font-family: var(--font-pixel); }
-.footer-links a:hover { color: var(--green); }
-.footer-bottom { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 30px; padding-top: 18px; border-top: 2px solid var(--line); font-size: 13px; color: var(--muted); }
-
-/* ---------- Reveal (khớp kiểu pixel) ---------- */
-.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.5s steps(5), transform 0.5s steps(5); }
-.reveal.in { opacity: 1; transform: none; }
-
-/* ---------- Responsive ---------- */
-@media (max-width: 980px) {
-  .cards { grid-template-columns: repeat(2, 1fr); }
-  .eco-grid, .link-grid { grid-template-columns: repeat(2, 1fr); }
-  .stats-grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 820px) {
-  .lang-btn .lang-label { display: none; }
-}
-@media (max-width: 760px) {
-  .nav-links {
-    position: fixed; inset: 70px 0 auto; flex-direction: column; gap: 2px;
-    background: rgba(5, 7, 15, 0.98); border-bottom: 2px solid var(--line);
-    padding: 14px 6vw 22px; transform: translateY(-14px); opacity: 0; pointer-events: none;
-    transition: opacity 0.2s, transform 0.2s;
-  }
-  .nav-links.open { transform: none; opacity: 1; pointer-events: auto; }
-  .nav-links a { padding: 13px 10px; font-size: 15px; }
-  .burger { display: flex; }
-  .nav-actions .btn { display: none; }
-  .two-col, .credit-grid, .eco-grid, .link-grid { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .section { padding: 56px 0; }
-}
-@media (max-width: 460px) {
-  .cards { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; scroll-behavior: auto; }
-  .reveal { opacity: 1; transform: none; }
-}
-
-/* ============================================================
-   DEEP-SEA SOFT OVERRIDE — bo góc + viền 1.5px + bỏ dịch chuyển
-   "khớp" cyberpunk. Giữ icon pixel & font pixel cho thương hiệu,
-   nhưng mọi khung chuyển sang phong cách biển tĩnh, dễ nhìn.
-   ============================================================ */
-:root { --hair: 1.5px; }
-
-body { background-attachment: fixed; }
-
-.site-header { border-bottom: var(--hair) solid var(--line); background: rgba(10, 20, 32, 0.85); backdrop-filter: blur(10px); }
-.brand-mark { border: var(--hair) solid var(--ink); border-radius: 12px; box-shadow: var(--shadow-hard-sm); }
-.nav-links a { border-radius: 9px; border-color: transparent; transition: color .18s, background .18s; }
-.nav-links a:hover { background: var(--surface); border-color: var(--line); }
-
-.lang-btn, .burger { border: var(--hair) solid var(--line); border-radius: 10px; }
-.lang-menu { border: var(--hair) solid var(--line-2); border-radius: 12px; padding: 8px; }
-.lang-menu button { border-radius: 8px; font-family: var(--font-body); font-size: 14px; }
-.lang-menu button .code { font-family: var(--font-mono); }
-
-.btn { border: var(--hair) solid var(--ink); border-radius: 11px; box-shadow: var(--shadow-hard-sm);
-  transition: transform .18s ease, box-shadow .18s ease, background .18s, filter .18s; }
-.btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-hard); }
-.btn:active { transform: translateY(0); box-shadow: var(--shadow-hard-sm); }
-
-.hero-banner { border: var(--hair) solid var(--line-2); border-radius: 16px; }
-.eyebrow { border: var(--hair) solid var(--line); border-radius: 999px; }
-.lede code, .note code, td code, li code, p code { border: var(--hair) solid var(--line); border-radius: 6px; }
-
-.terminal, .code-block { border: var(--hair) solid var(--line); border-radius: 14px; }
-.term-bar { border-bottom: var(--hair) solid var(--line); }
-.dot { border-radius: 50%; border: none; }
-.copy-btn { border: var(--hair) solid var(--line-2); border-radius: 8px; font-family: var(--font-body); }
-
-.stats-band { border-block: var(--hair) solid var(--line); }
-.section.alt { border-block: var(--hair) solid var(--line); }
-
-.card { border: var(--hair) solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-hard-sm);
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s; }
-.card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hard); border-color: var(--blue); }
-.card-icon { border: var(--hair) solid var(--line); border-radius: 12px; }
-
-.note { border: var(--hair) solid var(--warn); border-radius: 12px; box-shadow: none; }
-
-.tab-bar { border-bottom: var(--hair) solid var(--line); }
-.tab { border-radius: 9px; border: var(--hair) solid transparent; font-family: var(--font-body); }
-.tab.active { color: var(--text); background: var(--surface-2); border-color: var(--line-2); box-shadow: none; }
-.tab-indicator { height: 3px; border: none; border-radius: 999px; bottom: -13px; }
-.panel.active { animation: panelIn .35s ease; }
-@keyframes panelIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-
-.table-wrap { border: var(--hair) solid var(--line); border-radius: 12px; }
-.table th { font-family: var(--font-body); }
-.steps li::before { border: var(--hair) solid var(--ink); border-radius: 8px; }
-
-.faq details { border: var(--hair) solid var(--line); border-radius: 12px; }
-.faq details[open] summary { border-bottom: var(--hair) solid var(--line); }
-.faq summary { font-family: var(--font-body); }
-
-.eco-card, .link-card, .repo-box { border: var(--hair) solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-hard-sm); }
-.eco-card:hover, .link-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hard); }
-.eco-tag { border: var(--hair) solid var(--line); border-radius: 999px; font-family: var(--font-body); }
-.repo-box { border-color: var(--line-2); }
-.repo-url { border: var(--hair) solid var(--line); border-radius: 10px; }
-.author-chip { border: var(--hair) solid var(--ink); border-radius: 999px; box-shadow: none; }
-.stack span { border: var(--hair) solid var(--line); border-radius: 999px; font-family: var(--font-body); }
-.credit-list li::before { border: none; border-radius: 3px; }
-
-.site-footer { border-top: var(--hair) solid var(--line); }
-.footer-bottom { border-top: var(--hair) solid var(--line); }
-.reveal { transition: opacity .6s ease, transform .6s ease; }
-
-@media (max-width: 760px) {
-  .nav-links { background: rgba(10, 20, 32, 0.98); border-bottom: var(--hair) solid var(--line); }
-}
-
-/* ============================================================
-   MISTRAL-STYLE LAYOUT — bố cục điển hình (statement lớn,
-   product row, danh sách UPPERCASE, CTA đóng).
-   Giữ nguyên bảng màu biển + bo góc; không thêm ảnh.
-   ============================================================ */
-
-/* Câu khẩu hiệu lớn kiểu Mistral ("Do it all with Mistral.") */
-.statement {
-  font-family: var(--font-pixel);
-  font-weight: 900;
-  font-size: clamp(26px, 5vw, 54px);
-  line-height: 1.12;
-  letter-spacing: 0.5px;
-  text-align: center;
-  margin: 0 auto 14px;
-  max-width: 900px;
-}
-#tinh-nang .statement { margin-bottom: 10px; }
-
-/* Hero bỏ ảnh banner: chữ lớn hơn, giãn đều */
-.hero { padding: 96px 0 64px; }
-.hero h1 { font-size: clamp(28px, 5.4vw, 56px); line-height: 1.18; margin-bottom: 22px; }
-.hero .lede { max-width: 780px; margin-bottom: 34px; }
-
-/* Product row: trái = kicker + heading + một dòng mô tả;
-   phải = danh sách tính năng UPPERCASE kiểu Mistral. */
-.prow {
-  display: grid;
-  grid-template-columns: 1.35fr 1fr;
-  gap: 34px;
-  align-items: start;
-  padding: 44px 0;
-  border-top: var(--hair) solid var(--line);
-}
-.prow:last-of-type { border-bottom: var(--hair) solid var(--line); }
-.prow-kicker {
-  display: block;
-  font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1.6px;
-  text-transform: uppercase;
-  color: var(--blue);
-  margin-bottom: 10px;
-}
-.prow-main h3 {
-  font-family: var(--font-pixel);
-  font-size: clamp(17px, 2.4vw, 26px);
-  line-height: 1.3;
-  font-weight: 900;
-  margin: 0 0 12px;
-  letter-spacing: 0.3px;
-}
-.prow-main p { margin: 0; color: var(--muted); font-size: 15.5px; max-width: 560px; }
-.prow-list {
-  list-style: none;
-  margin: 4px 0 0;
-  padding: 0;
-  display: grid;
-  gap: 2px;
-}
-.prow-list li {
-  font-family: var(--font-body);
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  color: #b9cde6;
-  padding: 12px 2px;
-  border-bottom: var(--hair) solid var(--line);
-}
-.prow-list li:last-child { border-bottom: none; }
-#tinh-nang .note { margin-top: 40px; }
-
-/* Dải CTA đóng kiểu Mistral ("OWN YOUR OWN AI FUTURE.") */
-.cta-band {
-  padding: 110px 0 120px;
-  text-align: center;
-  border-top: var(--hair) solid var(--line);
-  background:
-    radial-gradient(900px 420px at 50% 0%, rgba(90, 167, 232, 0.12), transparent 60%),
-    var(--bg-2);
-}
-.cta-band .statement { margin-bottom: 18px; }
-.cta-sub { max-width: 640px; margin: 0 auto 34px; color: var(--muted); font-size: 16.5px; }
-.cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-
-@media (max-width: 860px) {
-  .prow { grid-template-columns: 1fr; gap: 18px; padding: 34px 0; }
-  .hero { padding: 72px 0 48px; }
-  .cta-band { padding: 80px 0 88px; }
-}
+  <script src="assets/app.js"></script>
+</body>
+</html>

@@ -8,9 +8,9 @@ import { useTheme } from '../theme';
 import { useI18n } from '../i18n';
 
 const TYPE_META = {
-  theme: { label: 'Giao dien', icon: Palette, tone: 'text-cyan-300 bg-cyan-500/10 border-cyan-500/30' },
-  provider: { label: 'Nha cung cap', icon: Server, tone: 'text-emerald-300 bg-emerald-500/10 border-emerald-500/30' },
-  snippet: { label: 'Tinh nang', icon: ScrollText, tone: 'text-amber-300 bg-amber-500/10 border-amber-500/30' }
+  theme: { label: 'addon.typeTheme', icon: Palette, tone: 'text-cyan-300 bg-cyan-500/10 border-cyan-500/30' },
+  provider: { label: 'addon.typeProvider', icon: Server, tone: 'text-emerald-300 bg-emerald-500/10 border-emerald-500/30' },
+  snippet: { label: 'addon.typeSnippet', icon: ScrollText, tone: 'text-amber-300 bg-amber-500/10 border-amber-500/30' }
 };
 
 const EXAMPLE_ADDON = `{
@@ -80,15 +80,15 @@ export default function AddonsView() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success) {
-        flash('err', data.error || 'Cai dat that bai.');
+        flash('err', data.error || t('addon.installFail'));
         return false;
       }
       await reload();
-      flash('ok', `Da cai "${data.addon.name}" (${data.addon.type}).`);
+      flash('ok', t('addon.installed', { name: data.addon.name, type: data.addon.type }));
       if (data.addon.type === 'theme') setTheme(data.addon.id);
       return true;
     } catch (e) {
-      flash('err', 'Loi mang: ' + e.message);
+      flash('err', t('addon.netError', { msg: e.message }));
       return false;
     } finally {
       setBusy(false);
@@ -103,7 +103,7 @@ export default function AddonsView() {
       const ok = await install(String(reader.result));
       if (ok) setSource('');
     };
-    reader.onerror = () => flash('err', 'Doc file that bai.');
+    reader.onerror = () => flash('err', t('addon.readFail'));
     reader.readAsText(file);
     e.target.value = '';
   };
@@ -113,14 +113,14 @@ export default function AddonsView() {
     try {
       const res = await authFetch(`/api/addons/${encodeURIComponent(id)}`, { method: 'DELETE' });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.success) flash('err', data.error || 'Khong xoa duoc.');
+      if (!res.ok || !data.success) flash('err', data.error || t('addon.deleteFail'));
       else {
         if (activeId === id) setTheme('');
         await reload();
-        flash('ok', 'Da go bo add-on.');
+        flash('ok', t('addon.deleted'));
       }
     } catch (e) {
-      flash('err', 'Loi mang: ' + e.message);
+      flash('err', t('addon.netError', { msg: e.message }));
     } finally {
       setBusy(false);
     }
@@ -145,18 +145,18 @@ export default function AddonsView() {
               onClick={() => setTheme('')}
               className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-300 text-xs flex items-center gap-1.5 transition"
             >
-              <RotateCcw className="w-3.5 h-3.5" /> Ve mac dinh
+              <RotateCcw className="w-3.5 h-3.5" /> {t('addon.resetDefault')}
             </button>
           ) : (
             <span className="px-3 py-1.5 rounded-lg bg-slate-900/70 border border-slate-800 text-slate-500 text-xs font-mono">
-              dang dung giao dinh goc
+              {t('addon.usingDefault')}
             </span>
           )}
           <button
             onClick={reload}
             className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-300 text-xs flex items-center gap-1.5 transition"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Tai lai
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> {t('addon.reload')}
           </button>
         </div>
       </div>
@@ -175,17 +175,17 @@ export default function AddonsView() {
       <div className="card-glass p-4 mb-6">
         <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
           <h2 className="text-sm font-bold text-white flex items-center gap-2">
-            <Code2 className="w-4 h-4 text-cyan-400" /> Cai add-on bang file .addon
+            <Code2 className="w-4 h-4 text-cyan-400" /> {t('addon.installFileTitle')}
           </h2>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSource(EXAMPLE_ADDON)}
               className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-300 text-[11px] flex items-center gap-1.5 transition"
             >
-              <Sparkles className="w-3.5 h-3.5" /> Mau sample
+              <Sparkles className="w-3.5 h-3.5" /> {t('addon.sampleBtn')}
             </button>
             <label className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-300 text-[11px] flex items-center gap-1.5 cursor-pointer transition">
-              <Upload className="w-3.5 h-3.5" /> Tai file .addon
+              <Upload className="w-3.5 h-3.5" /> {t('addon.uploadBtn')}
               <input type="file" accept=".addon,.json,application/json" className="hidden" onChange={onFile} />
             </label>
           </div>
@@ -195,7 +195,7 @@ export default function AddonsView() {
           value={source}
           onChange={(e) => setSource(e.target.value)}
           spellCheck={false}
-          placeholder={'Dan noi dung file .addon (JSON) vao day...\nHoac luu file "theme.addon" roi tai len.'}
+          placeholder={t('addon.sourcePh')}
           className="w-full h-40 bg-slate-950/80 border border-slate-800 focus:border-cyan-500/60 rounded-xl p-3 text-[12px] font-mono text-slate-200 placeholder:text-slate-600 outline-none resize-y leading-relaxed"
         />
 
@@ -205,10 +205,10 @@ export default function AddonsView() {
             disabled={busy || !source.trim()}
             className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-bold hover:from-cyan-400 hover:to-blue-500 transition disabled:opacity-40 flex items-center gap-2"
           >
-            <Download className="w-4 h-4" /> {busy ? 'Dang xu ly...' : 'Cai dat add-on'}
+            <Download className="w-4 h-4" /> {busy ? t('addon.processing') : t('addon.installBtn')}
           </button>
           <span className="text-[11px] text-slate-500 font-mono">
-            the loai: theme | provider | snippet — theme chi can "accent" + "surface"
+            {t('addon.theLoaiHint')}
           </span>
         </div>
       </div>
@@ -216,22 +216,22 @@ export default function AddonsView() {
       {/* Type filter */}
       <div className="flex flex-wrap items-center gap-1.5 mb-4">
         {[
-          { id: 'all', label: 'Tat ca' },
-          { id: 'theme', label: 'Giao dien' },
-          { id: 'provider', label: 'Nha cung cap' },
-          { id: 'snippet', label: 'Tinh nang' }
-        ].map((t) => (
+          { id: 'all', label: 'addon.tabAll' },
+          { id: 'theme', label: 'addon.typeTheme' },
+          { id: 'provider', label: 'addon.typeProvider' },
+          { id: 'snippet', label: 'addon.typeSnippet' }
+        ].map((ft) => (
           <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
+            key={ft.id}
+            onClick={() => setTab(ft.id)}
             className={`px-3 py-1.5 rounded-lg text-[11px] font-medium border transition ${
-              tab === t.id
+              tab === ft.id
                 ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40'
                 : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:text-slate-200 hover:border-slate-700'
             }`}
           >
-            {t.label}
-            <span className="ml-1.5 text-slate-500 font-mono">{counts[t.id] ?? 0}</span>
+            {t(ft.label)}
+            <span className="ml-1.5 text-slate-500 font-mono">{counts[ft.id] ?? 0}</span>
           </button>
         ))}
       </div>
@@ -240,8 +240,8 @@ export default function AddonsView() {
       {filtered.length === 0 ? (
         <div className="card-glass p-8 text-center">
           <Puzzle className="w-8 h-8 text-slate-600 mx-auto mb-3" />
-          <p className="text-sm text-slate-300">Chua co add-on loai nay.</p>
-          <p className="text-xs text-slate-500 mt-1">Viet mot file .addon o o tren de them vao kho.</p>
+          <p className="text-sm text-slate-300">{t('addon.emptyTitle')}</p>
+          <p className="text-xs text-slate-500 mt-1">{t('addon.emptySub')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
@@ -259,7 +259,7 @@ export default function AddonsView() {
                     </div>
                     <p className="text-[10px] font-mono text-slate-500 truncate mt-0.5" title={a.id}>{a.id}</p>
                   </div>
-                  <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full border ${meta.tone}`}>{meta.label}</span>
+                  <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full border ${meta.tone}`}>{t(meta.label)}</span>
                 </div>
 
                 <p className="text-[11px] text-slate-400 leading-snug line-clamp-2">{a.description || '—'}</p>
@@ -291,26 +291,26 @@ export default function AddonsView() {
                           : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-400 hover:to-blue-500'
                       }`}
                     >
-                      {isActive ? (<><Check className="w-3.5 h-3.5" /> Dang bat</>) : (<><Palette className="w-3.5 h-3.5" /> Bat theme</>)}
+                      {isActive ? (<><Check className="w-3.5 h-3.5" /> {t('addon.themeOn')}</>) : (<><Palette className="w-3.5 h-3.5" /> {t('addon.themeEnable')}</>)}
                     </button>
                   )}
                   {a.type === 'theme' && (
                     <button
                       onClick={() => setPreview(preview === a.id ? null : a.id)}
                       className="px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-300 transition"
-                      title="Xem bien CSS"
+                      title={t('addon.viewVars')}
                     >
                       <Eye className="w-3.5 h-3.5" />
                     </button>
                   )}
                   {a.type === 'provider' && (
                     <span className="flex-1 text-[10px] font-mono text-slate-500 px-2 py-1.5 rounded-lg bg-slate-950/60 border border-slate-800">
-                      provider cua ban da nam trong /v1/models
+                      {t('addon.providerNote')}
                     </span>
                   )}
                   {a.type === 'snippet' && (
                     <span className="flex-1 text-[10px] font-mono text-amber-400/80 px-2 py-1.5 rounded-lg bg-amber-500/5 border border-amber-500/20">
-                      dang bat tu dong trong Model Finder
+                      {t('addon.snippetNote')}
                     </span>
                   )}
                   {!a.builtin && (
@@ -318,7 +318,7 @@ export default function AddonsView() {
                       onClick={() => remove(a.id)}
                       disabled={busy}
                       className="px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-rose-500/50 text-slate-400 hover:text-rose-400 transition disabled:opacity-40"
-                      title="Go bo cai"
+                      title={t('addon.uninstall')}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -339,7 +339,7 @@ export default function AddonsView() {
       {/* Cheat sheet */}
       <div className="card-glass p-4 mt-6">
         <h2 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
-          <Code2 className="w-4 h-4 text-cyan-400" /> Cach viet mot file .addon
+          <Code2 className="w-4 h-4 text-cyan-400" /> {t('addon.howToTitle')}
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 text-[11px] text-slate-400 leading-relaxed">
           <div className="rounded-lg bg-slate-950/60 border border-slate-800 p-3">
@@ -348,8 +348,7 @@ export default function AddonsView() {
   "theme":{ "accent":"#f472b6",
             "surface":"#150a26",
             "text":"#fff", "radius":"16px" } }`}</p>
-            <p className="mt-1.5">Engine tu sinh 11 shade cho accent + surface, va van hop thu cong
-              bien <span className="font-mono text-slate-300">"--color-cyan-500": "6 182 212"</span>.</p>
+            <p className="mt-1.5">{t('addon.howToTheme')}</p>
           </div>
           <div className="rounded-lg bg-slate-950/60 border border-slate-800 p-3">
             <p className="text-emerald-300 font-semibold mb-1">provider</p>
@@ -359,20 +358,19 @@ export default function AddonsView() {
     "baseUrl":"http://localhost:11434/v1",
     "requiresAuth":false,
     "models":[{"id":"llama3","name":"Llama 3"}] } }`}</p>
-            <p className="mt-1.5">Cai xong xuat hien ngay trong Model Finder va goi duoc qua /v1.</p>
+            <p className="mt-1.5">{t('addon.howToProvider')}</p>
           </div>
           <div className="rounded-lg bg-slate-950/60 border border-slate-800 p-3">
             <p className="text-amber-300 font-semibold mb-1">snippet</p>
             <p className="font-mono text-slate-500">{`{ "id":"my.snippet", "name":"My trick",
   "type":"snippet",
   "snippet":"copy_alive_ids" }`}</p>
-            <p className="mt-1.5">Chi bat/tat hanh vi da duoc WENKER dinh nghia san — khong chay JS tuy
-              tien (an toan).</p>
+            <p className="mt-1.5">{t('addon.howToSnippet')}</p>
           </div>
         </div>
         <p className="text-[11px] text-slate-500 mt-3 font-mono">
-          Ghi chu: add-on luu tai <span className="text-slate-300">~/.wenker/addons.json</span> — dat
-          <span className="text-slate-300"> WENKER_HOME</span> de doi cho luu tru.
+          {t('addon.noteStore')} <span className="text-slate-300">~/.wenker/addons.json</span> —{' '}
+          <span className="text-slate-300">WENKER_HOME</span> {t('addon.noteHome')}
         </p>
       </div>
     </div>

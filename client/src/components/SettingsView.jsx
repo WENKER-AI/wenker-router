@@ -100,35 +100,35 @@ export default function SettingsView() {
           <div className="card-glass p-6 rounded-xl space-y-4">
             <h2 className="font-bold text-sm text-white flex items-center gap-2">
               <Server className="w-4 h-4 text-cyan-400" />
-              <span>Máy Chủ Cục Bộ (Local Server)</span>
+              <span>{t('set.localTitle')}</span>
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Cổng Lắng Nghe (Port):</label>
+                <label className="block text-slate-300 font-medium mb-1">{t('set.portLabel')}</label>
                 <input
                   type="number"
                   value={settings.port || 3600}
                   onChange={(e) => setSettings({ ...settings, port: parseInt(e.target.value) || 3600 })}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:border-cyan-500 focus:outline-none"
                 />
-                <span className="text-[10px] text-slate-500 mt-1 block">Khởi động lại server để áp dụng thay đổi cổng.</span>
+                <span className="text-[10px] text-slate-500 mt-1 block">{t('set.portHelp')}</span>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Host Lắng Nghe:</label>
+                <label className="block text-slate-300 font-medium mb-1">{t('set.hostLabel')}</label>
                 <input
                   type="text"
                   value={settings.host || '0.0.0.0'}
                   onChange={(e) => setSettings({ ...settings, host: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:border-cyan-500 focus:outline-none"
                 />
-                <span className="text-[10px] text-slate-500 mt-1 block">0.0.0.0 cho phép truy cập từ mạng LAN nội bộ.</span>
+                <span className="text-[10px] text-slate-500 mt-1 block">{t('set.hostHelp')}</span>
               </div>
             </div>
 
             <div className="pt-2">
-              <label className="block text-slate-300 font-medium mb-1 text-xs">Mô Hình Mặc Định Khi Không Khai Báo:</label>
+              <label className="block text-slate-300 font-medium mb-1 text-xs">{t('set.defaultModelLabel')}</label>
               <input
                 type="text"
                 value={settings.defaultModel || 'wenker-deepseek-r1-free'}
@@ -142,7 +142,7 @@ export default function SettingsView() {
           <div className="card-glass p-6 rounded-xl space-y-4">
             <h2 className="font-bold text-sm text-white flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Cơ Chế Dự Phòng Thông Minh (Smart Failover)</span>
+              <span>{t('set.failoverTitle')}</span>
             </h2>
 
             <div className="flex items-start gap-3">
@@ -155,10 +155,10 @@ export default function SettingsView() {
               />
               <div>
                 <label htmlFor="smartFallbackCheck" className="text-slate-200 text-xs font-semibold cursor-pointer block">
-                  Dự Phòng Khi Nguồn GỐC THỰC SỰ LỖI (429 / 5xx)
+                  {t('set.failoverCheck')}
                 </label>
                 <p className="text-slate-400 text-[11px] mt-0.5 leading-relaxed">
-                  Khi bật: nếu nhà cung cấp bạn gọi trả lỗi upstream thật (hết hạn mức 429, sập 5xx), router đi theo chuỗi dự phòng trong tab <strong>Định Tuyến</strong> và <em>ghi rõ trong Nhật Ký</em> provider nào thực sự trả lời (nhãn "dự phòng"). <strong>Từ bản này, router KHÔNG âm thầm chuyển provider khi thiếu API Key nữa</strong> — thiếu key là trả lỗi 401 thật, để bạn không bị ảo tưởng model đó đang chạy.
+                  {t('set.failoverHelp')}
                 </p>
               </div>
             </div>
@@ -168,7 +168,7 @@ export default function SettingsView() {
           <div className="card-glass p-6 rounded-xl space-y-4">
             <h2 className="font-bold text-sm text-white flex items-center gap-2">
               <Globe className="w-4 h-4 text-violet-400" />
-              <span>Kết nối ra ngoài qua VPN / Proxy cục bộ</span>
+              <span>{t('set.proxyTitle')}</span>
             </h2>
 
             <div className="flex items-start gap-3">
@@ -181,17 +181,17 @@ export default function SettingsView() {
               />
               <div>
                 <label htmlFor="proxyEnabledCheck" className="text-slate-200 text-xs font-semibold cursor-pointer block">
-                  Đẩy mọi request upstream qua HTTP proxy
+                  {t('set.proxyCheck')}
                 </label>
                 <p className="text-slate-400 text-[11px] mt-0.5 leading-relaxed">
-                  Dành cho VPN công cụ local (Clash, v2rayN, mihomo…) phát HTTP proxy trên máy bạn. Khi bật, router gửi mọi lời gọi tới OpenAI / Anthropic / Groq / OpenRouter… qua proxy này. Node không tự đọc biến <code className="text-violet-300">HTTP_PROXY</code>, nên phải khai báo ở đây.
+                  {t('set.proxyHelp')}
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Địa chỉ Proxy (http://…):</label>
+                <label className="block text-slate-300 font-medium mb-1">{t('set.proxyUrlLabel')}</label>
                 <input
                   type="text"
                   placeholder="http://127.0.0.1:7890"
@@ -199,10 +199,10 @@ export default function SettingsView() {
                   onChange={(e) => setSettings({ ...settings, proxyUrl: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:border-violet-500 focus:outline-none"
                 />
-                <span className="text-[10px] text-slate-500 mt-1 block">Chỉ hỗ trợ proxy HTTP/HTTPS. SOCKS cần cấu hình riêng.</span>
+                <span className="text-[10px] text-slate-500 mt-1 block">{t('set.proxyUrlHelp')}</span>
               </div>
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Bỏ qua proxy (NO_PROXY, phân tách bởi dấu phẩy):</label>
+                <label className="block text-slate-300 font-medium mb-1">{t('set.noProxyLabel')}</label>
                 <input
                   type="text"
                   placeholder="localhost, internal.company"
@@ -210,7 +210,7 @@ export default function SettingsView() {
                   onChange={(e) => setSettings({ ...settings, proxyNoProxy: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:border-violet-500 focus:outline-none"
                 />
-                <span className="text-[10px] text-slate-500 mt-1 block">Vòng ngoài (localhost) và mạng riêng (10.x, 192.168.x, 172.16–31.x) LUÔN được bỏ qua tự động — model local (Ollama/LM Studio/vLLM) không bao giờ bị đẩy ra proxy.</span>
+                <span className="text-[10px] text-slate-500 mt-1 block">{t('set.noProxyHelp')}</span>
               </div>
             </div>
 
@@ -222,18 +222,18 @@ export default function SettingsView() {
                 className="inline-flex items-center gap-2 text-xs px-3 py-2 rounded-lg bg-violet-500/10 text-violet-300 border border-violet-500/30 hover:bg-violet-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 {proxyTesting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Globe className="w-4 h-4" />}
-                <span>Kiểm tra kết nối</span>
+                <span>{t('set.testConn')}</span>
               </button>
               {proxyResult && (
                 <span className={proxyResult.ok ? 'text-[11px] text-emerald-400' : 'text-[11px] text-rose-400'}>
                   {proxyResult.ok
-                    ? <>OK · IP ra ngoài <strong className="font-mono">{proxyResult.ip}</strong> · {proxyResult.latencyMs}ms</>
-                    : <>Thất bại: {proxyResult.error}</>}
+                    ? <>{t('set.testOk')} <strong className="font-mono">{proxyResult.ip}</strong> · {proxyResult.latencyMs}ms</>
+                    : <>{t('set.testFail')} {proxyResult.error}</>}
                 </span>
               )}
             </div>
             <p className="text-[10px] text-slate-500 leading-relaxed">
-              Nhấn <strong>Lưu Cấu Hình</strong> để áp dụng. Sau khi lưu, request mới dùng proxy ngay (không cần khởi động lại server).
+              {t('set.proxySaveNote')}
             </p>
           </div>
 
@@ -241,11 +241,11 @@ export default function SettingsView() {
           <div className="card-glass p-6 rounded-xl space-y-4">
             <h2 className="font-bold text-sm text-white flex items-center gap-2">
               <Users className="w-4 h-4 text-cyan-400" />
-              <span>Hạn mức WENKER Cloud theo ngày</span>
+              <span>{t('set.quotaTitle')}</span>
             </h2>
             <div>
               <label className="block text-slate-300 font-medium mb-1 text-xs">
-                Số lượt miễn phí cho mỗi tài khoản đăng nhập (mỗi ngày):
+                {t('set.quotaLabel')}
               </label>
               <input
                 type="number"
@@ -255,10 +255,7 @@ export default function SettingsView() {
                 className="w-40 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono text-xs focus:border-cyan-500 focus:outline-none"
               />
               <p className="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
-                Áp dụng cho 9 tài khoản đăng nhập (mật khẩu 1&ndash;9) khi gọi model WENKER Cloud / Pollinations /
-                DuckDuckGo. Khi hết lượt, API trả về <strong>409</strong> và người dùng có thể xem quảng cáo để nhận
-                thêm 10 lượt (tối đa 30 lượt thưởng/ngày). Đặt <strong>0</strong> để không giới hạn. Giá trị mới có
-                hiệu lực từ ngày kế tiếp với các tài khoản đã phát sinh hôm nay.
+                {t('set.quotaHelp')}
               </p>
             </div>
           </div>
@@ -267,23 +264,23 @@ export default function SettingsView() {
           <div className="card-glass p-6 rounded-xl space-y-3">
             <h2 className="font-bold text-sm text-white flex items-center gap-2">
               <Info className="w-4 h-4 text-blue-400" />
-              <span>Thông Tin Ứng Dụng</span>
+              <span>{t('set.aboutTitle')}</span>
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
-                <span className="text-slate-500 text-[10px] block">Phiên Bản</span>
+                <span className="text-slate-500 text-[10px] block">{t('set.version')}</span>
                 <span className="font-bold text-slate-200">{settings.version || '2.0.0'}</span>
               </div>
               <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
-                <span className="text-slate-500 text-[10px] block">Bản Quyền</span>
-                <span className="font-bold text-slate-200">Mã Nguồn Mở (MIT)</span>
+                <span className="text-slate-500 text-[10px] block">{t('set.license')}</span>
+                <span className="font-bold text-slate-200">{t('set.licenseVal')}</span>
               </div>
               <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
-                <span className="text-slate-500 text-[10px] block">Giao Thức</span>
+                <span className="text-slate-500 text-[10px] block">{t('set.protocol')}</span>
                 <span className="font-bold text-cyan-400">OpenAI + Anthropic</span>
               </div>
               <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
-                <span className="text-slate-500 text-[10px] block">Môi Trường</span>
+                <span className="text-slate-500 text-[10px] block">{t('set.env')}</span>
                 <span className="font-bold text-emerald-400">Local Zero-Latency</span>
               </div>
             </div>
@@ -295,7 +292,7 @@ export default function SettingsView() {
               className="btn-primary text-xs"
             >
               {saved ? <Check className="w-4 h-4 text-emerald-300" /> : <Save className="w-4 h-4" />}
-              <span>{saved ? 'Đã Lưu Thành Công' : 'Lưu Cấu Hình'}</span>
+              <span>{saved ? t('common.saved') : t('common.saveChanges')}</span>
             </button>
           </div>
 

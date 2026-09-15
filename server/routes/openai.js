@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../services/dbService');
 const proxyService = require('../services/proxyService');
+const catalogI18n = require('../config/catalog-i18n');
 
 // Middleware to check WENKER API Key
 function authenticateWenkerKey(req, res, next) {
@@ -29,12 +30,14 @@ function authenticateWenkerKey(req, res, next) {
  * Returns all models across all enabled providers
  */
 router.get('/models', (req, res) => {
+  const lang = catalogI18n.resolveLang(req.headers['x-wenker-lang']);
   const providers = db.getAllProviders().filter(p => p.enabled);
   const health = db.getHealth();
   const modelsList = [];
   const nowEpoch = Math.floor(Date.now() / 1000);
 
-  for (const p of providers) {
+  for (const raw of providers) {
+    const p = catalogI18n.localizeProvider(raw, lang);
     const h = health[p.id];
     const providerStatus = !h ? 'unknown' : (h.ok ? 'alive' : (h.needsKey ? 'needs_key' : 'down'));
     // requiresAuth = the upstream demands a key at all (auth model).

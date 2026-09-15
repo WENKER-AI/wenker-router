@@ -31,26 +31,26 @@ export default function Dashboard({ stats, setActiveTab }) {
     {
       id: 'claude-code',
       title: 'Claude Code CLI',
-      desc: 'Công cụ lập trình terminal của Anthropic',
+      desc: 'dash.integClaudeDesc',
       command: `export ANTHROPIC_BASE_URL=http://localhost:3600/v1\nexport ANTHROPIC_API_KEY=sk-wenker-local-admin\nclaude`
     },
     {
       id: 'cursor',
       title: 'Cursor AI IDE',
-      desc: 'Cấu hình trong Cursor Settings > Models > OpenAI API Key',
+      desc: 'dash.integCursorDesc',
       command: `Base URL: http://localhost:3600/v1\nAPI Key:  sk-wenker-local-admin\nModel:    wenker-deepseek-r1-free`
     },
     {
       id: 'cline',
       title: 'Cline / Roo Code (VSCode)',
-      desc: 'Chọn Provider là "OpenAI Compatible"',
+      desc: 'dash.integClineDesc',
       command: `Base URL: http://localhost:3600/v1\nAPI Key:  sk-wenker-local-admin\nModel ID: wenker-qwen-2.5-coder-free`
     },
     {
       id: 'curl',
       title: 'cURL Terminal Test',
-      desc: 'Kiểm tra nhanh qua dòng lệnh cURL',
-      command: `curl -X POST http://localhost:3600/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -H "Authorization: Bearer sk-wenker-local-admin" \\\n  -d '{"model": "wenker-deepseek-r1-free", "messages": [{"role": "user", "content": "Xin chào WENKER Router!"}]}'`
+      desc: 'dash.integCurlDesc',
+      command: `curl -X POST http://localhost:3600/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -H "Authorization: Bearer sk-wenker-local-admin" \\\n  -d '{"model": "wenker-deepseek-r1-free", "messages": [{"role": "user", "content": "Hello WENKER Router!"}]}'`
     }
   ];
 
@@ -64,7 +64,7 @@ export default function Dashboard({ stats, setActiveTab }) {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold mb-3">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>WENKER Router Core 2.0 • Sẵn Sàng Hoạt Động</span>
+              <span>WENKER Router Core 2.0 • {t('dash.readyBadge')}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
               {t('dash.title')}
@@ -183,7 +183,7 @@ export default function Dashboard({ stats, setActiveTab }) {
                     )}
                   </button>
                 </div>
-                <p className="text-xs text-slate-400 mb-3">{item.desc}</p>
+                <p className="text-xs text-slate-400 mb-3">{t(item.desc)}</p>
                 <div className="bg-slate-950/90 border border-slate-800 rounded-lg p-3 font-mono text-xs text-cyan-300 whitespace-pre overflow-x-auto">
                   {item.command}
                 </div>

@@ -100,7 +100,7 @@ export default function RoutingView() {
           className="btn-primary text-xs self-start md:self-auto"
         >
           {saved ? <Check className="w-4 h-4 text-emerald-300" /> : <Save className="w-4 h-4" />}
-          <span>{saved ? 'Đã Lưu Thành Công' : 'Lưu Thay Đổi'}</span>
+          <span>{saved ? t('common.saved') : t('common.saveChanges')}</span>
         </button>
       </div>
 
@@ -117,10 +117,10 @@ export default function RoutingView() {
               <div>
                 <h2 className="font-bold text-sm text-white flex items-center gap-2">
                   <SlidersHorizontal className="w-4 h-4 text-cyan-400" />
-                  <span>Ánh Xạ Tên Mô Hình (Model Aliases)</span>
+                  <span>{t('route.aliasTitle')}</span>
                 </h2>
                 <p className="text-[11px] text-slate-400 mt-0.5">
-                  Khi client yêu cầu mô hình A, WENKER Router sẽ tự động chuyển hướng tới mô hình B.
+                  {t('route.aliasSub')}
                 </p>
               </div>
             </div>
@@ -141,7 +141,7 @@ export default function RoutingView() {
                   <button
                     onClick={() => handleDeleteAlias(fromModel)}
                     className="text-slate-500 hover:text-rose-400 p-1 transition shrink-0"
-                    title="Xóa ánh xạ"
+                    title={t('route.delAliasTitle')}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -152,19 +152,19 @@ export default function RoutingView() {
             {/* Add New Alias Form */}
             <form onSubmit={handleAddAlias} className="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 space-y-3 text-xs">
               <div className="font-semibold text-slate-300 text-[11px] uppercase tracking-wider">
-                + Thêm Ánh Xạ Mới
+                {t('route.addNew')}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <input
                   type="text"
-                  placeholder="Tên Client gọi (vd: gpt-4o)"
+                  placeholder={t('route.aliasFromPh')}
                   value={newAliasKey}
                   onChange={(e) => setNewAliasKey(e.target.value)}
                   className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono text-xs focus:border-cyan-500 focus:outline-none"
                 />
                 <input
                   type="text"
-                  placeholder="Mô hình đích (vd: wenker-cloud/...)"
+                  placeholder={t('route.aliasToPh')}
                   value={newAliasTarget}
                   onChange={(e) => setNewAliasTarget(e.target.value)}
                   className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono text-xs focus:border-cyan-500 focus:outline-none"
@@ -175,7 +175,7 @@ export default function RoutingView() {
                 className="btn-secondary w-full justify-center text-xs py-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Thêm Quy Tắc</span>
+                <span>{t('route.addRule')}</span>
               </button>
             </form>
           </div>
@@ -185,47 +185,47 @@ export default function RoutingView() {
             <div>
               <h2 className="font-bold text-sm text-white flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4 text-amber-400" />
-                <span>Chính Sách Dự Phòng (Failover Rules)</span>
+                <span>{t('route.failoverTitle')}</span>
               </h2>
               <p className="text-[11px] text-slate-400 mt-0.5">
-                Cơ chế tự động chuyển tiếp lưu lượng khi nhà cung cấp chính hết quota hoặc bị lỗi 429 / 500.
+                {t('route.failoverSub')}
               </p>
 
               <div className="space-y-3 mt-4 text-xs">
                 <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-slate-200">OpenAI Fallback</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">Chỉ khi lỗi thật</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">{t('route.onlyRealErr')}</span>
                   </div>
                   <p className="text-slate-400 text-[11px]">
-                    Nếu upstream trả 429 / 5xx: thử lần lượt theo <code>fallbackOrder</code> (Cài đặt). Mỗi lần dự phòng đều bị đánh dấu "dự phòng" trong Nhật Ký. Thiếu API Key = lỗi 401 thẳng, không đổi provider.
+                    {t('route.openaiDesc')}
                   </p>
                 </div>
 
                 <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-slate-200">Anthropic Claude Fallback</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">Chỉ khi lỗi thật</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">{t('route.onlyRealErr')}</span>
                   </div>
                   <p className="text-slate-400 text-[11px]">
-                    <code>/v1/messages</code> dùng chung cơ chế trên. Chuỗi dự phòng chỉ chạy khi upstream lỗi thật, và câu trả lời luôn ghi rõ provider/model nào thực sự trả lời.
+                    {t('route.anthropicDesc')}
                   </p>
                 </div>
 
                 <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-200">Mất Internet</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-400">Lỗi thật</span>
+                    <span className="font-semibold text-slate-200">{t('route.internetTitle')}</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-400">{t('route.realErrBadge')}</span>
                   </div>
                   <p className="text-slate-400 text-[11px]">
-                    Khi toàn bộ chuỗi dự phòng chết, router trả lỗi 502/503 kèm hint — KHÔNG bịa câu trả lời giả lập (hành vi bịa đã bị xóa khỏi code).
+                    {t('route.internetDesc')}
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-4 text-xs text-cyan-300">
-              <span className="text-cyan-400 mr-1">[&gt;]</span> <strong>Mẹo:</strong> Sử dụng tiền tố <code>providerId/modelName</code> khi gửi prompt từ client (ví dụ <code>groq/llama-3.3-70b-versatile</code> hoặc <code>wenker-cloud/wenker-deepseek-r1-free</code>) để định tuyến chính xác 100% tới nhà cung cấp bạn mong muốn!
+              <span className="text-cyan-400 mr-1">[&gt;]</span> <strong>{t('route.tipLabel')}</strong> {t('route.tipBody')}
             </div>
           </div>
 

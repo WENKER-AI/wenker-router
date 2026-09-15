@@ -25,16 +25,16 @@ import { authFetch } from '../session.jsx';
 import { useI18n } from '../i18n';
 
 const CATEGORIES = [
-  { id: 'all', label: 'Tất Cả' },
-  { id: 'wenker', label: 'WENKER Cloud' },
-  { id: 'free', label: 'Miễn Phí (No-Auth)' },
-  { id: 'flagship', label: 'Big Tech' },
-  { id: 'inference', label: 'Cloud Inference' },
-  { id: 'china', label: 'Trung Quốc (Asia)' },
-  { id: 'local', label: 'Local Runtimes' },
-  { id: 'coding', label: 'Coding & Agents' },
-  { id: 'specialized', label: 'Chuyên Sâu' },
-  { id: 'custom', label: 'Tùy Chỉnh' }
+  { id: 'all', label: 'cat.all' },
+  { id: 'wenker', label: 'cat.wenker' },
+  { id: 'free', label: 'cat.free' },
+  { id: 'flagship', label: 'cat.flagship' },
+  { id: 'inference', label: 'cat.inference' },
+  { id: 'china', label: 'cat.china' },
+  { id: 'local', label: 'cat.local' },
+  { id: 'coding', label: 'cat.coding' },
+  { id: 'specialized', label: 'cat.specialized' },
+  { id: 'custom', label: 'cat.custom' }
 ];
 
 export default function ProvidersView() {
@@ -235,7 +235,7 @@ export default function ProvidersView() {
   };
 
   const handleDeleteCustom = async (id) => {
-    if (!confirm('Bạn có chắc muốn xóa nhà cung cấp tùy chỉnh này?')) return;
+    if (!confirm(t('prov.deleteConfirm'))) return;
     try {
       await authFetch(`/api/providers/custom/${id}`, { method: 'DELETE' });
       fetchProviders();
@@ -279,17 +279,17 @@ export default function ProvidersView() {
             onClick={handleProbeAll}
             disabled={probing}
             className="btn-secondary text-xs flex items-center gap-1.5 disabled:opacity-60"
-            title="Gửi 1 câu chat thật tới từng nguồn miễn phí để biết nguồn nào còn sống"
+            title={t('prov.probeAllTitle')}
           >
             {probing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Activity className="w-4 h-4 text-emerald-400" />}
-            <span>{probing ? 'Đang kiểm tra...' : 'Test nguồn sống'}</span>
+            <span>{probing ? t('prov.probing') : t('prov.probeAll')}</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
             className="btn-primary text-xs"
           >
             <Plus className="w-4 h-4" />
-            <span>Thêm Nhà Cung Cấp</span>
+            <span>{t('prov.addProvider')}</span>
           </button>
         </div>
       </div>
@@ -302,7 +302,7 @@ export default function ProvidersView() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Tìm kiếm theo tên nhà cung cấp hoặc model (gpt-4o, claude, deepseek)..."
+            placeholder={t('prov.searchPh')}
             className="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 placeholder-slate-500"
           />
         </div>
@@ -320,7 +320,7 @@ export default function ProvidersView() {
                     : 'bg-slate-900/80 text-slate-400 border border-slate-800 hover:border-slate-700 hover:text-slate-200'
                 }`}
               >
-                {cat.label}
+                {t(cat.label)}
               </button>
             );
           })}
@@ -348,7 +348,7 @@ export default function ProvidersView() {
             };
             const DOT_TONES = { slate: 'bg-slate-500', emerald: 'bg-emerald-400', amber: 'bg-amber-400', rose: 'bg-rose-400' };
             const healthTone = !h ? 'slate' : (h.stale ? 'slate' : h.ok ? 'emerald' : (h.needsKey || h.keyWouldHelp) ? 'amber' : 'rose');
-            const healthLabel = !h ? 'Chưa test' : h.stale ? `Cũ ${Math.round(h.ageMs / 60000)}p` : h.ok ? `Sống ${h.latencyMs || 0}ms` : h.needsKey ? 'Cần key' : h.keyWouldHelp ? 'Hết lượt free' : 'Chết';
+            const healthLabel = !h ? t('h.notTested') : h.stale ? t('h.stale', { n: Math.round(h.ageMs / 60000) }) : h.ok ? t('h.alive', { n: h.latencyMs || 0 }) : h.needsKey ? t('h.needKey') : h.keyWouldHelp ? t('h.freeOut') : t('h.dead');
 
             return (
               <div
@@ -381,24 +381,24 @@ export default function ProvidersView() {
                               free to use yet still require a (free) API key. Show them apart. */}
                           {p.isFree ? (
                             <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                              Miễn phí
+                              {t('prov.free')}
                             </span>
                           ) : (
                             <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                              Trả phí
+                              {t('prov.paid')}
                             </span>
                           )}
                           {p.requiresAuth ? (
                             <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-400 border border-amber-500/20" title={p.authType}>
-                              Cần API key
+                              {t('prov.needKeyBadge')}
                             </span>
                           ) : (
                             <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
-                              Không cần key
+                              {t('prov.noKeyBadge')}
                             </span>
                           )}
                           <span
-                            title={h ? (h.ok ? `Model đầu bảng trả lời: "${h.sample || ''}"` : h.error) : 'Bấm "Test" để kiểm tra nguồn này có thực sự trả lời không'}
+                            title={h ? (h.ok ? t('prov.sampleAnswer', { s: h.sample || '' }) : h.error) : t('prov.healthTipTitle')}
                             className={`text-[10px] font-semibold px-1.5 py-0.2 rounded border flex items-center gap-1 ${HEALTH_TONES[healthTone]}`}
                           >
                             <span className={`w-1.5 h-1.5 rounded-full ${DOT_TONES[healthTone]} ${h && !h.stale && h.ok ? 'animate-pulse' : ''}`} />
@@ -411,7 +411,7 @@ export default function ProvidersView() {
                     <button
                       onClick={(e) => { e.stopPropagation(); handleToggle(p); }}
                       className="text-slate-400 hover:text-cyan-400 transition"
-                      title={p.enabled ? "Đang Bật - Bấm để Tắt" : "Đang Tắt - Bấm để Bật"}
+                      title={p.enabled ? t('prov.toggleOn') : t('prov.toggleOff')}
                     >
                       {p.enabled ? (
                         <ToggleRight className="w-6 h-6 text-cyan-400" />
@@ -432,7 +432,7 @@ export default function ProvidersView() {
                     <button
                       onClick={(e) => { e.stopPropagation(); handleCopyBaseUrl(p.baseUrl, p.id); }}
                       className="text-slate-400 hover:text-cyan-400 shrink-0"
-                      title="Sao chép Base URL"
+                      title={t('prov.copyBaseTitle')}
                     >
                       {copiedId === p.id ? (
                         <Check className="w-3.5 h-3.5 text-emerald-400" />
@@ -445,7 +445,7 @@ export default function ProvidersView() {
                   {/* Models list snippet */}
                   <div className="mb-3">
                     <span className="text-[11px] font-semibold text-slate-400">
-                      Mô hình ({p.models?.length || 0}):
+                      {t('prov.modelsLabel')} ({p.models?.length || 0}):
                     </span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {(p.models || []).slice(0, 3).map(m => (
@@ -455,7 +455,7 @@ export default function ProvidersView() {
                       ))}
                       {(p.models || []).length > 3 && (
                         <span className="text-[10px] text-slate-500 self-center">
-                          +{p.models.length - 3} nữa
+                          {t('prov.more', { n: p.models.length - 3 })}
                         </span>
                       )}
                     </div>
@@ -469,7 +469,7 @@ export default function ProvidersView() {
                       onClick={(e) => { e.stopPropagation(); handlePing(p.id); }}
                       disabled={isPingTesting}
                       className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-750 text-slate-300 text-[11px] font-medium border border-slate-700 flex items-center gap-1 transition"
-                      title="Kiểm tra độ trễ mạng"
+                      title={t('prov.pingTitle')}
                     >
                       {isPingTesting ? (
                         <RefreshCw className="w-3 h-3 animate-spin text-cyan-400" />
@@ -481,7 +481,7 @@ export default function ProvidersView() {
 
                     {ping && (
                       <span className={`text-[10px] font-mono font-semibold ${ping.success ? 'text-emerald-400' : 'text-rose-400'}`}>
-                        {ping.success ? `${ping.latencyMs}ms` : 'Lỗi'}
+                        {ping.success ? `${ping.latencyMs}ms` : t('common.error')}
                       </span>
                     )}
 
@@ -489,7 +489,7 @@ export default function ProvidersView() {
                       onClick={(e) => { e.stopPropagation(); handleProbeOne(p.id); }}
                       disabled={isProbing}
                       className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-750 text-slate-300 text-[11px] font-medium border border-slate-700 flex items-center gap-1 transition disabled:opacity-60"
-                      title="Gửi 1 câu chat thật tới provider này (kiểm tra model có trả lời được không)"
+                      title={t('prov.testTitle')}
                     >
                       {isProbing ? (
                         <RefreshCw className="w-3 h-3 animate-spin text-emerald-400" />
@@ -505,7 +505,7 @@ export default function ProvidersView() {
                       <button
                         onClick={(e) => { e.stopPropagation(); handleDeleteCustom(p.id); }}
                         className="p-1 rounded text-slate-500 hover:text-rose-400 transition"
-                        title="Xóa custom provider"
+                        title={t('prov.deleteCustomTitle')}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -526,7 +526,7 @@ export default function ProvidersView() {
                       }`}
                     >
                       <Key className="w-3 h-3" />
-                      <span>{hasUserKey ? 'Đã Cấu Hình' : 'Cấu Hình'}</span>
+                      <span>{hasUserKey ? t('prov.configured') : t('prov.configure')}</span>
                     </button>
                   </div>
                 </div>
@@ -542,15 +542,15 @@ export default function ProvidersView() {
           <div className="card-glass bg-slate-900 border-slate-700 w-full max-w-lg p-6 rounded-2xl shadow-2xl">
             <h2 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
               <Key className="w-5 h-5 text-cyan-400" />
-              <span>Cấu Hình {selectedProvider.name}</span>
+              <span>{t('prov.configTitle')} {selectedProvider.name}</span>
             </h2>
             <p className="text-xs text-slate-400 mb-4">
-              Nhập API Key, Cookie hoặc tinh chỉnh Base URL theo nhu cầu riêng.
+              {t('prov.configSub')}
             </p>
 
             <div className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Base URL:</label>
+                <label className="block text-slate-300 font-medium mb-1">{t('prov.baseUrlLabel')}</label>
                 <input
                   type="text"
                   value={baseUrlInput}
@@ -561,10 +561,10 @@ export default function ProvidersView() {
 
               <div>
                 <label className="block text-slate-300 font-medium mb-1">
-                  API Key{selectedProvider.authType && selectedProvider.authType !== 'none' ? ` (${selectedProvider.authType})` : ''}:
+                  {t('prov.apiKeyLabel')}{selectedProvider.authType && selectedProvider.authType !== 'none' ? ` (${selectedProvider.authType})` : ''}:
                   {!selectedProvider.requiresAuth && (
                     <span className="ml-1.5 text-[10px] font-semibold px-1.5 py-0.2 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
-                      KHÔNG BẮT BUỘC
+                      {t('prov.notRequired')}
                     </span>
                   )}
                 </label>
@@ -572,19 +572,18 @@ export default function ProvidersView() {
                   type="password"
                   value={apiKeyInput}
                   onChange={(e) => setApiKeyInput(e.target.value)}
-                  placeholder={selectedProvider.requiresAuth ? 'sk-...' : 'Bo trong - nguon nay khong can key'}
+                  placeholder={selectedProvider.requiresAuth ? 'sk-...' : t('prov.noKeyPlaceholder')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:border-cyan-500 focus:outline-none"
                 />
                 {!selectedProvider.requiresAuth && (
                   <p className="mt-1.5 text-[11px] leading-relaxed text-slate-500">
-                    Nguồn này không yêu cầu xác thực — để trống vẫn dùng được. Chỉ nhập key nếu muốn nâng
-                    tier (ví dụ Pollinations ẩn danh hết budget → thêm key miễn phí để hồi sinh).
+                    {t('prov.noKeyHelp')}
                   </p>
                 )}
                 {selectedProvider.keyHelp && (
                   <div className="mt-2 rounded-lg border border-cyan-500/25 bg-cyan-500/5 p-2.5 text-[11px] leading-relaxed text-cyan-200">
                     <span className="font-semibold text-cyan-300">
-                      {selectedProvider.requiresAuth ? 'Cách lấy key miễn phí: ' : 'Tùy chọn - cách lấy key miễn phí: '}
+                      {selectedProvider.requiresAuth ? `${t('prov.keyHelpAuth')} ` : `${t('prov.keyHelpOpt')} `}
                     </span>
                     {selectedProvider.keyHelp}
                     {selectedProvider.website && (
@@ -594,7 +593,7 @@ export default function ProvidersView() {
                         rel="noreferrer"
                         className="inline-flex items-center gap-1 ml-1 text-cyan-400 underline underline-offset-2 hover:text-cyan-300"
                       >
-                        Mở trang <ExternalLink className="w-3 h-3" />
+                        {t('prov.openPage')} <ExternalLink className="w-3 h-3" />
                       </a>
                     )}
                   </div>
@@ -603,13 +602,13 @@ export default function ProvidersView() {
 
               <div>
                 <label className="block text-slate-300 font-medium mb-1">
-                  Cookie / Session Token (Tùy chọn):
+                  {t('prov.cookieLabel')}
                 </label>
                 <textarea
                   rows={2}
                   value={cookieInput}
                   onChange={(e) => setCookieInput(e.target.value)}
-                  placeholder="session_token=... (dành cho các provider hỗ trợ cookie auth)"
+                  placeholder={t('prov.cookiePh')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:border-cyan-500 focus:outline-none resize-none"
                 />
               </div>
@@ -620,13 +619,13 @@ export default function ProvidersView() {
                 onClick={() => setSelectedProvider(null)}
                 className="btn-secondary text-xs"
               >
-                Hủy
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleSaveConfig}
                 className="btn-primary text-xs"
               >
-                Lưu Thay Đổi
+                {t('common.saveChanges')}
               </button>
             </div>
           </div>
@@ -645,8 +644,8 @@ export default function ProvidersView() {
           <div className="flex items-start justify-between gap-3 py-1.5 border-b border-slate-800/50 last:border-0">
             <span className="text-[11px] text-slate-500 shrink-0">{label}</span>
             <span className={`text-[11px] text-slate-200 text-right break-all ${mono ? 'font-mono' : 'font-medium'}`}>
-              {value === true ? <span className="text-emerald-400">Có</span>
-                : value === false ? <span className="text-slate-500">Không</span>
+              {value === true ? <span className="text-emerald-400">{t('common.yes')}</span>
+                : value === false ? <span className="text-slate-500">{t('common.no')}</span>
                 : (value === '' || value == null) ? <span className="text-slate-600">—</span>
                 : value}
             </span>
@@ -677,13 +676,13 @@ export default function ProvidersView() {
                     <h2 className="text-lg font-bold text-white leading-tight">{dp.name}</h2>
                     <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                       <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">{dp.category}</span>
-                      {dp.isFree && <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Miễn phí</span>}
+                      {dp.isFree && <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">{t('prov.free')}</span>}
                       <span className={`text-[10px] font-semibold px-1.5 py-0.2 rounded border ${dp.requiresAuth ? 'bg-amber-500/15 text-amber-400 border-amber-500/20' : 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20'}`}>
-                        {dp.requiresAuth ? 'Cần API key' : 'Không cần key'}
+                        {dp.requiresAuth ? t('prov.needKeyBadge') : t('prov.noKeyBadge')}
                       </span>
                       {dp.isCustom && <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">Custom</span>}
                       <span className={`text-[10px] font-semibold px-1.5 py-0.2 rounded border ${dp.enabled ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30' : 'bg-slate-800 text-slate-500 border-slate-700'}`}>
-                        {dp.enabled ? 'Đang bật' : 'Đang tắt'}
+                        {dp.enabled ? t('prov.enabled') : t('prov.disabled')}
                       </span>
                     </div>
                   </div>
@@ -691,7 +690,7 @@ export default function ProvidersView() {
                 <button
                   onClick={() => { setDetailProvider(null); setModelSearch(''); }}
                   className="text-slate-500 hover:text-white text-xl leading-none px-1"
-                  title="Đóng"
+                  title={t('common.close')}
                 >
                   ✕
                 </button>
@@ -701,28 +700,28 @@ export default function ProvidersView() {
                 {/* Thông tin */}
                 <section>
                   <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <Globe className="w-3.5 h-3.5 text-cyan-400" /> Thông tin
+                    <Globe className="w-3.5 h-3.5 text-cyan-400" /> {t('prov.info')}
                   </h3>
                   <p className="text-xs text-slate-400 leading-relaxed mb-3">{dp.description}</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
                     <InfoRow label="Provider ID" value={dp.id} mono />
-                    <InfoRow label="Danh mục" value={dp.category} />
+                    <InfoRow label={t('prov.category')} value={dp.category} />
                     {dp.website && (
                       <div className="flex items-start justify-between gap-3 py-1.5 border-b border-slate-800/50">
                         <span className="text-[11px] text-slate-500 shrink-0">Website</span>
                         <a href={dp.website} target="_blank" rel="noreferrer" className="text-[11px] text-cyan-400 hover:underline text-right break-all flex items-center gap-1">
-                          Mở <ExternalLink className="w-3 h-3" />
+                          {t('prov.openPage')} <ExternalLink className="w-3 h-3" />
                         </a>
                       </div>
                     )}
-                    <InfoRow label="Số mô hình" value={dp.models?.length || 0} />
+                    <InfoRow label={t('prov.modelCount')} value={dp.models?.length || 0} />
                   </div>
                 </section>
 
                 {/* Cấu hình */}
                 <section>
                   <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <Settings className="w-3.5 h-3.5 text-cyan-400" /> Cấu hình
+                    <Settings className="w-3.5 h-3.5 text-cyan-400" /> {t('prov.config')}
                   </h3>
                   <div className="bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2">
                     <div className="flex items-center justify-between gap-3 py-2 border-b border-slate-800/60">
@@ -732,30 +731,30 @@ export default function ProvidersView() {
                         <button
                           onClick={() => handleCopyBaseUrl(dp.baseUrl, 'detail-' + dp.id)}
                           className="text-slate-400 hover:text-cyan-400 shrink-0"
-                          title="Sao chép"
+                          title={t('common.copy')}
                         >
                           {copiedId === 'detail-' + dp.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
                       </div>
                     </div>
-                    <InfoRow label="Loại xác thực" value={dp.authType || 'none'} mono />
-                    <InfoRow label="Tên header" value={dp.headerName} mono />
-                    <InfoRow label="Yêu cầu API Key" value={dp.requiresAuth} />
-                    <InfoRow label="API Key đã lưu" value={dp.userApiKey ? `Có (${String(dp.userApiKey).slice(0, 6)}…${String(dp.userApiKey).slice(-4)})` : 'Chưa cấu hình'} mono />
-                    <InfoRow label="Cookie / Token đã lưu" value={dp.userCookie ? 'Có' : 'Không'} />
+                    <InfoRow label={t('prov.authType')} value={dp.authType || 'none'} mono />
+                    <InfoRow label={t('prov.headerName')} value={dp.headerName} mono />
+                    <InfoRow label={t('prov.requiresKey')} value={dp.requiresAuth} />
+                    <InfoRow label={t('prov.savedKey')} value={dp.userApiKey ? `${t('common.yes')} (${String(dp.userApiKey).slice(0, 6)}…${String(dp.userApiKey).slice(-4)})` : t('common.notSet')} mono />
+                    <InfoRow label={t('prov.savedCookie')} value={dp.userCookie ? t('common.yes') : t('common.no')} />
                     {(() => {
                       const dh = health[dp.id];
-                      const label = !dh ? 'Chưa kiểm tra' : dh.stale ? `Kết quả cũ (${Math.round(dh.ageMs / 60000)} phút trước)` : dh.ok ? `Đang sống (${dh.latencyMs || 0}ms)` : dh.needsKey ? `Cần API Key${dh.error ? ` — ${dh.error}` : ''}` : dh.keyWouldHelp ? `Nguồn sống nhưng hết lượt miễn phí — thêm key miễn phí để tiếp tục (${dh.error})` : `Không trả lời — ${dh.error}`;
-                      return <InfoRow label="Trạng thái kiểm tra" value={label} />;
+                      const label = !dh ? t('prov.notChecked') : dh.stale ? t('prov.oldResult', { n: Math.round(dh.ageMs / 60000) }) : dh.ok ? t('prov.aliveStatus', { n: dh.latencyMs || 0 }) : dh.needsKey ? `${t('prov.needKeyStatus')}${dh.error ? ` — ${dh.error}` : ''}` : dh.keyWouldHelp ? `${t('prov.freeOutStatus')} (${dh.error})` : `${t('prov.noAnswerStatus')} — ${dh.error}`;
+                      return <InfoRow label={t('prov.checkStatus')} value={label} />;
                     })()}
                   </div>
                   {dp.keyHelp && (
                     <div className="mt-3 rounded-lg border border-cyan-500/25 bg-cyan-500/5 p-3 text-[11px] leading-relaxed text-cyan-200">
-                      <div className="font-semibold text-cyan-300 mb-0.5">Cách lấy API Key miễn phí</div>
+                      <div className="font-semibold text-cyan-300 mb-0.5">{t('prov.howToGetKey')}</div>
                       {dp.keyHelp}
                       {dp.website && (
                         <a href={dp.website} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 mt-1 text-cyan-400 underline underline-offset-2 hover:text-cyan-300">
-                          Mở trang đăng ký <ExternalLink className="w-3 h-3" />
+                          {t('prov.openSignup')} <ExternalLink className="w-3 h-3" />
                         </a>
                       )}
                     </div>
@@ -770,7 +769,7 @@ export default function ProvidersView() {
                     className="btn-secondary text-xs mt-3 w-full justify-center"
                   >
                     <Key className="w-3.5 h-3.5" />
-                    <span>Chỉnh sửa cấu hình</span>
+                    <span>{t('prov.editConfig')}</span>
                   </button>
                 </section>
 
@@ -778,7 +777,7 @@ export default function ProvidersView() {
                 <section>
                   <div className="flex items-center justify-between gap-3 mb-2">
                     <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                      <Layers className="w-3.5 h-3.5 text-cyan-400" /> Mô hình ({dp.models?.length || 0})
+                      <Layers className="w-3.5 h-3.5 text-cyan-400" /> {t('prov.modelList')} ({dp.models?.length || 0})
                     </h3>
                     <div className="relative w-44">
                       <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2" />
@@ -786,13 +785,13 @@ export default function ProvidersView() {
                         type="text"
                         value={modelSearch}
                         onChange={(e) => setModelSearch(e.target.value)}
-                        placeholder="Lọc model..."
+                        placeholder={t('prov.filterModelPh')}
                         className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-2 py-1.5 text-[11px] text-slate-200 focus:border-cyan-500 focus:outline-none"
                       />
                     </div>
                   </div>
                   {models.length === 0 ? (
-                    <p className="text-[11px] text-slate-500 py-3 text-center">Không có model nào khớp bộ lọc.</p>
+                    <p className="text-[11px] text-slate-500 py-3 text-center">{t('prov.noMatch')}</p>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {models.map(m => (
@@ -802,7 +801,7 @@ export default function ProvidersView() {
                             <div className="text-[10px] text-slate-500 truncate">
                               {m.name || ''}
                               {m.servedModel && m.servedModel !== m.id && (
-                                <span className="ml-1 px-1 py-px rounded bg-sky-500/10 border border-sky-500/25 text-sky-300" title={`Model thực sự trả lời: ${m.servedModel}`}>
+                                <span className="ml-1 px-1 py-px rounded bg-sky-500/10 border border-sky-500/25 text-sky-300" title={t('prov.realModel') + ' ' + m.servedModel}>
                                   → {m.servedModel.split('/').pop()}
                                 </span>
                               )}
@@ -815,7 +814,7 @@ export default function ProvidersView() {
                             <button
                               onClick={() => handleCopyBaseUrl(m.id, 'model-' + m.id)}
                               className="text-slate-500 hover:text-cyan-400"
-                              title="Sao chép tên model"
+                              title={t('prov.copyModelTitle')}
                             >
                               {copiedId === 'model-' + m.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                             </button>
@@ -837,27 +836,27 @@ export default function ProvidersView() {
           <div className="card-glass bg-slate-900 border-slate-700 w-full max-w-lg p-6 rounded-2xl shadow-2xl">
             <h2 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
               <Plus className="w-5 h-5 text-cyan-400" />
-              <span>Thêm Nhà Cung Cấp Mới (Custom Provider)</span>
+              <span>{t('prov.addTitle')}</span>
             </h2>
             <p className="text-xs text-slate-400 mb-4">
-              Thêm bất kỳ máy chủ LLM nội bộ (vLLM, Ollama, LM Studio) hoặc Cloud AI Gateway tùy ý.
+              {t('prov.addSub')}
             </p>
 
             <form onSubmit={handleAddCustomProvider} className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Tên Nhà Cung Cấp:</label>
+                <label className="block text-slate-300 font-medium mb-1">{t('prov.nameLabel')}</label>
                 <input
                   required
                   type="text"
                   value={customForm.name}
                   onChange={(e) => setCustomForm({ ...customForm, name: e.target.value })}
-                  placeholder="Ví dụ: Cụm GPU Local Cty, My Private Gateway"
+                  placeholder={t('prov.namePh')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:border-cyan-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Base URL:</label>
+                <label className="block text-slate-300 font-medium mb-1">{t('prov.baseUrlLabel')}</label>
                 <input
                   required
                   type="text"
@@ -870,49 +869,49 @@ export default function ProvidersView() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">Loại Xác Thực:</label>
+                  <label className="block text-slate-300 font-medium mb-1">{t('prov.authLabel')}</label>
                   <select
                     value={customForm.authType}
                     onChange={(e) => setCustomForm({ ...customForm, authType: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:border-cyan-500 focus:outline-none"
                   >
-                    <option value="bearer">Bearer Token (Header: Authorization)</option>
-                    <option value="api-key">API Key (Header: x-api-key)</option>
-                    <option value="none">Không Cần Xác Thực (None / Free)</option>
-                    <option value="cookie">Cookie Session</option>
+                    <option value="bearer">{t('prov.authBearer')}</option>
+                    <option value="api-key">{t('prov.authApiKey')}</option>
+                    <option value="none">{t('prov.authNone')}</option>
+                    <option value="cookie">{t('prov.authCookie')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">Tên Mô Hình Mặc Định:</label>
+                  <label className="block text-slate-300 font-medium mb-1">{t('prov.defaultModelLabel')}</label>
                   <input
                     type="text"
                     value={customForm.modelName}
                     onChange={(e) => setCustomForm({ ...customForm, modelName: e.target.value })}
-                    placeholder="my-model-name"
+                    placeholder={t('prov.modelNamePh')}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:border-cyan-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">API Key / Token (Nếu có):</label>
+                <label className="block text-slate-300 font-medium mb-1">{t('prov.apiKeyIfAny')}</label>
                 <input
                   type="password"
                   value={customForm.userApiKey}
                   onChange={(e) => setCustomForm({ ...customForm, userApiKey: e.target.value })}
-                  placeholder="Nhập API key..."
+                  placeholder={t('prov.apiKeyPh')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:border-cyan-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Mô Tả Ngắn:</label>
+                <label className="block text-slate-300 font-medium mb-1">{t('prov.descLabel')}</label>
                 <input
                   type="text"
                   value={customForm.description}
                   onChange={(e) => setCustomForm({ ...customForm, description: e.target.value })}
-                  placeholder="Mô tả mục đích sử dụng..."
+                  placeholder={t('prov.descPh')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:border-cyan-500 focus:outline-none"
                 />
               </div>
@@ -926,7 +925,7 @@ export default function ProvidersView() {
                   className="rounded bg-slate-950 border-slate-800 text-cyan-500 focus:ring-cyan-500"
                 />
                 <label htmlFor="isFreeCheck" className="text-slate-300 font-medium cursor-pointer">
-                  Đánh dấu là nhà cung cấp Miễn Phí (Free Tier)
+                  {t('prov.freeCheck')}
                 </label>
               </div>
 
@@ -936,13 +935,13 @@ export default function ProvidersView() {
                   onClick={() => setShowAddModal(false)}
                   className="btn-secondary text-xs"
                 >
-                  Hủy
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="btn-primary text-xs"
                 >
-                  Tạo Nhà Cung Cấp
+                  {t('prov.createProvider')}
                 </button>
               </div>
             </form>

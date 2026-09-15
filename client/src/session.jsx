@@ -29,6 +29,13 @@ export async function authFetch(url, options = {}) {
   const token = getToken();
   const headers = { ...(options.headers || {}) };
   if (token) headers['x-wenker-session'] = token;
+  // Server-localized catalog (provider/add-on descriptions) follows the UI language.
+  try {
+    const lang = localStorage.getItem('wenker.ui.lang');
+    if (lang) headers['x-wenker-lang'] = lang;
+  } catch (e) {
+    /* storage disabled */
+  }
   return fetch(url, { ...options, headers });
 }
 
