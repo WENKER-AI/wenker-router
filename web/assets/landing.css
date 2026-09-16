@@ -589,12 +589,31 @@ code {
 }
 
 /* ============================================================
-   INTRO — animation 4 cảnh (section đầu trang, gộp từ intro.html)
+   INTRO SPLASH — overlay toàn màn hình ~10s, hiện lần đầu khi vào web
    ============================================================ */
 .intro-stage {
-  position: relative; height: 100svh; min-height: 620px; overflow: hidden;
-  border-bottom: 1px solid var(--line); background: var(--bg);
+  position: fixed; inset: 0; z-index: 150; overflow: hidden;
+  background: var(--bg);
+  transition: opacity .7s ease, visibility .7s ease;
 }
+.intro-stage.dismissed { opacity: 0; visibility: hidden; pointer-events: none; }
+body.intro-open { overflow: hidden; }
+.intro-skip {
+  position: absolute; top: 22px; right: 24px; z-index: 3;
+  display: inline-flex; align-items: center; gap: 8px;
+  font: inherit; font-size: 13px; font-weight: 600; letter-spacing: .01em;
+  color: var(--ink-soft); background: rgba(255,255,255,.04);
+  border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px;
+  cursor: pointer; transition: color .2s, border-color .2s, background .2s;
+}
+.intro-skip:hover { color: var(--ink); border-color: var(--line-hi); background: rgba(255,255,255,.07); }
+.intro-skip svg { transition: transform .2s; }
+.intro-skip:hover svg { transform: translateX(3px); }
+.intro-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; z-index: 3; background: rgba(255,255,255,.06); }
+.intro-progress > i { display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  animation: introProg 10s linear forwards; }
+@keyframes introProg { to { width: 100%; } }
 .intro-stage #introStars { position: absolute; inset: 0; width: 100%; height: 100%; }
 .intro-glow {
   position: absolute; top: 50%; left: 50%; width: 1400px; height: 900px;
@@ -650,7 +669,7 @@ code {
 @keyframes iTagIn { from { opacity: 0; transform: translateY(10px); letter-spacing: .08em; } to { opacity: 1; letter-spacing: .01em; } }
 
 /* Scene 3: terminal */
-.i-scene3 { opacity: 0; animation: iSceneIn .8s ease 5.4s forwards; }
+.i-scene3 { opacity: 0; animation: iSceneIn .8s ease 5s forwards; }
 .i-terminal { width: min(760px, 92vw); background: rgba(12,12,17,.94); border: 1px solid var(--line-hi);
   border-radius: 18px; box-shadow: 0 40px 100px -20px rgba(0,0,0,.8), 0 0 60px -20px rgba(129,140,248,.35);
   overflow: hidden; transform: translateY(16px); animation: iTermIn .7s cubic-bezier(.2,.8,.2,1) forwards; }
@@ -669,7 +688,7 @@ code {
 .i-terminal .caret { display: inline-block; width: 9px; height: 18px; vertical-align: -3px; background: var(--accent-2); animation: caret 1s steps(1) infinite; }
 
 /* Scene 4: closing */
-.i-scene4 { opacity: 0; animation: iSceneIn .9s ease 10.6s forwards; text-align: center; }
+.i-scene4 { opacity: 0; animation: iSceneIn .9s ease 8.4s forwards; text-align: center; }
 .i-scene4 h2 { font-size: clamp(40px, 7vw, 66px); font-weight: 800; letter-spacing: -.03em; line-height: 1.1; }
 .i-scene4 .i-s { font-family: var(--serif); font-style: italic; font-weight: 400;
   background: linear-gradient(110deg, #c7d2fe, var(--accent-2));
@@ -746,11 +765,8 @@ code {
   .credit-grid { grid-template-columns: 1fr; gap: 28px; }
 }
 @media (max-width: 720px) {
-  .intro-stage { height: 88svh; }
+  .intro-skip { top: 16px; right: 16px; padding: 8px 13px; font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .i-scene1, .i-scene2, .i-scene3 { display: none; }
-  .i-scene4 { opacity: 1; animation: none; }
-  .i-badge { opacity: 1; animation: none; }
-  .intro-glow { animation: none; }
+  .intro-stage { display: none; }
 }

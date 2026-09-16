@@ -285,12 +285,19 @@
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
   }
 
-  /* ---------- intro: animation 4 cảnh (gộp từ intro.html) ---------- */
+  /* ---------- intro: splash toàn màn hình ~10s, hiện lần đầu khi vào web ---------- */
   (function initIntro() {
     var stage = document.getElementById("intro");
-    if (!stage || reduceMotion) return; // reduced-motion: CSS hiện sẵn cảnh cuối
+    if (!stage) return;
+    var timers = [], raf = 0;
 
-    /* starfield */
+    var seen = false;
+    try { seen = sessionStorage.getItem("wenker.intro.seen") === "1"; } catch (e) {}
+    if (reduceMotion || seen) { closeIntro(false); return; } // không chặn: ẩn splash ngay
+
+    document.body.classList.add("intro-open");
+
+    /* starfield (dừng được khi đóng) */
     var cv = document.getElementById("introStars");
     if (cv) {
       var cx = cv.getContext("2d");
@@ -312,7 +319,7 @@
           cx.fillStyle = "rgba(150,160,255," + s.a + ")";
           cx.beginPath(); cx.arc(s.x, s.y, s.r, 0, 7); cx.fill();
         }
-        requestAnimationFrame(tick);
+        raf = requestAnimationFrame(tick);
       })();
     }
 
@@ -327,11 +334,11 @@
       });
     }
 
-    /* scene fade chain */
-    function fade(id, at) { var el = document.getElementById(id); if (el) setTimeout(function () { el.classList.add("fade"); }, at); }
-    fade("s1", 2100); fade("s2", 5100);
-    setTimeout(function () { var s3 = document.getElementById("s3"); if (s3) s3.style.opacity = "1"; }, 5400);
-    fade("s3", 10300);
+    /* scene fade chain — total ~10s */
+    function at(fn, ms) { timers.push(setTimeout(fn, ms)); }
+    function fade(id, ms) { at(function () { var el = document.getElementById(id); if (el) el.classList.add("fade"); }, ms); }
+    fade("s1", 1900); fade("s2", 4700); fade("s3", 8000);
+    at(function () { closeIntro(true); }, 10000); // tự đóng sau 10 giây
 
     /* terminal typing */
     var term = document.getElementById("introTerm");
@@ -353,12 +360,29 @@
           else { ilines.push('<span class="p">$</span> ' + iesc(cmd)); setTimeout(then, 500); }
         })();
       }
-      setTimeout(function () {
+      at(function () {
         typeCmd(CMD1, 42, function () { typeCmd(CMD2, 110, function () {
           setTimeout(function () { term.innerHTML = ilines.join("\n") + "\n" + OUT; }, 400);
         }); });
-      }, 5700);
+      }, 5100);
     }
+
+    function closeIntro(animate) {
+      if (!stage || stage.classList.contains("dismissed")) return;
+      if (!animate) { stage.style.display = "none"; } else { stage.classList.add("dismissed"); }
+      document.body.classList.remove("intro-open");
+      if (raf) cancelAnimationFrame(raf);
+      timers.forEach(clearTimeout);
+      try { sessionStorage.setItem("wenker.intro.seen", "1"); } catch (e) {}
+      window.scrollTo(0, 0);
+    }
+    var skip = document.getElementById("introSkip");
+    var enter = document.getElementById("introEnter");
+    if (skip) skip.addEventListener("click", function () { closeIntro(true); });
+    if (enter) enter.addEventListener("click", function () { closeIntro(true); });
+    document.addEventListener("keydown", function onKey(e) {
+      if (e.key === "Escape") { closeIntro(true); document.removeEventListener("keydown", onKey); }
+    });
   })();
 
   /* ---------- year ---------- */

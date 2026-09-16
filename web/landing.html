@@ -9,6 +9,55 @@
   <link rel="stylesheet" href="assets/landing.css" />
 </head>
 <body>
+  <!-- ================= INTRO SPLASH (toàn màn hình ~10s, hiện lần đầu khi vào web) ================= -->
+  <div class="intro-stage" id="intro" role="dialog" aria-modal="true" aria-label="Giới thiệu WENKER Router">
+    <canvas id="introStars" aria-hidden="true"></canvas>
+    <div class="intro-glow" aria-hidden="true"></div>
+    <div class="intro-grid" aria-hidden="true"></div>
+    <div class="intro-vignette" aria-hidden="true"></div>
+
+    <button class="intro-skip" id="introSkip" type="button">Bỏ qua intro
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="intro-progress" aria-hidden="true"><i></i></div>
+
+    <div class="i-scene i-scene1" id="s1">
+      <div class="i-ring"></div><div class="i-ring i-ring2"></div>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ilg" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#818cf8"/><stop offset="1" stop-color="#67e8f9"/></linearGradient></defs>
+        <path d="M2 5l4 14 4.5-10L15 19l4-14"/></svg>
+    </div>
+
+    <div class="i-scene i-scene2" id="s2">
+      <div class="i-wordmark">
+        <div class="i-wm">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 5l4 14 4.5-10L15 19l4-14" stroke="url(#ilg2)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="ilg2" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#818cf8"/><stop offset="1" stop-color="#67e8f9"/></linearGradient></defs></svg>
+          <span id="wmText"></span>
+        </div>
+        <div class="i-tagline">Một cổng. Mọi model AI. <em>Thuộc về bạn.</em></div>
+      </div>
+    </div>
+
+    <div class="i-scene i-scene3" id="s3">
+      <div class="i-terminal">
+        <div class="i-term-bar"><span class="i-dot d1"></span><span class="i-dot d2"></span><span class="i-dot d3"></span><span class="i-term-title">wenker — gateway</span><span class="i-term-live"><i></i>LIVE</span></div>
+        <pre id="introTerm"></pre>
+      </div>
+    </div>
+
+    <div class="i-scene i-scene4" id="s4">
+      <div>
+        <h2>Làm chủ AI<br/><span class="i-s">của chính bạn.</span></h2>
+        <div class="i-sub">560+ model · 181 nhà cung cấp · localhost:3600</div>
+        <div class="i-badges">
+          <span class="i-badge" style="animation-delay:9s">MÃ NGUỒN MỞ · MIT</span>
+          <span class="i-badge" style="animation-delay:9.15s">100% TRÊN MÁY BẠN</span>
+          <span class="i-badge" style="animation-delay:9.3s">KHÔNG TELEMETRY</span>
+        </div>
+        <button class="btn btn-primary i-skip" id="introEnter" type="button">Khám phá ↓</button>
+      </div>
+    </div>
+  </div>
+
   <div class="scroll-progress" id="scrollProgress"></div>
 
   <!-- ================= ANNOUNCEMENT ================= -->
@@ -48,50 +97,6 @@
   </header>
 
   <main id="top">
-    <!-- ================= INTRO (animation 4 cảnh) ================= -->
-    <section class="intro-stage" id="intro" aria-label="Giới thiệu WENKER Router">
-      <canvas id="introStars" aria-hidden="true"></canvas>
-      <div class="intro-glow" aria-hidden="true"></div>
-      <div class="intro-grid" aria-hidden="true"></div>
-      <div class="intro-vignette" aria-hidden="true"></div>
-
-      <div class="i-scene i-scene1" id="s1">
-        <div class="i-ring"></div><div class="i-ring i-ring2"></div>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ilg" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#818cf8"/><stop offset="1" stop-color="#67e8f9"/></linearGradient></defs>
-          <path d="M2 5l4 14 4.5-10L15 19l4-14"/></svg>
-      </div>
-
-      <div class="i-scene i-scene2" id="s2">
-        <div class="i-wordmark">
-          <div class="i-wm">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 5l4 14 4.5-10L15 19l4-14" stroke="url(#ilg2)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="ilg2" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#818cf8"/><stop offset="1" stop-color="#67e8f9"/></linearGradient></defs></svg>
-            <span id="wmText"></span>
-          </div>
-          <div class="i-tagline">Một cổng. Mọi model AI. <em>Thuộc về bạn.</em></div>
-        </div>
-      </div>
-
-      <div class="i-scene i-scene3" id="s3">
-        <div class="i-terminal">
-          <div class="i-term-bar"><span class="i-dot d1"></span><span class="i-dot d2"></span><span class="i-dot d3"></span><span class="i-term-title">wenker — gateway</span><span class="i-term-live"><i></i>LIVE</span></div>
-          <pre id="introTerm"></pre>
-        </div>
-      </div>
-
-      <div class="i-scene i-scene4" id="s4">
-        <div>
-          <h2>Làm chủ AI<br/><span class="i-s">của chính bạn.</span></h2>
-          <div class="i-sub">560+ model · 181 nhà cung cấp · localhost:3600</div>
-          <div class="i-badges">
-            <span class="i-badge" style="animation-delay:11.4s">MÃ NGUỒN MỞ · MIT</span>
-            <span class="i-badge" style="animation-delay:11.6s">100% TRÊN MÁY BẠN</span>
-            <span class="i-badge" style="animation-delay:11.8s">KHÔNG TELEMETRY</span>
-          </div>
-          <a class="btn btn-primary i-skip" href="#hero">Khám phá ↓</a>
-        </div>
-      </div>
-    </section>
-
     <!-- ================= HERO ================= -->
     <section class="hero" id="hero">
       <canvas id="netCanvas" aria-hidden="true"></canvas>
