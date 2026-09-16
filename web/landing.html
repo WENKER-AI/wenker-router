@@ -5,10 +5,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WENKER Router — Một lớp sở hữu AI hoàn toàn mới</title>
   <meta name="description" content="WENKER Router hợp nhất 181 nhà cung cấp và 560+ model AI sau hai chuẩn mở. Mã nguồn mở MIT, chạy 100% trên máy bạn. Một lớp sở hữu AI hoàn toàn mới." />
+  
+  <!-- Google Analytics - Tuần 1: Tracking -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TRACKING-ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TRACKING-ID', {
+      page_path: window.location.pathname,
+      anonymize_ip: true
+    });
+    
+    // Track custom events
+    function trackEvent(category, action, label) {
+      gtag('event', action, {
+        'event_category': category,
+        'event_label': label
+      });
+    }
+  </script>
+  
+  <!-- Open Graph / SEO -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://wenker.ai/" />
+  <meta property="og:title" content="WENKER Router — Một lớp sở hữu AI hoàn toàn mới" />
+  <meta property="og:description" content="WENKER Router hợp nhất 181 nhà cung cấp và 560+ model AI sau hai chuẩn mở. Mã nguồn mở MIT, chạy 100% trên máy bạn." />
+  <meta property="og:image" content="https://wenker.ai/assets/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="WENKER Router — Một lớp sở hữu AI hoàn toàn mới" />
+  <meta name="twitter:description" content="WENKER Router hợp nhất 181 nhà cung cấp và 560+ model AI sau hai chuẩn mở. Mã nguồn mở MIT, chạy 100% trên máy bạn." />
+  <meta name="twitter:image" content="https://wenker.ai/assets/og-image.png" />
+  
+  <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="assets/favicon-w.svg" />
   <link rel="stylesheet" href="assets/landing.css" />
+  
+  <!-- Lazy Loading - Tuần 1: Performance -->
+  <link rel="preload" href="assets/landing.css" as="style" />
+  <link rel="preload" href="assets/i18n.js" as="script" />
+  <link rel="preload" href="assets/landing.js" as="script" />
+  
+  <!-- Intersection Observer polyfill cho browser cũ -->
+  <script>
+    if ('loading' in HTMLImageElement.prototype) {
+      // Native lazy loading supported
+    } else {
+      // Load polyfill
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/intersection-observer@0.12.0/intersection-observer.min.js';
+      document.head.appendChild(script);
+    }
+  </script>
 </head>
 <body>
+  <!-- Event Tracking - Tuần 1 -->
+  <script>
+    // Track important user interactions
+    document.addEventListener('DOMContentLoaded', () => {
+      // Track button clicks
+      const buttons = document.querySelectorAll('button, a[href^="#"], a[href*="github"]');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const text = btn.innerText?.trim() || btn.getAttribute('aria-label') || 'button';
+          const href = btn.getAttribute('href') || '';
+          const id = btn.id || '';
+          
+          if (typeof trackEvent === 'function') {
+            trackEvent('Engagement', 'click', `${id || text} - ${href}`);
+          }
+        });
+      });
+      
+      // Track scroll depth
+      let scrollDepthTracked = false;
+      window.addEventListener('scroll', () => {
+        const scrolled = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+        if (scrolled > 50 && !scrollDepthTracked) {
+          scrollDepthTracked = true;
+          if (typeof trackEvent === 'function') {
+            trackEvent('Scroll', '50_percent', 'Landing Page');
+          }
+        }
+      });
+      
+      // Track time on page
+      setTimeout(() => {
+        if (typeof trackEvent === 'function') {
+          trackEvent('Time', '30_seconds', 'Landing Page');
+        }
+      }, 30000);
+    });
+  </script>
+  
   <!-- ================= INTRO SPLASH (toàn màn hình ~10s, hiện lần đầu khi vào web) ================= -->
   <div class="intro-stage" id="intro" role="dialog" aria-modal="true" aria-label="Giới thiệu WENKER Router">
     <canvas id="introStars" aria-hidden="true"></canvas>
@@ -576,14 +669,39 @@
     <div class="video-backdrop" data-video-close></div>
     <div class="video-shell">
       <button class="video-close" data-video-close aria-label="Đóng">✕</button>
-      <video id="promoVideo" controls playsinline preload="metadata">
+      <!-- Lazy Loading - Tuần 1: Video lazy load -->
+      <video id="promoVideo" controls playsinline preload="none" loading="lazy" poster="assets/video-poster.jpg">
         <source src="assets/promo.mp4" type="video/mp4" />
         Trình duyệt của bạn không hỗ trợ video.
       </video>
+      <script>
+        // Lazy load video khi click
+        document.addEventListener('DOMContentLoaded', () => {
+          const video = document.getElementById('promoVideo');
+          const modal = document.querySelector('.video-modal');
+          
+          if (video && modal) {
+            const originalPreload = video.preload;
+            
+            // lấy video source
+            modal.addEventListener('click', (e) => {
+              if (e.target === modal || e.target.classList.contains('video-close')) {
+                return;
+              }
+              // Load video metadata khi modal được mở
+              if (video.preload === 'none') {
+                video.preload = 'metadata';
+                video.load();
+              }
+            });
+          }
+        });
+      </script>
       <div class="video-fallback">Video đang được chuẩn bị — quay lại sau. Trong lúc chờ, hãy <a href="#tai">cài thử router</a>.</div>
     </div>
   </div>
 
+  <script src="assets/i18n.js"></script>
   <script src="assets/landing.js"></script>
 </body>
 </html>

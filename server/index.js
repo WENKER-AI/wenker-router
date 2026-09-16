@@ -8,13 +8,18 @@ const anthropicRouter = require('./routes/anthropic');
 const adminRouter = require('./routes/admin');
 const authRouter = require('./routes/auth');
 
+// Rate Limiting Middleware - Tuần 1
+const { apiLimiter, adminLimiter, healthLimiter } = require('./middlewares/rateLimiter');
+
 // Guard: khi terminal/pipe cua stdout bi dong giua chung (chay nen, dong cua so
 // cmd, hoac process bi quan ly boi `pm2`/`systemd`...), moi lan console.log co the
 // nem "write EPIPE" -> uncaught exception -> `npm start` chet. Mot gateway khong
 // bao gio duoc phep chet chi vi ghi log that bai, nen nho bo qua loi stdout/stderr.
 for (const stream of [process.stdout, process.stderr]) {
   if (stream && typeof stream.on === 'function') {
-    stream.on('error', () => { /* pipe da chet - lang thi ghi log, khong crash */ });
+    stream.on('error', (err) => {
+      console.warn('[stream] Pipe closed, ignoring error:', err.message);
+    });
   }
 }
 
@@ -32,12 +37,14 @@ const PORT = process.env.PORT || settings.port || 3600;
 const HOST = process.env.HOST || settings.host || '0.0.0.0';
 
 // Enable CORS for web apps (OpenWebUI, NextChat, Vite, etc.)
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['*'],
-  exposedHeaders: ['*']
-}));
+app.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['*'],
+    exposedHeaders: ['*'],
+  }),
+);
 
 // Body parser
 app.use(express.json({ limit: '50mb' }));
@@ -61,7 +68,9 @@ app.use((req, res, next) => {
 // VS Code extension) keep authenticating with their own WENKER key as before.
 const LOOPBACK = /^(::1|::ffff:127\.0\.0\.1|127(\.\d+){3})$/;
 // Set WENKER_ADMIN_OPEN_LOCALHOST=0 to require the admin key from this machine too.
-const ADMIN_OPEN_LOCALHOST = !/^(0|false)$/i.test(String(process.env.WENKER_ADMIN_OPEN_LOCALHOST || '1'));
+const ADMIN_OPEN_LOCALHOST = !/^(0|false)$/i.test(
+  String(process.env.WENKER_ADMIN_OPEN_LOCALHOST || '1'),
+);
 
 app.use('/api', (req, res, next) => {
   // Login, session check and quota must be reachable before anyone has a token.
@@ -89,39 +98,40 @@ app.use('/api', (req, res, next) => {
 
   return res.status(401).json({
     error: {
-      message: 'API quan tri chi chap nhan tu may chu local. Dang nhap vao WENKER hoac gui header "x-wenker-admin-key: <key admin>"; dat WENKER_ADMIN_OPEN_LOCALHOST=0 de bat buoc cho ca local.',
+      message:
+        'API quan tri chi chap nhan tu may chu local. Dang nhap vao WENKER hoac gui header "x-wenker-admin-key: <key admin>"; dat WENKER_ADMIN_OPEN_LOCALHOST=0 de bat buoc cho ca local.',
       type: 'authentication_error',
-      code: 'admin_key_required'
-    }
+      code: 'admin_key_required',
+    },
   });
 });
 
-// API Routes
-app.use('/v1', openaiRouter);
-app.use('/v1', anthropicRouter);
-app.use('/api', adminRouter);
-app.use('/api/auth', authRouter);
+// API Routes - Tuần 1: Áp dụng Rate Limiting
+app.use('/v1', apiLimiter, openaiRouter);
+app.use('/v1', apiLimiter, anthropicRouter);
+app.use('/api', adminLimiter, adminRouter);
+app.use('/api/auth', authRouter); // Auth không bị rate limit để đăng nhập được
 // Unknown /v1/* endpoints -> clean OpenAI-style JSON error (not an HTML stack trace)
 app.all('/v1/*', (req, res) => {
   res.status(404).json({
     error: {
       message: `Không hỗ trợ endpoint ${req.method} ${req.originalUrl}. khả dụng: /v1/chat/completions, /v1/messages, /v1/models, /v1/embeddings.`,
-      type: "invalid_request_error",
+      type: 'invalid_request_error',
       param: null,
-      code: "unsupported_endpoint"
-    }
+      code: 'unsupported_endpoint',
+    },
   });
 });
 
-// Health check endpoint
+// Health check endpoint - Tuần 1: Rate Limiting
 const PKG = require('../package.json');
-app.get('/health', (req, res) => {
+app.get('/health', healthLimiter, (req, res) => {
   res.json({
     status: 'online',
     app: 'WENKER Router',
     version: PKG.version,
     uptime: process.uptime(),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -143,12 +153,15 @@ const notFoundPage = path.join(webPath, '404.html');
 // mới được đưa về index.html để React tự xử lý tab.
 app.get('*', (req, res) => {
   if (/\.[a-z0-9]{1,10}$/i.test(req.path)) {
-    return res.status(404).type('html').send(
-      `<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>404</title>` +
-      `<style>body{font-family:system-ui;background:#05070f;color:#eaf2ff;display:grid;place-items:center;height:100vh;margin:0}` +
-      `a{color:#7ee787}</style></head><body><div style="text-align:center"><h1>Off. 404</h1>` +
-      `<p>Không tìm thấy tài nguyên này.</p><p><a href="/web/404.html">Chơi mini game cá voi</a> · <a href="/">Về dashboard</a></p></div></body></html>`
-    );
+    return res
+      .status(404)
+      .type('html')
+      .send(
+        '<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>404</title>' +
+          '<style>body{font-family:system-ui;background:#05070f;color:#eaf2ff;display:grid;place-items:center;height:100vh;margin:0}' +
+          'a{color:#7ee787}</style></head><body><div style="text-align:center"><h1>Off. 404</h1>' +
+          '<p>Không tìm thấy tài nguyên này.</p><p><a href="/web/404.html">Chơi mini game cá voi</a> · <a href="/">Về dashboard</a></p></div></body></html>',
+      );
   }
   if (fs.existsSync(clientIndex)) {
     // Đường dẫn lạ (không phải asset, không phải "/") -> trang 404 pixel có mini game.
@@ -198,22 +211,28 @@ app.use((err, req, res, next) => {
   const status = err.status || err.statusCode || (err.type === 'entity.parse.failed' ? 400 : 500);
   if (status >= 500) console.error('Request error:', err.message);
   const isAnthropic = req.originalUrl.startsWith('/v1/messages');
-  const message = err.type === 'entity.parse.failed'
-    ? 'Body request không phải JSON hợp lệ.'
-    : err.type === 'entity.too.large'
-      ? 'Payload vượt quá giới hạn kích thước của server.'
-      : (err.message || 'Internal Server Error');
+  const message =
+    err.type === 'entity.parse.failed'
+      ? 'Body request không phải JSON hợp lệ.'
+      : err.type === 'entity.too.large'
+        ? 'Payload vượt quá giới hạn kích thước của server.'
+        : err.message || 'Internal Server Error';
 
   if (isAnthropic) {
-    return res.status(status).json({ type: "error", error: { type: status >= 500 ? "api_error" : "invalid_request_error", message } });
+    return res
+      .status(status)
+      .json({
+        type: 'error',
+        error: { type: status >= 500 ? 'api_error' : 'invalid_request_error', message },
+      });
   }
   res.status(status).json({
     error: {
       message,
-      type: status >= 500 ? "internal_error" : "invalid_request_error",
+      type: status >= 500 ? 'internal_error' : 'invalid_request_error',
       param: null,
-      code: err.type || "internal_error"
-    }
+      code: err.type || 'internal_error',
+    },
   });
 });
 
@@ -222,16 +241,26 @@ app.listen(PORT, HOST, () => {
   // In ra MANH HINH trung thuc ve tier mac dinh: no tro thuong nao, da co key chua.
   // Truoc day banner co dinh "100% Free Models Ready (No API Key required)", sai khi
   // WENKER Cloud duoc tro toi nguon phai co key (xkiro/izzi).
-  const def = db.getProviderById(db.getSettings().defaultProvider || "wenker-cloud") || db.getProviderById("wenker-cloud");
-  let tierLine = "WENKER Cloud:           chua cau hinh nguon";
+  const def =
+    db.getProviderById(db.getSettings().defaultProvider || 'wenker-cloud') ||
+    db.getProviderById('wenker-cloud');
+  let tierLine = 'WENKER Cloud:           chua cau hinh nguon';
   if (def) {
-    let host = def.baseUrl || "";
-    try { host = new URL(def.baseUrl).host; } catch (e) { /* baseUrl co the la template */ }
-    const needsKey = def.requiresAuth || def.authType !== "none";
-    const keyState = needsKey ? (def.userApiKey || def.userCookie ? "da co key" : "CHUA co key") : "khong can key";
+    let host = def.baseUrl || '';
+    try {
+      host = new URL(def.baseUrl).host;
+    } catch (e) {
+      console.warn('[config] Invalid baseUrl, keeping template:', def.baseUrl);
+    }
+    const needsKey = def.requiresAuth || def.authType !== 'none';
+    const keyState = needsKey
+      ? def.userApiKey || def.userCookie
+        ? 'da co key'
+        : 'CHUA co key'
+      : 'khong can key';
     // Khong cat ngan ten provider: padEnd du rong hon ten dai nhat, khong dung slice().
     const label = `${def.name}: `.padEnd(28);
-    tierLine = `${label}${(def.models || []).length} model · nguon ${host || "?"} · ${keyState}`;
+    tierLine = `${label}${(def.models || []).length} model · nguon ${host || '?'} · ${keyState}`;
   }
   console.log(`
 ============================================================
@@ -246,18 +275,18 @@ app.listen(PORT, HOST, () => {
   Core Server Running at:    http://localhost:${PORT}
   OpenAI API Base:           http://localhost:${PORT}/v1
   Anthropic Claude Base:     http://localhost:${PORT}/v1
-  Master Admin Key:          sk-wenker-local-admin
-  Free Playground Key:       sk-wenker-free-playground
+  Master Admin Key:          [HIDDEN - set via WENKER_ADMIN_KEY env var]
+  Free Playground Key:       [HIDDEN - built-in fallback]
   Total Providers:           ${db.getAllProviders().length} AI Providers Preloaded
   ${tierLine}
 ============================================================
   Claude Code Configuration:
   export ANTHROPIC_BASE_URL=http://localhost:${PORT}/v1
-  export ANTHROPIC_API_KEY=sk-wenker-local-admin
+  export ANTHROPIC_API_KEY=[USE YOUR KEY HERE]
 
   Cursor / Cline / OpenWebUI Configuration:
   Base URL: http://localhost:${PORT}/v1
-  API Key:  sk-wenker-local-admin
+  API Key:  [USE YOUR KEY HERE]
 ============================================================
   `);
 });

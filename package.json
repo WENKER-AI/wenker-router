@@ -1,6 +1,7 @@
 {
   "name": "wenker-router",
   "version": "2.1.13",
+  "type": "module",
   "description": "WENKER Router - Open Source Local AI Proxy Gateway supporting 180+ providers and WENKER Cloud",
   "main": "server/index.js",
   "bin": {
@@ -35,7 +36,11 @@
     "dev:client": "cd client && npm run dev",
     "install:all": "npm install && cd client && npm install",
     "pack:dry": "npm pack --dry-run",
-    "web": "node scripts/serve-web.js"
+    "web": "node scripts/serve-web.js",
+    "lint": "eslint server/**/*.js scripts/**/*.js bin/*.js",
+    "lint:fix": "eslint --fix server/**/*.js scripts/**/*.js bin/*.js",
+    "format": "prettier --write \"server/**/*.js\" \"scripts/**/*.js\" \"bin/*.js\" \"web/assets/*.js\"",
+    "format:check": "prettier --check \"server/**/*.js\" \"scripts/**/*.js\" \"bin/*.js\" \"web/assets/*.js\""
   },
   "repository": {
     "type": "git",
@@ -63,6 +68,16 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-rate-limit": "^8.7.0",
     "undici": "^6.28.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.12.0",
+    "chai": "^6.2.2",
+    "chai-http": "^5.1.2",
+    "eslint": "^9.12.0",
+    "globals": "^15.11.0",
+    "mocha": "^12.0.1",
+    "prettier": "^3.3.3"
   }
 }
