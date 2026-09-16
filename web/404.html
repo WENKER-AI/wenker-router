@@ -5,22 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>404 · OFF — WENKER Router</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon-w.svg" />
-  <link rel="stylesheet" href="assets/style.css" />
-<base target="_blank">
+  <link rel="stylesheet" href="assets/landing.css" />
 </head>
 <body>
   <section class="lost">
     <canvas id="netCanvas" aria-hidden="true"></canvas>
     <div class="hero-glow" aria-hidden="true"></div>
+    <div class="hero-grid-lines" aria-hidden="true"></div>
     <div class="container lost-inner">
+      <span class="lost-kicker">Lỗi 404 · đường dẫn không tồn tại</span>
       <h1>OFF</h1>
-      <p>BRUH — có gì đó không đúng ở đây. Đường dẫn này không tồn tại.</p>
-      <div>
-        <a class="btn btn-primary" href="index.html">Về trang chủ</a>
+      <p class="lost-msg">BRUH — có gì đó không đúng ở đây. Đường dẫn này không tồn tại. Trong lúc chờ, chơi tạm một game:</p>
+      <div class="lost-cta">
+        <a class="btn btn-primary" href="landing.html">Về trang chủ</a>
         <a class="btn btn-ghost" href="https://github.com/WENKER-AI/wenker-router" target="_blank" rel="noopener">GitHub</a>
+      </div>
+
+      <div class="game-shell">
+        <div class="game-tabs" id="gameTabs">
+          <button data-game="snake" class="active">Rắn</button>
+          <button data-game="catch">Bắt cá</button>
+          <button data-game="flappy">Cá voi bay</button>
+        </div>
+        <canvas id="gameCanvas" width="480" height="320" aria-label="Mini game"></canvas>
+        <p class="game-hint">Rắn: phím mũi tên · Bắt cá: ← → hoặc chuột · Cá voi bay: Space / nhấp</p>
       </div>
     </div>
   </section>
-  <script src="assets/app.js"></script>
+  <script src="assets/landing.js"></script>
+  <script src="assets/games.js"></script>
+  <script>
+    (function () {
+      if (!window.WenkerGames) return;
+      var canvas = document.getElementById("gameCanvas");
+      var tabs = document.getElementById("gameTabs");
+      if (canvas && tabs) window.WenkerGames.mount(canvas, tabs);
+    })();
+  </script>
 </body>
 </html>

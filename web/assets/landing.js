@@ -285,6 +285,82 @@
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
   }
 
+  /* ---------- intro: animation 4 cảnh (gộp từ intro.html) ---------- */
+  (function initIntro() {
+    var stage = document.getElementById("intro");
+    if (!stage || reduceMotion) return; // reduced-motion: CSS hiện sẵn cảnh cuối
+
+    /* starfield */
+    var cv = document.getElementById("introStars");
+    if (cv) {
+      var cx = cv.getContext("2d");
+      var stars = [], sw = 0, sh = 0, sdpr = Math.min(window.devicePixelRatio || 1, 2);
+      function sizeStars() {
+        var r = stage.getBoundingClientRect();
+        sw = r.width; sh = r.height;
+        cv.width = sw * sdpr; cv.height = sh * sdpr;
+        cx.setTransform(sdpr, 0, 0, sdpr, 0, 0);
+        stars = [];
+        for (var i = 0; i < 140; i++) stars.push({ x: Math.random() * sw, y: Math.random() * sh, r: Math.random() * 1.4 + .3, v: Math.random() * .3 + .05, a: Math.random() * .7 + .2 });
+      }
+      sizeStars();
+      window.addEventListener("resize", sizeStars);
+      (function tick() {
+        cx.clearRect(0, 0, sw, sh);
+        for (var i = 0; i < stars.length; i++) {
+          var s = stars[i]; s.y -= s.v; if (s.y < 0) s.y = sh;
+          cx.fillStyle = "rgba(150,160,255," + s.a + ")";
+          cx.beginPath(); cx.arc(s.x, s.y, s.r, 0, 7); cx.fill();
+        }
+        requestAnimationFrame(tick);
+      })();
+    }
+
+    /* wordmark letter cascade */
+    var wm = document.getElementById("wmText");
+    if (wm) {
+      "WENKER·ROUTER".split("").forEach(function (c, i) {
+        var sp = document.createElement("span"); sp.className = "ch";
+        sp.style.animationDelay = (2.6 + i * .06) + "s";
+        if (c === "·") { sp.innerHTML = "<em>·</em>"; } else { sp.textContent = c; }
+        wm.appendChild(sp);
+      });
+    }
+
+    /* scene fade chain */
+    function fade(id, at) { var el = document.getElementById(id); if (el) setTimeout(function () { el.classList.add("fade"); }, at); }
+    fade("s1", 2100); fade("s2", 5100);
+    setTimeout(function () { var s3 = document.getElementById("s3"); if (s3) s3.style.opacity = "1"; }, 5400);
+    fade("s3", 10300);
+
+    /* terminal typing */
+    var term = document.getElementById("introTerm");
+    if (term) {
+      var CMD1 = "npm install -g wenker-router", CMD2 = "wenker";
+      var OUT = '<span class="dim">────────────────────────────────────────────</span>\n' +
+        '<span class="ok">✓</span> WENKER Router đang chạy tại <span class="hl">http://localhost:3600</span>\n' +
+        '<span class="dim">  OpenAI    → /v1/chat/completions</span>\n' +
+        '<span class="dim">  Anthropic → /v1/messages</span>\n' +
+        '<span class="ok">✓</span> 560+ model · <span class="hl">181</span> providers · 0 telemetry';
+      function iesc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+      var ilines = [];
+      function typeCmd(cmd, speed, then) {
+        var i = 0, cur = "";
+        (function step() {
+          cur = cmd.slice(0, ++i);
+          term.innerHTML = ilines.join("\n") + (ilines.length ? "\n" : "") + '<span class="p">$</span> ' + iesc(cur) + '<span class="caret"></span>';
+          if (i < cmd.length) setTimeout(step, speed);
+          else { ilines.push('<span class="p">$</span> ' + iesc(cmd)); setTimeout(then, 500); }
+        })();
+      }
+      setTimeout(function () {
+        typeCmd(CMD1, 42, function () { typeCmd(CMD2, 110, function () {
+          setTimeout(function () { term.innerHTML = ilines.join("\n") + "\n" + OUT; }, 400);
+        }); });
+      }, 5700);
+    }
+  })();
+
   /* ---------- year ---------- */
   var year = document.getElementById("year");
   if (year) year.textContent = new Date().getFullYear();
