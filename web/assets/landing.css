@@ -3,6 +3,8 @@
    Dark institutional (V7 Labs) × luxury ownership (TitanGate)
    Palette: near-black #0a0a0c · zinc text · indigo→cyan accent
    ============================================================ */
+
+/* Dark Mode CSS Variables - Tuần 2 */
 :root {
   --bg: #0a0a0c;
   --bg-soft: #0e0e12;
@@ -23,6 +25,78 @@
   --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
   --radius: 18px;
   --shadow-lg: 0 30px 80px -20px rgba(0, 0, 0, 0.7);
+  /* Dark mode defaults */
+  --theme: dark;
+}
+
+/* Light Mode Theme */
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-soft: #f8fafc;
+  --bg-card: #f1f5f9;
+  --bg-card-hi: #e2e8f0;
+  --ink: #0f172a;
+  --ink-soft: #475569;
+  --ink-dim: #94a3b8;
+  --line: rgba(0, 0, 0, 0.08);
+  --line-hi: rgba(0, 0, 0, 0.16);
+  --accent: #6366f1;
+  --accent-2: #22d3ee;
+  --accent-ink: #4f46e5;
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --shadow-lg: 0 30px 80px -20px rgba(0, 0, 0, 0.1);
+  --theme: light;
+}
+
+/* Theme Toggle Button Styles */
+.theme-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-soft);
+  transition: all 0.2s ease;
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-card);
+  color: var(--ink);
+}
+
+.theme-toggle .theme-icon {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.theme-toggle .theme-icon.sun {
+  opacity: 1;
+}
+
+[data-theme="dark"] .theme-toggle .theme-icon.sun {
+  opacity: 0;
+}
+
+[data-theme="dark"] .theme-toggle .theme-icon.moon {
+  opacity: 1;
+}
+
+[data-theme="light"] .theme-toggle .theme-icon.sun {
+  opacity: 1;
+}
+
+[data-theme="light"] .theme-toggle .theme-icon.moon {
+  opacity: 0;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }

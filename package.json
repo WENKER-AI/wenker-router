@@ -31,16 +31,23 @@
   ],
   "scripts": {
     "start": "node server/index.js",
+    "start:ts": "node --loader ts-node/esm server/index.ts",
     "dev": "node server/index.js",
+    "dev:ts": "node --loader ts-node/esm server/index.ts",
+    "build": "npx ts-node scripts/build.ts",
     "build:client": "cd client && npm run build",
+    "build:all": "npm run build && npm run build:client",
     "dev:client": "cd client && npm run dev",
     "install:all": "npm install && cd client && npm install",
     "pack:dry": "npm pack --dry-run",
     "web": "node scripts/serve-web.js",
-    "lint": "eslint server/**/*.js scripts/**/*.js bin/*.js",
-    "lint:fix": "eslint --fix server/**/*.js scripts/**/*.js bin/*.js",
-    "format": "prettier --write \"server/**/*.js\" \"scripts/**/*.js\" \"bin/*.js\" \"web/assets/*.js\"",
-    "format:check": "prettier --check \"server/**/*.js\" \"scripts/**/*.js\" \"bin/*.js\" \"web/assets/*.js\""
+    "lint": "eslint server/**/*.ts server/**/*.js scripts/**/*.js bin/*.js",
+    "lint:fix": "eslint --fix server/**/*.ts server/**/*.js scripts/**/*.js bin/*.js",
+    "format": "prettier --write \"server/**/*.ts\" \"server/**/*.js\" \"scripts/**/*.js\" \"bin/*.js\" \"web/assets/*.js\"",
+    "format:check": "prettier --check \"server/**/*.ts\" \"server/**/*.js\" \"scripts/**/*.js\" \"bin/*.js\" \"web/assets/*.js\"",
+    "typecheck": "tsc --noEmit",
+    "test": "npx mocha tests/**/*.test.js --timeout 10000",
+    "test:watch": "npx mocha tests/**/*.test.js --watch --timeout 10000"
   },
   "repository": {
     "type": "git",
@@ -73,11 +80,19 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.12.0",
+    "@types/chai": "^5.2.3",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.20.3",
     "chai": "^6.2.2",
     "chai-http": "^5.1.2",
+    "esbuild": "^0.28.2",
     "eslint": "^9.12.0",
     "globals": "^15.11.0",
     "mocha": "^12.0.1",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^7.0.2"
   }
 }

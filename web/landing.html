@@ -45,6 +45,16 @@
   <link rel="icon" type="image/svg+xml" href="assets/favicon-w.svg" />
   <link rel="stylesheet" href="assets/landing.css" />
   
+  <!-- Dark Mode CSS Variables - Tuần 2 -->
+  <script>
+    // Set dark mode preference before CSS loads
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+  
   <!-- Lazy Loading - Tuần 1: Performance -->
   <link rel="preload" href="assets/landing.css" as="style" />
   <link rel="preload" href="assets/i18n.js" as="script" />
@@ -99,6 +109,29 @@
           trackEvent('Time', '30_seconds', 'Landing Page');
         }
       }, 30000);
+      
+      // Dark Mode Toggle - Tuần 2
+      const themeToggle = document.getElementById('themeToggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+          const currentTheme = document.documentElement.getAttribute('data-theme');
+          const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', newTheme);
+          localStorage.setItem('theme', newTheme);
+          
+          // Track theme change
+          if (typeof trackEvent === 'function') {
+            trackEvent('Preferences', 'theme_change', newTheme);
+          }
+        });
+      }
+      
+      // Listen for system theme changes
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+        }
+      });
     });
   </script>
   
@@ -184,6 +217,16 @@
       <div class="nav-actions">
         <button class="btn btn-ghost btn-sm" data-video-open>▶ Xem video</button>
         <a class="btn btn-primary btn-sm" href="#tai">Tải về</a>
+        <!-- Dark Mode Toggle - Tuần 2 -->
+        <button id="themeToggle" class="theme-toggle" aria-label="Chuyển đổi chủ đề" title="Chuyển đổi chủ đề">
+          <svg class="theme-icon sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5" />
+            <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42m12.72-12.72l1.42-1.42" />
+          </svg>
+          <svg class="theme-icon moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        </button>
         <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
       </div>
     </div>
@@ -703,5 +746,37 @@
 
   <script src="assets/i18n.js"></script>
   <script src="assets/landing.js"></script>
+  
+  <!-- Service Worker Registration - Tuần 2 -->
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/web/sw.js', {
+          scope: '/web/',
+        })
+          .then((registration) => {
+            console.log('[SW] Service Worker registered:', registration.scope);
+            
+            // Update Service Worker when new version available
+            registration.addEventListener('updatefound', () => {
+              console.log('[SW] New version found');
+              const newWorker = registration.installing;
+              newWorker?.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed') {
+                  console.log('[SW] New version installed, reloading...');
+                  if (navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage('skipWaiting');
+                  }
+                }
+              });
+            });
+          })
+          .catch((error) => {
+            console.warn('[SW] Service Worker registration failed:', error);
+          });
+      });
+    }
+  </script>
 </body>
 </html>
