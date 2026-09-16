@@ -8,6 +8,7 @@ import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
 import { RateLimiter } from './middlewares/rateLimiter';
+import { PluginManager } from './plugins/pluginManager';
 
 // Import routes
 import openaiRouter from './routes/openai';
@@ -42,6 +43,9 @@ const app: Express = express();
 const settings = db.getSettings();
 const PORT = process.env.PORT || settings.port || 3600;
 const HOST = process.env.HOST || settings.host || '0.0.0.0';
+
+// Plugin Manager - Tuần 3
+const pluginManager = new PluginManager(app);
 
 // Enable CORS for web apps (OpenWebUI, NextChat, Vite, etc.)
 app.use(
@@ -118,6 +122,37 @@ app.use('/v1', RateLimiter.apiLimiter, openaiRouter);
 app.use('/v1', RateLimiter.apiLimiter, anthropicRouter);
 app.use('/api', RateLimiter.adminLimiter, adminRouter);
 app.use('/api/auth', authRouter); // Auth không bị rate limit để đăng nhập được
+
+// Plugin Routes - Tuần 3
+// Load plugins từ thư mục
+pluginManager.loadPluginsFromDirectory(path.join(__dirname, '..', 'plugins')).catch((err) => {
+  console.error('[PluginManager] Lỗi load plugins:', err);
+});
+
+// Plugin API routes
+app.get('/api/plugins', (req: Request, res: Response) => {
+  const plugins = pluginManager.getPlugins();
+  res.json({
+    plugins: plugins.map((p) => p.config),
+    count: plugins.length,
+  });
+});
+
+app.post('/api/plugins/:id/register', async (req: Request, res: Response) => {
+  const { id } = req.params;
+  // Implement plugin registration via API
+  res.json({ message: 'Plugin registration endpoint', pluginId: id });
+});
+
+app.post('/api/plugins/:id/unregister', async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    await pluginManager.unregisterPlugin(id);
+    res.json({ message: `Plugin ${id} unregistered successfully` });
+  } catch (error) {
+    res.status(404).json({ error: (error as Error).message });
+  }
+});
 
 // Unknown /v1/* endpoints -> clean OpenAI-style JSON error (not an HTML stack trace)
 app.all('/v1/*', (req: Request, res: Response) => {

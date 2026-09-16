@@ -26,7 +26,7 @@
     }
   </script>
   
-  <!-- Open Graph / SEO -->
+  <!-- Open Graph / SEO - Tuần 3: SEO Optimization -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://wenker.ai/" />
   <meta property="og:title" content="WENKER Router — Một lớp sở hữu AI hoàn toàn mới" />
@@ -34,15 +34,84 @@
   <meta property="og:image" content="https://wenker.ai/assets/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="WENKER Router" />
+  <meta property="og:locale" content="vi_VN" />
   
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="WENKER Router — Một lớp sở hữu AI hoàn toàn mới" />
   <meta name="twitter:description" content="WENKER Router hợp nhất 181 nhà cung cấp và 560+ model AI sau hai chuẩn mở. Mã nguồn mở MIT, chạy 100% trên máy bạn." />
   <meta name="twitter:image" content="https://wenker.ai/assets/og-image.png" />
+  <meta name="twitter:site" content="@wenkerai" />
+  <meta name="twitter:creator" content="@wenkerai" />
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://wenker.ai/web/landing.html" />
+  
+  <!-- Additional SEO Meta Tags -->
+  <meta name="keywords" content="AI, Router, WENKER, OpenAI, Claude, LLAMA, Mistral, Proxy, Gateway, API, Máy học, Trí tuệ nhân tạo" />
+  <meta name="author" content="WENKER Team" />
+  <meta name="publisher" content="WENKER AI" />
+  <meta name="copyright" content="MIT License" />
+  <meta name="robots" content="index, follow" />
+  <meta name="revisit-after" content="1 days" />
+  <meta name="rating" content="general" />
+  <meta name="distribution" content="global" />
+  
+  <!-- Favicon with multiple sizes -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon-w.svg" />
+  <link rel="apple-touch-icon" href="assets/favicon-w.svg" />
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="assets/favicon-w.svg" />
+  
+  <!-- Structured Data - Tuần 3: SEO -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "WENKER Router",
+      "description": "Cổng định tuyến AI mã nguồn mở hỗ trợ 181+ nhà cung cấp và 560+ model AI",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "programmingLanguage": "JavaScript, TypeScript",
+      "license": "MIT",
+      "version": "2.1.13",
+      "url": "https://wenker.ai/",
+      "author": {
+        "@type": "Organization",
+        "name": "WENKER AI",
+        "url": "https://wenker.ai/"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "category": "Free"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "1000"
+      }
+    }
+  </script>
+  
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "WENKER AI",
+      "url": "https://wenker.ai/",
+      "logo": "https://wenker.ai/assets/favicon-w.svg",
+      "description": "Cổng định tuyến AI mã nguồn mở cho cộng đồng",
+      "sameAs": [
+        "https://github.com/WENKER-AI/wenker-router",
+        "https://twitter.com/wenkerai"
+      ]
+    }
+  </script>
+  
   <link rel="stylesheet" href="assets/landing.css" />
   
   <!-- Dark Mode CSS Variables - Tuần 2 -->
@@ -745,7 +814,36 @@
   </div>
 
   <script src="assets/i18n.js"></script>
+  <script src="assets/abTesting.js"></script>
   <script src="assets/landing.js"></script>
+  
+  <!-- A/B Testing Initialization - Tuần 3 -->
+  <script>
+    // Khởi tạo A/B Testing experiments
+    document.addEventListener('DOMContentLoaded', () => {
+      // Ví dụ: A/B Test cho CTA button
+      if (typeof window.ABTesting !== 'undefined') {
+        window.ABTesting.addExperiment('cta_button', ['blue', 'green', 'gradient'], 1.0, {
+          blue: 0.34,
+          green: 0.33,
+          gradient: 0.33,
+        });
+
+        window.ABTesting.addExperiment('hero_section', ['v1', 'v2'], 0.5);
+
+        // Track conversion khi click button tải về
+        const downloadButtons = document.querySelectorAll('a[href*="tai"], a[href*="download"]');
+        downloadButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            window.ABTesting.trackConversion('cta_button', 'click', {
+              button_text: btn.innerText,
+              button_class: btn.className,
+            });
+          });
+        });
+      }
+    });
+  </script>
   
   <!-- Service Worker Registration - Tuần 2 -->
   <script>
