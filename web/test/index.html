@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WENKER AI - Nhà Cung Cấp Chính | Official Provider Portal</title>
+    <meta name="description" content="WENKER AI Official Provider Portal - Nhà cung cấp model AI gốc, không cần Base URL hay API Key">
+    <meta name="keywords" content="WENKER AI, AI Provider, Model AI, API, No Base URL, No API Key, Nhà cung cấp AI">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="WENKER AI - Nhà Cung Cấp Chính">
+    <meta property="og:description" content="Nhà cung cấp model AI gốc cho WENKER Router">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#0b1221">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <style>
+        :root {
+            --bg-primary: #0b1221;
+            --bg-secondary: #0f172a;
+            --bg-tertiary: #1e293b;
+            --text-primary: #eaf2ff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #00d4ff;
+            --accent-hover: #00a8c8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --border: #334155;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --gradient: linear-gradient(135deg, #00d4ff 0%, #00a8c8 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Background Pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 212, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.02) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--bg-primary);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--accent);
+        }
+
+        .nav-link.active {
+            color: var(--accent);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient);
+            border-radius: 1px;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-tertiary);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-title .highlight {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .hero-description {
+            font-size: 1rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto 3rem;
+        }
+
+        /* Stats Bar */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            font-size: 1.125rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent 0%, rgba(0, 212, 255, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 40px var(--shadow);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Models Section */
+        .models-section {
+            padding: 4rem 2rem;
+            background: linear-gradient(180deg, transparent 0%, var(--bg-secondary) 50%, transparent 100%);
+        }
+
+        .models-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .toggle-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .toggle-btn.active {
+            background: var(--gradient);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+        }
+
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .model-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .model-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px var(--shadow);
+        }
+
+        .model-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .model-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .model-icon.premium {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
+            color: #000;
+        }
+
+        .model-icon.free {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .model-icon.standard {
+            background: linear-gradient(135deg, #00d4ff 0%, #00a8c8 100%);
+            color: white;
+        }
+
+        .model-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .model-badge.free {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .model-badge.premium {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+        }
+
+        .model-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .model-id {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .model-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .model-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 3rem 2rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .footer-link {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .stats {
+                gap: 1.5rem;
+            }
+
+            .stat-item {
+                min-width: 100px;
+                padding: 0.75rem;
+            }
+
+            .models-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-container {
+                padding: 1rem;
+            }
+
+            .nav {
+                display: none;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero { animation: fadeInUp 0.6s ease-out; }
+        .features-grid > * { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
+        .features-grid > *:nth-child(1) { animation-delay: 0.1s; }
+        .features-grid > *:nth-child(2) { animation-delay: 0.2s; }
+        .features-grid > *:nth-child(3) { animation-delay: 0.3s; }
+        .features-grid > *:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            color: var(--text-primary);
+            box-shadow: 0 10px 40px var(--shadow);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Copy Button */
+        .copy-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+        }
+
+        /* Model Detail Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--error);
+        }
+
+        .code-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">
+                <div class="logo-icon">W</div>
+                <span class="logo-text">WENKER AI</span>
+            </a>
+            <div class="tagline">Nhà Cung Cấp Chính</div>
+            <nav class="nav">
+                <a href="#models" class="nav-link">Models</a>
+                <a href="#features" class="nav-link">Tính Năng</a>
+                <a href="#docs" class="nav-link">Tài Liệu</a>
+                <a href="/ads/" class="nav-link">ADS Portal</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            <span>Nhà Cung Cấp Chính Thức</span>
+        </div>
+        <h1 class="hero-title">
+            WENKER AI <span class="highlight">Provider Portal</span>
+        </h1>
+        <p class="hero-subtitle">
+            Nhà cung cấp model AI gốc, không cần Base URL hay API Key
+        </p>
+        <p class="hero-description">
+            Chúng tôi cung cấp các model AI chất lượng cao trực tiếp từ nhà phát triển. 
+            Không cần cấu hình phức tạp, không cần API key. Chỉ cần chọn model và bắt đầu sử dụng.
+        </p>
+        
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value">182+</div>
+                <div class="stat-label">Providers</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">1000+</div>
+                <div class="stat-label">Models</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">99.9%</div>
+                <div class="stat-label">Uptime</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">0ms</div>
+                <div class="stat-label">No Config</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <h2 class="section-title">Tính Năng Nổi Bật</h2>
+        <p class="section-subtitle">Tại sao nên sử dụng WENKER AI Provider Portal</p>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">Không Cần Cấu Hình</h3>
+                <p class="feature-description">
+                    Sử dụng trực tiếp mà không cần cấu hình Base URL hay API Key. 
+                    Chỉ cần chọn model và bắt đầu chat ngay lập tức.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Tốc Độ Cao</h3>
+                <p class="feature-description">
+                    Kết nối trực tiếp đến các nhà cung cấp AI hàng đầu thế giới. 
+                    Được tối ưu hóa cho tốc độ và độ ổn định.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3 class="feature-title">Bảo Mật An Toàn</h3>
+                <p class="feature-description">
+                    Mọi request được xử lý qua proxy an toàn. 
+                    Không lưu trữ dữ liệu của bạn. Hoàn toàn riêng tư.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🌍</div>
+                <h3 class="feature-title">Hỗ Trợ Toàn Cầu</h3>
+                <p class="feature-description">
+                    Hỗ trợ nhiều nhà cung cấp từ khắp nơi trên thế giới. 
+                    Bao gồm OpenAI, Anthropic, Google, Mistral, v.v.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Models Section -->
+    <section class="models-section" id="models">
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <div class="models-header">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="modelSearch" 
+                           placeholder="Tìm kiếm model (gpt-4, claude, deepseek, ...)">
+                </div>
+                <div class="view-toggle">
+                    <button class="toggle-btn active" data-view="grid">📊 Lưới</button>
+                    <button class="toggle-btn" data-view="list">📋 Danh Sách</button>
+                </div>
+            </div>
+            
+            <div class="models-grid" id="modelsGrid">
+                <!-- Models will be populated by JavaScript -->
+                <div class="spinner" id="loadingSpinner"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>WENKER AI</h3>
+                <p style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.6;">
+                    Nhà cung cấp giải pháp AI Proxy Gateway hàng đầu Việt Nam. 
+                    Kết nối mọi model AI vào một nền tảng thống nhất.
+                </p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Sản Phẩm</h3>
+                <a href="/" class="footer-link">Provider Portal</a>
+                <a href="/ads/" class="footer-link">ADS Portal</a>
+                <a href="/router/" class="footer-link">Router</a>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Hỗ Trợ</h3>
+                <a href="#" class="footer-link">Tài Liệu</a>
+                <a href="#" class="footer-link">API Reference</a>
+                <a href="#" class="footer-link">Community</a>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Thông Tin</h3>
+                <a href="#" class="footer-link">Giới Thiệu</a>
+                <a href="#" class="footer-link">Điều Khoản</a>
+                <a href="#" class="footer-link">Chính Sách</a>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>© 2024 WENKER AI. All rights reserved. | v2.1.13</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Model Detail Modal -->
+    <div class="modal" id="modelModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Model Details</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sample Models Data
+        const models = [
+            {
+                id: 'gpt-4',
+                name: 'GPT-4',
+                provider: 'OpenAI',
+                type: 'premium',
+                category: 'Text',
+                description: 'Model ngôn ngữ mạnh mẽ nhất của OpenAI',
+                context: 32768,
+                maxTokens: 8192,
+                price: '$0.03/1K tokens',
+                tags: ['text', 'reasoning', 'advanced'],
+                usage: 'Chat, Coding, Reasoning',
+                example: 'Xin chào, tôi là GPT-4...'
+            },
+            {
+                id: 'gpt-4-turbo',
+                name: 'GPT-4 Turbo',
+                provider: 'OpenAI',
+                type: 'premium',
+                category: 'Text',
+                description: 'GPT-4 với tốc độ và chi phí thấp hơn',
+                context: 131072,
+                maxTokens: 4096,
+                price: '$0.01/1K tokens',
+                tags: ['text', 'fast', 'efficient'],
+                usage: 'Chat, Coding',
+                example: 'Xin chào, tôi là GPT-4 Turbo...'
+            },
+            {
+                id: 'gpt-4o',
+                name: 'GPT-4o',
+                provider: 'OpenAI',
+                type: 'premium',
+                category: 'Multimodal',
+                description: 'Model đa phương thức (text, image, audio)',
+                context: 131072,
+                maxTokens: 4096,
+                price: '$0.015/1K tokens',
+                tags: ['text', 'image', 'audio', 'multimodal'],
+                usage: 'Chat, Vision, Audio',
+                example: 'Tôi có thể xem và nghe...'
+            },
+            {
+                id: 'gpt-3.5-turbo',
+                name: 'GPT-3.5 Turbo',
+                provider: 'OpenAI',
+                type: 'standard',
+                category: 'Text',
+                description: 'Model GPT-3.5 được tối ưu hóa',
+                context: 16384,
+                maxTokens: 4096,
+                price: '$0.0015/1K tokens',
+                tags: ['text', 'chat', 'general'],
+                usage: 'Chat, General Tasks',
+                example: 'Xin chào, tôi là GPT-3.5...'
+            },
+            {
+                id: 'claude-3-5-sonnet',
+                name: 'Claude 3.5 Sonnet',
+                provider: 'Anthropic',
+                type: 'premium',
+                category: 'Text',
+                description: 'Claude 3.5 với trí thông minh vượt trội',
+                context: 200000,
+                maxTokens: 4096,
+                price: '$0.003/1K tokens',
+                tags: ['text', 'reasoning', 'intelligent'],
+                usage: 'Complex Tasks, Reasoning',
+                example: 'Tôi là Claude 3.5 Sonnet...'
+            },
+            {
+                id: 'claude-3-haiku',
+                name: 'Claude 3 Haiku',
+                provider: 'Anthropic',
+                type: 'standard',
+                category: 'Text',
+                description: 'Claude 3 phiên bản nhanh và hiệu quả',
+                context: 200000,
+                maxTokens: 4096,
+                price: '$0.00025/1K tokens',
+                tags: ['text', 'fast', 'efficient'],
+                usage: 'Quick Tasks, Chat',
+                example: 'Tôi là Claude 3 Haiku...'
+            },
+            {
+                id: 'gemini-1.5-pro',
+                name: 'Gemini 1.5 Pro',
+                provider: 'Google',
+                type: 'premium',
+                category: 'Multimodal',
+                description: 'Model AI đa phương thức của Google',
+                context: 1048576,
+                maxTokens: 8192,
+                price: '$0.0025/1K tokens',
+                tags: ['text', 'image', 'video', 'long-context'],
+                usage: 'Long Context, Multimodal',
+                example: 'Tôi là Gemini 1.5 Pro...'
+            },
+            {
+                id: 'llama-3.1-70b',
+                name: 'Llama 3.1 70B',
+                provider: 'Meta',
+                type: 'free',
+                category: 'Text',
+                description: 'Model mở lành mạnh nhất hiện nay',
+                context: 131072,
+                maxTokens: 4096,
+                price: 'Free',
+                tags: ['text', 'open-source', 'free'],
+                usage: 'General Chat, Coding',
+                example: 'Tôi là Llama 3.1...'
+            },
+            {
+                id: 'deepseek-r1',
+                name: 'DeepSeek R1',
+                provider: 'DeepSeek',
+                type: 'premium',
+                category: 'Text',
+                description: 'Model chuyên về reasoning',
+                context: 32768,
+                maxTokens: 4096,
+                price: '$0.001/1K tokens',
+                tags: ['text', 'reasoning', 'math'],
+                usage: 'Math, Reasoning, Analysis',
+                example: 'Tôi là DeepSeek R1...'
+            },
+            {
+                id: 'mistral-large',
+                name: 'Mistral Large',
+                provider: 'Mistral AI',
+                type: 'standard',
+                category: 'Text',
+                description: 'Model ngôn ngữ của Mistral AI',
+                context: 32768,
+                maxTokens: 4096,
+                price: '$0.002/1K tokens',
+                tags: ['text', 'chat', 'multilingual'],
+                usage: 'Chat, Multilingual',
+                example: 'Je suis Mistral Large...'
+            }
+        ];
+
+        // Filter models based on search
+        function filterModels(searchTerm = '') {
+            const term = searchTerm.toLowerCase();
+            return models.filter(model => 
+                model.name.toLowerCase().includes(term) ||
+                model.id.toLowerCase().includes(term) ||
+                model.provider.toLowerCase().includes(term) ||
+                model.description.toLowerCase().includes(term) ||
+                model.tags.some(tag => tag.includes(term))
+            );
+        }
+
+        // Render models
+        function renderModels(filteredModels = models) {
+            const grid = document.getElementById('modelsGrid');
+            grid.innerHTML = '';
+            
+            if (filteredModels.length === 0) {
+                grid.innerHTML = '<p style="color: var(--text-secondary); text-align: center; grid-column: 1 / -1;">Không tìm thấy model nào.</p>';
+                return;
+            }
+
+            filteredModels.forEach(model => {
+                const card = document.createElement('div');
+                card.className = 'model-card';
+                card.onclick = () => showModelDetails(model);
+                
+                const typeClass = model.type || 'standard';
+                
+                card.innerHTML = `
+                    <div class="model-header">
+                        <div class="model-icon ${typeClass}">${model.provider.charAt(0)}</div>
+                        <span class="model-badge ${typeClass}">${typeClass}</span>
+                    </div>
+                    <div class="model-name">${model.name}</div>
+                    <div class="model-id">${model.id}</div>
+                    <div class="model-meta">
+                        <span>📦 ${model.provider}</span>
+                        <span>🎯 ${model.category}</span>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.75rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${model.description}</p>
+                    <div class="model-stats">
+                        <div class="stat">
+                            <span>💬</span>
+                            <span class="stat-value">${(model.context / 1000).toFixed(0)}K</span>
+                            <span>context</span>
+                        </div>
+                        <div class="stat">
+                            <span>💰</span>
+                            <span class="stat-value">${model.price}</span>
+                        </div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Show model details modal
+        function showModelDetails(model) {
+            const modal = document.getElementById('modelModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalTitle.textContent = `${model.name} (${model.id})`;
+            
+            const typeClass = model.type || 'standard';
+            const copyIdBtn = `<button class="copy-btn" onclick="copyToClipboard('${model.id}')">Copy ID</button>`;
+            
+            modalBody.innerHTML = `
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <div class="model-icon ${typeClass}">${model.provider.charAt(0)}</div>
+                        <div>
+                            <div style="font-size: 1.125rem; font-weight: 600;">${model.provider}</div>
+                            <div style="color: var(--text-muted); font-size: 0.875rem;">${model.category} Model</div>
+                        </div>
+                        <span class="model-badge ${typeClass}" style="margin-left: auto;">${typeClass}</span>
+                    </div>
+                    <p style="color: var(--text-secondary); line-height: 1.7;">${model.description}</p>
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="margin-bottom: 0.75rem; color: var(--text-primary);">Model ID</h4>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-label">ID</span>
+                            ${copyIdBtn}
+                        </div>
+                        <code style="color: var(--accent);">${model.id}</code>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <h4 style="margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.875rem; text-transform: uppercase;">Context Window</h4>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-primary);">${(model.context / 1000).toFixed(0)}K</div>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.875rem; text-transform: uppercase;">Max Tokens</h4>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-primary);">${model.maxTokens.toLocaleString()}</div>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.875rem; text-transform: uppercase;">Price</h4>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: var(--accent);">${model.price}</div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="margin-bottom: 0.75rem; color: var(--text-primary);">Tags</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        ${model.tags.map(tag => `<span style="background: var(--bg-tertiary); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; color: var(--text-secondary);">${tag}</span>`).join('')}
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 style="margin-bottom: 0.75rem; color: var(--text-primary);">Usage</h4>
+                    <p style="color: var(--text-secondary); line-height: 1.7;">${model.usage}</p>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('modelModal');
+            modal.classList.remove('active');
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`Copied: ${text}`);
+            }).catch(() => {
+                showToast('Failed to copy');
+            });
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.opacity = '1';
+            toast.style.visibility = 'visible';
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.visibility = 'hidden';
+            }, 3000);
+        }
+
+        // Initialize
+        function init() {
+            // Render initial models
+            renderModels();
+            
+            // Search functionality
+            const searchInput = document.getElementById('modelSearch');
+            searchInput.addEventListener('input', (e) => {
+                const filtered = filterModels(e.target.value);
+                renderModels(filtered);
+            });
+            
+            // View toggle
+            const viewToggle = document.querySelectorAll('.toggle-btn');
+            viewToggle.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    viewToggle.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+            
+            // Modal close
+            const modalClose = document.getElementById('modalClose');
+            modalClose.addEventListener('click', closeModal);
+            
+            // Close modal on outside click
+            const modal = document.getElementById('modelModal');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        }
+
+        // Start
+        init();
+    </script>
+</body>
+</html>
