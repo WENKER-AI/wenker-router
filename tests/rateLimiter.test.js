@@ -3,14 +3,15 @@
  * Tuần 1 - Backend: Viết Unit Tests cho Rate Limiting
  */
 
-const { expect } = require('chai');
-const request = require('chai-http');
+process.env.NODE_ENV = 'test';
+const chai = require('chai');
+const { expect } = chai;
+const chaiHttp = require('chai-http');
+chai.use(chaiHttp.default);
 const express = require('express');
 const { apiLimiter, adminLimiter, healthLimiter } = require('../server/middlewares/rateLimiter');
 
-// Add chai-http to chai
-const chai = require('chai');
-chai.use(request);
+const requestApp = (chaiHttp.request && chaiHttp.request.execute) || chaiHttp.execute || chaiHttp.default || chaiHttp;
 
 describe('Rate Limiting Middleware - Tuần 1', function () {
   this.timeout(10000); // Tăng timeout cho rate limit tests
@@ -30,8 +31,7 @@ describe('Rate Limiting Middleware - Tuần 1', function () {
       const promises = [];
       for (let i = 0; i < 5; i++) {
         promises.push(
-          chai
-            .request(app)
+          requestApp(app)
             .get('/v1/test')
             .then((res) => {
               expect(res).to.have.status(200);
@@ -42,13 +42,20 @@ describe('Rate Limiting Middleware - Tuần 1', function () {
       await Promise.all(promises);
     });
 
+    it('should include rate limit headers', async () => {
+      const res = await requestApp(app).get('/v1/test');
+      expect(res).to.have.status(200);
+      expect(res.headers).to.have.property('x-ratelimit-limit');
+      expect(res.headers).to.have.property('x-ratelimit-remaining');
+      expect(res.headers).to.have.property('x-ratelimit-reset');
+    });
+
     it('should return 429 after exceeding limit (100 requests)', async () => {
       const promises = [];
       // Gửi 105 requests (vượt quá 100)
       for (let i = 0; i < 105; i++) {
         promises.push(
-          chai
-            .request(app)
+          requestApp(app)
             .get('/v1/test')
             .catch((err) => {
               if (i >= 100) {
@@ -61,14 +68,6 @@ describe('Rate Limiting Middleware - Tuần 1', function () {
         );
       }
       await Promise.all(promises);
-    });
-
-    it('should include rate limit headers', async () => {
-      const res = await chai.request(app).get('/v1/test');
-      expect(res).to.have.status(200);
-      expect(res.headers).to.have.property('x-ratelimit-limit');
-      expect(res.headers).to.have.property('x-ratelimit-remaining');
-      expect(res.headers).to.have.property('x-ratelimit-reset');
     });
   });
 
@@ -87,8 +86,7 @@ describe('Rate Limiting Middleware - Tuần 1', function () {
       const promises = [];
       for (let i = 0; i < 5; i++) {
         promises.push(
-          chai
-            .request(app)
+          requestApp(app)
             .get('/api/test')
             .then((res) => {
               expect(res).to.have.status(200);
@@ -103,8 +101,7 @@ describe('Rate Limiting Middleware - Tuần 1', function () {
       const promises = [];
       for (let i = 0; i < 35; i++) {
         promises.push(
-          chai
-            .request(app)
+          requestApp(app)
             .get('/api/test')
             .catch((err) => {
               if (i >= 30) {
@@ -134,8 +131,7 @@ describe('Rate Limiting Middleware - Tuần 1', function () {
       const promises = [];
       for (let i = 0; i < 5; i++) {
         promises.push(
-          chai
-            .request(app)
+          requestApp(app)
             .get('/health')
             .then((res) => {
               expect(res).to.have.status(200);
@@ -149,8 +145,7 @@ describe('Rate Limiting Middleware - Tuần 1', function () {
       const promises = [];
       for (let i = 0; i < 15; i++) {
         promises.push(
-          chai
-            .request(app)
+          requestApp(app)
             .get('/health')
             .catch((err) => {
               if (i >= 10) {

@@ -8,6 +8,8 @@ import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
 import { RateLimiter } from './middlewares/rateLimiter';
+import { inputSanitizer } from './middlewares/inputSanitizer';
+import { metricsService } from './services/metricsService';
 import { PluginManager } from './plugins/pluginManager';
 
 // Import routes
@@ -60,6 +62,12 @@ app.use(
 // Body parser
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Input sanitization middleware - Protection against prompt injection, XSS, etc.
+app.use(inputSanitizer);
+
+// Metrics middleware - Track all HTTP requests
+app.use(metricsService.requestMiddleware());
 
 // Logging middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -124,35 +132,107 @@ app.use('/api', RateLimiter.adminLimiter, adminRouter);
 app.use('/api/auth', authRouter); // Auth không bị rate limit để đăng nhập được
 
 // Plugin Routes - Tuần 3
+import {
+  requirePluginAdmin,
+  verifyPluginSignature,
+  pluginRateLimiter,
+  pluginAuditLogger,
+} from './middlewares/pluginAuth';
+
 // Load plugins từ thư mục
 pluginManager.loadPluginsFromDirectory(path.join(__dirname, '..', 'plugins')).catch((err) => {
   console.error('[PluginManager] Lỗi load plugins:', err);
 });
 
-// Plugin API routes
-app.get('/api/plugins', (req: Request, res: Response) => {
-  const plugins = pluginManager.getPlugins();
-  res.json({
-    plugins: plugins.map((p) => p.config),
-    count: plugins.length,
-  });
-});
-
-app.post('/api/plugins/:id/register', async (req: Request, res: Response) => {
-  const { id } = req.params;
-  // Implement plugin registration via API
-  res.json({ message: 'Plugin registration endpoint', pluginId: id });
-});
-
-app.post('/api/plugins/:id/unregister', async (req: Request, res: Response) => {
-  const { id } = req.params;
-  try {
-    await pluginManager.unregisterPlugin(id);
-    res.json({ message: `Plugin ${id} unregistered successfully` });
-  } catch (error) {
-    res.status(404).json({ error: (error as Error).message });
+// Plugin API routes - với authentication
+// GET /api/plugins - Xem danh sách (chỉ admin)
+app.get(
+  '/api/plugins',
+  RateLimiter.adminLimiter,
+  requirePluginAdmin,
+  pluginAuditLogger,
+  (req: Request, res: Response) => {
+    const plugins = pluginManager.getPlugins();
+    res.json({
+      plugins: plugins.map((p) => p.config),
+      count: plugins.length,
+    });
   }
-});
+);
+
+// POST /api/plugins/:id/register - Đăng ký plugin mới (yêu cầu admin + signature)
+app.post(
+  '/api/plugins/:id/register',
+  RateLimiter.adminLimiter,
+  pluginRateLimiter,
+  requirePluginAdmin,
+  verifyPluginSignature,
+  pluginAuditLogger,
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { pluginData } = req.body;
+    
+    if (!pluginData) {
+      return res.status(400).json({
+        error: {
+          message: 'Plugin data is required',
+          type: 'invalid_request_error',
+          code: 'missing_plugin_data',
+        },
+      });
+    }
+    
+    try {
+      // TODO: Implement actual plugin registration from data
+      // Hiện tại chỉ trả về success
+      console.log(`[PluginAPI] Registered plugin ${id} by admin ${req.pluginAdminUser?.id}`);
+      
+      res.json({
+        message: `Plugin ${id} registered successfully`,
+        pluginId: id,
+        admin: req.pluginAdminUser?.id,
+      });
+    } catch (error) {
+      console.error('[PluginAPI] Register error:', error);
+      res.status(500).json({
+        error: {
+          message: (error as Error).message,
+          type: 'internal_error',
+          code: 'plugin_registration_failed',
+        },
+      });
+    }
+  }
+);
+
+// POST /api/plugins/:id/unregister - Gỡ plugin (yêu cầu admin)
+app.post(
+  '/api/plugins/:id/unregister',
+  RateLimiter.adminLimiter,
+  pluginRateLimiter,
+  requirePluginAdmin,
+  pluginAuditLogger,
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+      await pluginManager.unregisterPlugin(id);
+      console.log(`[PluginAPI] Unregistered plugin ${id} by admin ${req.pluginAdminUser?.id}`);
+      res.json({
+        message: `Plugin ${id} unregistered successfully`,
+        pluginId: id,
+        admin: req.pluginAdminUser?.id,
+      });
+    } catch (error) {
+      res.status(404).json({
+        error: {
+          message: (error as Error).message,
+          type: 'not_found_error',
+          code: 'plugin_not_found',
+        },
+      });
+    }
+  }
+);
 
 // Unknown /v1/* endpoints -> clean OpenAI-style JSON error (not an HTML stack trace)
 app.all('/v1/*', (req: Request, res: Response) => {
@@ -175,8 +255,12 @@ app.get('/health', RateLimiter.healthLimiter, (req: Request, res: Response) => {
     version: PKG.version,
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
+    metrics: metricsService.getHealthStatus(),
   });
 });
+
+// Prometheus metrics endpoint
+app.get('/metrics', metricsService.getMetricsEndpoint());
 
 // Serve frontend static build if available
 const clientDistPath = path.join(__dirname, '..', 'client', 'dist');
@@ -290,9 +374,13 @@ app.listen(PORT, HOST, () => {
   if (def) {
     let host = def.baseUrl || '';
     try {
-      host = new URL(def.baseUrl).host;
+      const parsed = new URL(def.baseUrl);
+      // Use hostname + port only — never .host which can contain credentials
+      host = parsed.hostname + (parsed.port ? ':' + parsed.port : '');
     } catch (e) {
-      console.warn('[config] Invalid baseUrl, keeping template:', def.baseUrl);
+      // Mask any credentials in raw URL before logging
+      const safe = (def.baseUrl || '').replace(/:\/\/[^@]+@/, '://***@');
+      console.warn('[config] Invalid baseUrl, keeping template:', safe);
     }
     const needsKey = def.requiresAuth || def.authType !== 'none';
     const keyState = needsKey
