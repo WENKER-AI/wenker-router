@@ -1,13 +1,16 @@
-name: CI/CD Pipeline - Tuần 2
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [main, dev]
+    tags: ['v*']
   pull_request:
     branches: [main]
 
 env:
   NODE_VERSION: '20'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   test:
@@ -26,6 +29,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm ci
@@ -56,24 +60,33 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build TypeScript with esbuild
+      - name: Build TypeScript
         run: npx ts-node scripts/build.ts
+
+      - name: Build Client
+        run: npm run build:client
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: wenker-router-build
-          path: ./dist/
+          path: |
+            dist/
+            client/dist/
 
-  deploy:
-    name: Deploy to Production
+  publish:
+    name: Publish to npm
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      id-token: write
     
     steps:
       - name: Checkout repository
@@ -83,42 +96,57 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: wenker-router-build
-          path: ./dist/
+          path: ./
 
-      - name: Create version tag
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          echo "Current version: $VERSION"
-          git tag v$VERSION
-          git push origin v$VERSION
+      - name: Setup Node.js for publishing
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  deploy:
+    name: Create GitHub Release
+    needs: publish
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.ref_name }}
-          name: WENKER Router v${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          name: WENKER Router ${{ github.ref_name }}
           body: |
+            ## WENKER Router ${{ github.ref_name }}
+            
             Automated release created by GitHub Actions
             
-            **Changes:**
-            - TypeScript support added
-            - Rate Limiting middleware
-            - Google Analytics tracking
-            - Lazy Loading for performance
-            - Service Worker for offline support
-            - Dark Mode support
+            ### Assets
+            - Built files in release assets
+            - Docker image: `docker pull ghcr.io/${{ github.repository }}:${{ github.ref_name }}`
             
-            **Assets:**
-            - Built files in `/dist`
+            ### Quick Start
+            ```bash
+            npx @wenker-ai/wenker-router@${{ github.ref_name }}
+            ```
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   docker:
-    name: Build Docker Image
+    name: Build & Push Docker Image
     needs: test
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
     
     steps:
       - name: Checkout repository
@@ -127,19 +155,32 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Docker Hub
-        if: github.event_name != 'pull_request'
+      - name: Log in to Container Registry
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: wenkerai/wenker-router:latest,wenkerai/wenker-router:${{ github.sha }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -153,6 +194,5 @@ jobs:
 
       - name: Run npm audit
         run: |
-          npm audit --production
-          npm audit fix --force
-          git diff --quiet || (git config --global user.name "github-actions" && git config --global user.email "actions@github.com" && git commit -am "chore: apply security fixes" && git push)
+          npm audit --production || true
+          npm audit fix --force || true

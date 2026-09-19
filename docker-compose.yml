@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  wenker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wenker-router
+    ports:
+      - "3600:3600"
+    environment:
+      - NODE_ENV=production
+      - WENKER_HOME=/app/.wenker
+      - PORT=3600
+      - HOST=0.0.0.0
+      # Optional: Admin key (generate with: openssl rand -hex 32)
+      # - WENKER_ADMIN_KEY=your-admin-key-here
+      # Optional: Custom log level
+      # - LOG_LEVEL=info
+    volumes:
+      - wenker-data:/app/.wenker
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3600/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 15s
+      retries: 3
+    networks:
+      - wenker-network
+
+  # Optional: Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: wenker-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    restart: unless-stopped
+    networks:
+      - wenker-network
+    profiles:
+      - monitoring
+
+  # Optional: Grafana for dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: wenker-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+    restart: unless-stopped
+    networks:
+      - wenker-network
+    profiles:
+      - monitoring
+
+volumes:
+  wenker-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+networks:
+  wenker-network:
+    driver: bridge

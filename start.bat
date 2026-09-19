@@ -3,20 +3,20 @@ title WENKER Router - Local AI Proxy Gateway
 color 0b
 echo ============================================================
 echo   WENKER Router - Local AI Proxy Gateway v2.0
-echo   Ho tro 180+ AI Providers & WENKER Cloud Free Models
+echo   Supports over 180 AI providers and free models on WENKER Cloud.
 echo ============================================================
 echo.
 
 where node >nul 2>nul
 if %errorlevel% neq 0 (
-    echo [ERROR] Node.js chua duoc cai dat tren may!
-    echo Vui long tai va cai dat Node.js tu: https://nodejs.org/
+    echo [ERROR] Node.js has not been installed on the system!
+    echo Please download and install Node.js from: https://nodejs.org/
     pause
     exit /b
 )
 
-echo [INFO] Dang khoi dong may chu WENKER Router tren cong 3600...
-echo [INFO] Mo trinh duyet tai: http://localhost:3600
+echo [INFO] Starting WENKER Router server on port 3600...
+echo [INFO] Opening browser at: http://localhost:3600
 start http://localhost:3600
 
 node server/index.js

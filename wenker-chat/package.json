@@ -1,0 +1,37 @@
+{
+  "name": "@wenker-ai/wenker-chat",
+  "version": "0.1.0",
+  "description": "Simple terminal AI chat client for WENKER Router",
+  "type": "module",
+  "bin": {
+    "wenker-chat": "./dist/index.js",
+    "wenker": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "axios": "^1.6.7",
+    "chalk": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "tsx": "^4.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist/"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WENKER-AI/wenker-router.git"
+  },
+  "homepage": "https://github.com/WENKER-AI/wenker-router#wenker-chat",
+  "license": "MIT"
+}
