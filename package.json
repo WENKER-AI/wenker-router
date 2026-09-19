@@ -1,6 +1,6 @@
 {
   "name": "@wenker-ai/wenker-router",
-  "version": "2.1.15",
+  "version": "2.1.16",
   "description": "WENKER Router - Open Source Local AI Proxy Gateway supporting 180+ providers and WENKER Cloud",
   "main": "server/index.js",
   "bin": {

@@ -163,13 +163,14 @@ function checkPluginPermissions(requiredPermissions = []) {
  * Middleware để rate limit plugin operations
  * Tránh brute force attacks
  */
+const { ipKeyGenerator } = require('express-rate-limit');
 const pluginRateLimiter = require('express-rate-limit')({
   windowMs: 60 * 1000, // 1 phút
   max: 10, // 10 requests/phút cho plugin operations
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
-    return req.pluginAdminKey || req.ip;
+    return req.pluginAdminKey || ipKeyGenerator(req);
   },
   handler: (req, res) => {
     res.status(429).json({
@@ -183,7 +184,7 @@ const pluginRateLimiter = require('express-rate-limit')({
   },
   skip: (req) => {
     // Skip cho loopback
-    const LOOPBACK = /^(::1|::ffff:127\.0\.0\.1|127(\._\d+){3})$/;
+    const LOOPBACK = /^(::1|::ffff:127\.0\.0\.1|127(\.\d+){3})$/;
     const remote = req.socket.remoteAddress || '';
     return LOOPBACK.test(remote);
   },

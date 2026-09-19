@@ -219,7 +219,17 @@ const notFoundPage = path.join(webPath, '404.html');
 
 // Fallback cho SPA: chỉ những đường dẫn "giống trang" (không có phần mở rộng)
 // mới được đưa về index.html để React tự xử lý tab.
+// Skip API paths to avoid intercepting /metrics, /health, /v1/*, /api/*
+const API_PATHS = ['/health', '/metrics', '/metrics/json'];
 app.get('*', (req, res) => {
+  // Skip API paths entirely
+  if (API_PATHS.some(p => req.path === p || req.path.startsWith(p + '/')) ||
+      req.path.startsWith('/v1/') ||
+      req.path.startsWith('/api/')) {
+    return res.status(404).json({
+      error: { message: 'Not found', type: 'invalid_request_error', code: 'not_found' }
+    });
+  }
   if (/\.[a-z0-9]{1,10}$/i.test(req.path)) {
     return res
       .status(404)

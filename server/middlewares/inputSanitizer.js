@@ -94,6 +94,8 @@ function checkInjectionPatterns(content) {
  * @returns {Object} - { messages: Array, warnings: string[] }
  */
 function sanitizeMessages(messages) {
+  // Local reference to avoid potential scoping issues
+  const CONFIG = SANITIZATION_CONFIG;
   const warnings = [];
   const sanitized = [];
   
@@ -102,9 +104,9 @@ function sanitizeMessages(messages) {
   }
   
   // Limit number of messages
-  const limitedMessages = messages.slice(0, SANITIZATION_CONFIG.maxMessages);
-  if (messages.length > SANITATION_CONFIG.maxMessages) {
-    warnings.push(`Message count truncated from ${messages.length} to ${SANITIZATION_CONFIG.maxMessages}`);
+  const limitedMessages = messages.slice(0, CONFIG.maxMessages);
+  if (messages.length > CONFIG.maxMessages) {
+    warnings.push(`Message count truncated from ${messages.length} to ${CONFIG.maxMessages}`);
   }
   
   for (const msg of limitedMessages) {
@@ -134,9 +136,9 @@ function sanitizeMessages(messages) {
     
     // Sanitize tool_calls
     if (Array.isArray(msg.tool_calls)) {
-      const limitedTools = msg.tool_calls.slice(0, SANITIZATION_CONFIG.maxToolCalls);
-      if (msg.tool_calls.length > SANITIZATION_CONFIG.maxToolCalls) {
-        warnings.push(`Tool calls truncated from ${msg.tool_calls.length} to ${SANITIZATION_CONFIG.maxToolCalls}`);
+      const limitedTools = msg.tool_calls.slice(0, CONFIG.maxToolCalls);
+      if (msg.tool_calls.length > CONFIG.maxToolCalls) {
+        warnings.push(`Tool calls truncated from ${msg.tool_calls.length} to ${CONFIG.maxToolCalls}`);
       }
       sanitizedMsg.tool_calls = limitedTools.map(tc => {
         if (!tc || typeof tc !== 'object') return tc;
