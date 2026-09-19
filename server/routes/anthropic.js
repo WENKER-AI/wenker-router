@@ -4,9 +4,9 @@ const db = require('../services/dbService');
 const proxyService = require('../services/proxyService');
 
 function authenticateAnthropicKey(req, res, next) {
-  const authKey = req.headers['x-api-key'] || req.headers.authorization || "";
+  const authKey = req.headers['x-api-key'] || req.headers.authorization || '';
   if (!authKey) {
-    req.wenkerKey = "sk-wenker-free-playground";
+    req.wenkerKey = 'sk-wenker-free-playground';
     return next();
   }
   const validKey = db.validateKey(authKey);
@@ -28,17 +28,17 @@ router.post('/messages', authenticateAnthropicKey, async (req, res) => {
       req,
       res,
       body: req.body,
-      wenkerKey: req.wenkerKey
+      wenkerKey: req.wenkerKey,
     });
   } catch (err) {
-    console.error("Anthropic Route Error:", err);
+    console.error('Anthropic Route Error:', err);
     if (!res.headersSent) {
       res.status(500).json({
-        type: "error",
+        type: 'error',
         error: {
-          type: "api_error",
-          message: err.message || "Internal Server Error"
-        }
+          type: 'api_error',
+          message: err.message || 'Internal Server Error',
+        },
       });
     }
   }

@@ -15,9 +15,23 @@ const HEALTH_STALE_MS = 15 * 60 * 1000;
 
 // Providers that are realistically free to probe (no paid key burned per request).
 const PROBEABLE = [
-  'wenker-cloud', 'wenker-vip', 'wenker-community', 'pollinations', 'duckduckgo',
-  'openrouter', 'github-models', 'groq', 'groq-free', 'google-gemini', 'cerebras',
-  'sambanova', 'nim-nvidia', 'mistral', 'together', 'deepinfra', 'cloudflare-workers-ai'
+  'wenker-cloud',
+  'wenker-vip',
+  'wenker-community',
+  'pollinations',
+  'duckduckgo',
+  'openrouter',
+  'github-models',
+  'groq',
+  'groq-free',
+  'google-gemini',
+  'cerebras',
+  'sambanova',
+  'nim-nvidia',
+  'mistral',
+  'together',
+  'deepinfra',
+  'cloudflare-workers-ai',
 ];
 
 class HealthService {
@@ -41,27 +55,39 @@ class HealthService {
           messages: PROBE_MESSAGES,
           stream: false,
           res: null,
-          targetModel: provider.models?.find(m => m.id === 'wenker-deepseek-v3-free')?.targetModel || 'openai-fast'
+          targetModel:
+            provider.models?.find((m) => m.id === 'wenker-deepseek-v3-free')?.targetModel ||
+            'openai-fast',
         });
         const text = data.choices?.[0]?.message?.content;
         if (!text) throw new Error('upstream trả về rỗng');
         result = { ok: true, sample: String(text).slice(0, 60) };
       } else if (provider.id === 'duckduckgo') {
         const data = await freeProxyService.handleDuckDuckGo({
-          model: 'ddg-gpt-4o-mini', messages: PROBE_MESSAGES, stream: false, res: null
+          model: 'ddg-gpt-4o-mini',
+          messages: PROBE_MESSAGES,
+          stream: false,
+          res: null,
         });
         const text = data.choices?.[0]?.message?.content;
         if (!text) throw new Error('upstream trả về rỗng');
         result = { ok: true, sample: String(text).slice(0, 60) };
       } else {
         if (provider.requiresAuth && !provider.userApiKey) {
-          throw Object.assign(new Error('Chưa cấu hình API Key'), { status: 401, code: 'missing_api_key' });
+          throw Object.assign(new Error('Chưa cấu hình API Key'), {
+            status: 401,
+            code: 'missing_api_key',
+          });
         }
         const model = provider.models?.[0];
         const base = String(provider.baseUrl || '').replace(/\/+$/, '');
         if (!base || !/^https?:\/\//i.test(base)) throw new Error('Base URL không hợp lệ');
         const url = base.endsWith('/chat/completions') ? base : `${base}/chat/completions`;
-        const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'User-Agent': 'WENKER-Router/2.0' };
+        const headers = {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'User-Agent': 'WENKER-Router/2.0',
+        };
         const key = provider.userApiKey || '';
         if (key) {
           if (provider.authType === 'api-key') headers[provider.headerName || 'x-api-key'] = key;
@@ -71,12 +97,19 @@ class HealthService {
         const res = await fetch(url, {
           method: 'POST',
           headers,
-          body: JSON.stringify({ model: model?.targetModel || model?.id, messages: PROBE_MESSAGES, stream: false, max_tokens: 8 }),
-          signal: AbortSignal.timeout(PROBE_TIMEOUT_MS)
+          body: JSON.stringify({
+            model: model?.targetModel || model?.id,
+            messages: PROBE_MESSAGES,
+            stream: false,
+            max_tokens: 8,
+          }),
+          signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
         });
         if (!res.ok) {
           const t = await res.text().catch(() => '');
-          throw Object.assign(new Error(`HTTP ${res.status}: ${t.slice(0, 140)}`), { status: res.status });
+          throw Object.assign(new Error(`HTTP ${res.status}: ${t.slice(0, 140)}`), {
+            status: res.status,
+          });
         }
         const data = await res.json();
         const text = data.choices?.[0]?.message?.content;
@@ -84,19 +117,30 @@ class HealthService {
         result = { ok: true, sample: String(text).slice(0, 60) };
       }
     } catch (err) {
-      // "needsKey" must mean "this provider cannot work without a key" (requiresAuth),
-      // not merely "the upstream answered 401". The anonymous Pollinations/WENKER Cloud
-      // tier answers 401/402/403 when its free budget runs out, and labelling that
-      // "Cần API key" is exactly what made WENKER Cloud look key-gated.
+      // "needsKey" must mean "this provider cannot work without a key", i.e. it
+      // requires auth AND no key/cookie has been configured yet. Once a key exists,
+      // an upstream 401/403 means that key was REJECTED and 402 means the account is
+      // out of budget - neither is a request to paste a new key, and labelling them
+      // "Cần API key" makes a saved key look like it was never stored.
       const authRequired = Boolean(provider.requiresAuth);
-      const rejectedForAuth = err.code === 'missing_api_key' || err.status === 401 || err.status === 402 || err.status === 403;
+      const hasKey = Boolean(provider.userApiKey || provider.userCookie);
+      const missingKey = authRequired && !hasKey;
+      const rejectedForAuth =
+        err.code === 'missing_api_key' ||
+        err.status === 401 ||
+        err.status === 402 ||
+        err.status === 403;
       result = {
         ok: false,
         status: err.status || 0,
         error: String(err.message || err).slice(0, 220),
-        needsKey: authRequired && rejectedForAuth,
+        needsKey: missingKey && (err.code === 'missing_api_key' || rejectedForAuth),
+        // A stored key that the upstream refuses to accept (wrong / expired / revoked).
+        keyInvalid: hasKey && (err.status === 401 || err.status === 403),
+        // A stored key whose account ran out of budget / credits (402 Payment Required).
+        keyExhausted: hasKey && err.status === 402,
         // Free tier that is alive but rate/budget-limited: a key would help, it is not mandatory.
-        keyWouldHelp: !authRequired && rejectedForAuth
+        keyWouldHelp: !authRequired && rejectedForAuth,
       };
     }
 
@@ -110,7 +154,7 @@ class HealthService {
    */
   probeAll(ids = PROBEABLE) {
     if (this._running) return this._running;
-    const list = ids.map(id => db.getProviderById(id)).filter(Boolean);
+    const list = ids.map((id) => db.getProviderById(id)).filter(Boolean);
     this._running = (async () => {
       const out = {};
       const queue = [...list];

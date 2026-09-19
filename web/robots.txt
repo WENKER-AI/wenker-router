@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+Sitemap: https://wenker.ai/sitemap.xml
+
+# Crawl delay to be polite
+Crawl-delay: 2

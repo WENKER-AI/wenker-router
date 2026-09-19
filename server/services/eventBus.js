@@ -39,7 +39,11 @@ function subscribe(req, res) {
 
   // Giu ket noi song qua cac mang/ proxy co timeout: ping dinh ky.
   const heartbeat = setInterval(() => {
-    try { res.write(': ping\n\n'); } catch (e) { /* se bi clean ben duoi */ }
+    try {
+      res.write(': ping\n\n');
+    } catch (e) {
+      /* se bi clean ben duoi */
+    }
   }, 25000);
 
   req.on('close', () => {

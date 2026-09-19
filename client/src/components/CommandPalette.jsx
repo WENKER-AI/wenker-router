@@ -44,7 +44,7 @@ export default function CommandPalette({ open, onClose, setActiveTab }) {
     },
     {
       id: 'docs', label: t('cmd.docs'), icon: ExternalLink, kind: 'action',
-      run: () => window.open('/web/', '_blank'),
+      run: () => window.open('/wenker/', '_blank'),
     },
   ];
 

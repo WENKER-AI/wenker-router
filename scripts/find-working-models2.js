@@ -25,17 +25,19 @@ function req(method, path, body, timeoutMs) {
       },
       (res) => {
         let buf = '';
-        res.on('data', (c) => (buf += c));
+        res.on('data', (c) => buf += c);
         res.on('end', () => {
           let json = null;
           try {
             json = JSON.parse(buf);
-          } catch (e) {}
+          } catch (e) { /* ignore JSON parse error */ }
           resolve({ status: res.statusCode, text: buf, json, ms: Date.now() - t0 });
         });
-      }
+      },
     );
-    r.on('error', (e) => resolve({ status: 0, text: e.code || e.message, json: null, ms: Date.now() - t0 }));
+    r.on('error', (e) =>
+      resolve({ status: 0, text: e.code || e.message, json: null, ms: Date.now() - t0 }),
+    );
     r.on('timeout', () => {
       r.destroy();
       resolve({ status: -1, text: 'timeout', json: null, ms: Date.now() - t0 });
@@ -45,7 +47,8 @@ function req(method, path, body, timeoutMs) {
   });
 }
 
-const REFUSAL = /reached its budget|payment required|rate limit|too many requests|quota|invalid api key|no healthy upstream|is unavailable|not authorized/i;
+const REFUSAL =
+  /reached its budget|payment required|rate limit|too many requests|quota|invalid api key|no healthy upstream|is unavailable|not authorized/i;
 
 function contentOf(r) {
   if (r.json && r.json.choices && r.json.choices[0]) {
@@ -68,7 +71,9 @@ async function main() {
   }
   const picked = [];
   for (const [p, list] of byProv) {
-    list.sort((a, b) => (a.wenker_needs_key === false ? 0 : 1) - (b.wenker_needs_key === false ? 0 : 1));
+    list.sort(
+      (a, b) => (a.wenker_needs_key === false ? 0 : 1) - (b.wenker_needs_key === false ? 0 : 1),
+    );
     picked.push(list[0]);
   }
   console.log('Thu ' + picked.length + ' model (moi nhom 1 model), TUAN TU, prompt ngan "hi".\n');
@@ -88,26 +93,47 @@ async function main() {
     let verdict;
     if (r.status !== 200 || !c) {
       verdict = 'CHET';
-      dead.push({ id: model.id, prov: model.wenker_provider, why: 'HTTP ' + r.status + ' ' + r.text.slice(0, 70) });
+      dead.push({
+        id: model.id,
+        prov: model.wenker_provider,
+        why: 'HTTP ' + r.status + ' ' + r.text.slice(0, 70),
+      });
     } else if (REFUSAL.test(c)) {
       verdict = 'TU CHOI';
-      refused.push({ id: model.id, prov: model.wenker_provider, served, txt: c.replace(/\s+/g, ' ').slice(0, 70) });
+      refused.push({
+        id: model.id,
+        prov: model.wenker_provider,
+        served,
+        txt: c.replace(/\s+/g, ' ').slice(0, 70),
+      });
     } else {
       verdict = 'SONG';
-      real.push({ id: model.id, prov: model.wenker_provider, served, txt: c.replace(/\s+/g, ' ').slice(0, 70), ms: r.ms });
+      real.push({
+        id: model.id,
+        prov: model.wenker_provider,
+        served,
+        txt: c.replace(/\s+/g, ' ').slice(0, 70),
+        ms: r.ms,
+      });
     }
     console.log(
-      verdict.padEnd(9) + model.id.padEnd(30) +
-        '[' + String(model.wenker_provider).padEnd(19) + '] ' +
-        String(r.ms).padStart(6) + 'ms  ' +
+      verdict.padEnd(9) +
+        model.id.padEnd(30) +
+        '[' +
+        String(model.wenker_provider).padEnd(19) +
+        '] ' +
+        String(r.ms).padStart(6) +
+        'ms  ' +
         (served && served !== model.id ? '(phuc vu: ' + served + ') ' : '') +
-        (c ? '"' + c.replace(/\s+/g, ' ').slice(0, 60) + '"' : r.text.slice(0, 60))
+        (c ? '"' + c.replace(/\s+/g, ' ').slice(0, 60) + '"' : r.text.slice(0, 60)),
     );
   }
 
   console.log('\n============ TONG KET (prompt ngan, tuan tu) ============');
   console.log('MAI MAI TRA LOI THAT : ' + real.length);
-  real.forEach((x) => console.log('   ' + x.id + '   (' + x.prov + ', ' + x.ms + 'ms)  "' + x.txt + '"'));
+  real.forEach((x) =>
+    console.log('   ' + x.id + '   (' + x.prov + ', ' + x.ms + 'ms)  "' + x.txt + '"'),
+  );
   console.log('\nBI TU CHOI (upstream from choi) : ' + refused.length);
   refused.forEach((x) => console.log('   ' + x.id + '   (' + x.prov + ')  ' + x.txt));
   console.log('\nCHET HAN : ' + dead.length);

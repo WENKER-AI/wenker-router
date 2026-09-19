@@ -11,20 +11,20 @@
  *   HOST=0.0.0.0     địa chỉbind
  *   WENKER_HOME=...  thư mục dữ liệu (mặc định ~/.wenker)
  */
-"use strict";
 
-const path = require("path");
+
+const path = require('path');
 
 // Kiểm tra sớm để báo lỗi dễ hiểu thay vì crash khó đọc bên trong server.
-const major = Number(process.versions.node.split(".")[0]);
+const major = Number(process.versions.node.split('.')[0]);
 if (major < 18) {
   console.error(
     `\nWENKER Router cần Node.js >= 18 (phát hiện ${process.versions.node}).\n` +
-    "Node 18 trở lên mới có fetch() toàn cục, bắt buộc để gọi các nhà cung cấp AI.\n" +
-    "Tải bản mới nhất tại: https://nodejs.org/\n"
+      'Node 18 trở lên mới có fetch() toàn cục, bắt buộc để gọi các nhà cung cấp AI.\n' +
+      'Tải bản mới nhất tại: https://nodejs.org/\n',
   );
   process.exit(1);
 }
 
-const entry = path.join(__dirname, "..", "server", "index.js");
+const entry = path.join(__dirname, '..', 'server', 'index.js');
 require(entry);

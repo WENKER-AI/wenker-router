@@ -23,7 +23,7 @@ const DATA_FILES = [
   'api-keys.json',
   'custom-providers.json',
   'routing-rules.json',
-  'logs.json'
+  'logs.json',
 ];
 
 function migrateLegacyData() {
@@ -80,7 +80,7 @@ function localDay(date = new Date()) {
   return [
     date.getFullYear(),
     String(date.getMonth() + 1).padStart(2, '0'),
-    String(date.getDate()).padStart(2, '0')
+    String(date.getDate()).padStart(2, '0'),
   ].join('-');
 }
 
@@ -106,7 +106,7 @@ function defaultUsers() {
       tokens: 0,
       bonusUsed: 0,
       adCreditAmount: AD_CREDIT_AMOUNT,
-      adCreditsMax: AD_CREDIT_MAX_PER_DAY
+      adCreditsMax: AD_CREDIT_MAX_PER_DAY,
     };
   }
   return map;
@@ -148,7 +148,29 @@ const defaultSettings = {
   // Honest errors: unknown model names answer 404 with the real model list instead
   // of silently routing to the dead default upstream.
   strictModelResolution: true,
-  fallbackOrder: ['wenker-cloud', 'openrouter', 'groq', 'google-gemini', 'nim-nvidia', 'duckduckgo', 'pollinations'],
+  fallbackOrder: [
+    'wenker-cloud',
+    'openrouter',
+    'groq',
+    'google-gemini',
+    'nim-nvidia',
+    'duckduckgo',
+    'pollinations',
+  ],
+  // Failover chain exponential backoff config
+  failoverBaseDelayMs: 1000,      // Initial delay: 1s
+  failoverMaxDelayMs: 10000,      // Max delay: 10s
+  failoverJitterFactor: 0.3,      // 30% jitter to prevent thundering herd
+  // Proactive health check config
+  enableProactiveHealthCheck: true,
+  proactiveHealthCheckIntervalMs: 5 * 60 * 1000,  // 5 minutes
+  proactiveHealthCheckConcurrency: 3,
+  proactiveHealthCheckTimeoutMs: 30000,
+  proactiveHealthCheckProviders: [],  // Empty = use default PROBEABLE list
+  // Default timeouts (can be overridden per provider)
+  defaultRequestTimeoutMs: 60000,    // 60s default for chat completions
+  defaultHealthCheckTimeoutMs: 30000, // 30s for health checks
+  defaultFreeTierTimeoutMs: 45000,   // 45s for free tier (Pollinations/DuckDuckGo)
   // Free WENKER Cloud allowance per login user per day (see ~/.wenker/users.json).
   wenkerCloudDailyLimit: DEFAULT_DAILY_LIMIT,
   // Outbound VPN / HTTP proxy (xem server/services/proxyFetch.js). Mac dinh tat.
@@ -158,48 +180,48 @@ const defaultSettings = {
   proxyEnabled: false,
   proxyUrl: '',
   proxyNoProxy: 'localhost',
-  providerOverrides: {}
+  providerOverrides: {},
 };
 
 const defaultKeys = [
   {
-    id: "key-admin-1",
-    key: "sk-wenker-local-admin",
-    name: "Master Admin Key",
-    role: "admin",
+    id: 'key-admin-1',
+    key: 'sk-wenker-local-admin',
+    name: 'Master Admin Key',
+    role: 'admin',
     createdAt: new Date().toISOString(),
     usageCount: 0,
     promptTokens: 0,
     completionTokens: 0,
     rateLimit: 1000,
-    isActive: true
+    isActive: true,
   },
   {
-    id: "key-free-1",
-    key: "sk-wenker-free-playground",
-    name: "Free Playground Key",
-    role: "user",
+    id: 'key-free-1',
+    key: 'sk-wenker-free-playground',
+    name: 'Free Playground Key',
+    role: 'user',
     createdAt: new Date().toISOString(),
     usageCount: 0,
     promptTokens: 0,
     completionTokens: 0,
     rateLimit: 500,
-    isActive: true
-  }
+    isActive: true,
+  },
 ];
 
 const defaultRouting = {
   aliases: {
-    "gpt-4o": "wenker-cloud/wenker-deepseek-v3-free",
-    "gpt-4o-mini": "wenker-cloud/wenker-gpt-4o-mini-free",
-    "claude-3-5-sonnet": "wenker-cloud/wenker-deepseek-r1-free",
-    "claude-3-7-sonnet": "wenker-cloud/wenker-deepseek-r1-free",
-    "claude-code": "wenker-cloud/wenker-qwen-2.5-coder-free"
+    'gpt-4o': 'wenker-cloud/wenker-deepseek-v3-free',
+    'gpt-4o-mini': 'wenker-cloud/wenker-gpt-4o-mini-free',
+    'claude-3-5-sonnet': 'wenker-cloud/wenker-deepseek-r1-free',
+    'claude-3-7-sonnet': 'wenker-cloud/wenker-deepseek-r1-free',
+    'claude-code': 'wenker-cloud/wenker-qwen-2.5-coder-free',
   },
   fallbacks: [
-    { from: "openai", to: ["wenker-cloud", "groq", "duckduckgo"] },
-    { from: "anthropic", to: ["wenker-cloud", "duckduckgo"] }
-  ]
+    { from: 'openai', to: ['wenker-cloud', 'groq', 'duckduckgo'] },
+    { from: 'anthropic', to: ['wenker-cloud', 'duckduckgo'] },
+  ],
 };
 
 // Database Service Singleton
@@ -252,7 +274,8 @@ class DbService {
 
   // ---- Prompt response cache (free-upstream resilience) ----
   cacheKey(model, messages) {
-    const digest = crypto.createHash('sha256')
+    const digest = crypto
+      .createHash('sha256')
       .update(JSON.stringify({ model, messages }))
       .digest('hex');
     return digest.slice(0, 32);
@@ -284,16 +307,21 @@ class DbService {
     const keys = Object.keys(entries);
     if (keys.length > CACHE_MAX_ENTRIES) {
       // drop oldest first
-      keys.sort((a, b) => entries[a].at - entries[b].at)
+      keys
+        .sort((a, b) => entries[a].at - entries[b].at)
         .slice(0, keys.length - CACHE_MAX_ENTRIES)
-        .forEach(k => delete entries[k]);
+        .forEach((k) => delete entries[k]);
     }
     writeJsonFile(CACHE_FILE, this.cache);
     return true;
   }
 
   cacheStats() {
-    return { size: Object.keys(this.cache.entries).length, max: CACHE_MAX_ENTRIES, ttlMs: CACHE_TTL_MS };
+    return {
+      size: Object.keys(this.cache.entries).length,
+      max: CACHE_MAX_ENTRIES,
+      ttlMs: CACHE_TTL_MS,
+    };
   }
 
   clearCache() {
@@ -350,9 +378,9 @@ class DbService {
   // Providers handling
   getAllProviders() {
     const overrides = this.settings.providerOverrides || {};
-    
+
     // Builtin providers with overrides applied
-    const builtins = PROVIDERS.map(p => {
+    const builtins = PROVIDERS.map((p) => {
       const override = overrides[p.id] || {};
       return {
         ...p,
@@ -360,18 +388,18 @@ class DbService {
         // Ensure models list is preserved or augmented
         models: override.models || p.models,
         enabled: override.enabled !== undefined ? override.enabled : true,
-        userApiKey: override.userApiKey || "",
-        userCookie: override.userCookie || "",
+        userApiKey: override.userApiKey || '',
+        userCookie: override.userCookie || '',
         userHeaders: override.userHeaders || {},
-        isCustom: false
+        isCustom: false,
       };
     });
 
     // Custom user-defined providers
-    const customs = this.customProviders.map(cp => ({
+    const customs = this.customProviders.map((cp) => ({
       ...cp,
       isCustom: true,
-      enabled: cp.enabled !== undefined ? cp.enabled : true
+      enabled: cp.enabled !== undefined ? cp.enabled : true,
     }));
 
     return [...builtins, ...customs];
@@ -379,7 +407,7 @@ class DbService {
 
   getProviderById(id) {
     const all = this.getAllProviders();
-    return all.find(p => p.id === id);
+    return all.find((p) => p.id === id);
   }
 
   /**
@@ -404,13 +432,13 @@ class DbService {
       hasApiKey: Boolean(p.userApiKey),
       hasCookie: Boolean(p.userCookie),
       userApiKey: DbService.maskSecret(p.userApiKey),
-      userCookie: p.userCookie ? '••••(cookie da luu)' : ''
+      userCookie: p.userCookie ? '••••(cookie da luu)' : '',
     }));
   }
 
   updateProvider(id, updateData) {
     // Check if it's a custom provider
-    const customIdx = this.customProviders.findIndex(p => p.id === id);
+    const customIdx = this.customProviders.findIndex((p) => p.id === id);
     if (customIdx >= 0) {
       this.customProviders[customIdx] = { ...this.customProviders[customIdx], ...updateData };
       writeJsonFile(CUSTOM_PROVIDERS_FILE, this.customProviders);
@@ -422,8 +450,8 @@ class DbService {
       this.settings.providerOverrides = {};
     }
     this.settings.providerOverrides[id] = {
-      ...(this.settings.providerOverrides[id] || {}),
-      ...updateData
+      ...this.settings.providerOverrides[id] || {},
+      ...updateData,
     };
     writeJsonFile(CONFIG_FILE, this.settings);
     return this.getProviderById(id);
@@ -433,19 +461,21 @@ class DbService {
     const id = providerData.id || `custom-${Date.now()}`;
     const newProvider = {
       id,
-      name: providerData.name || "Custom Provider",
-      category: "custom",
-      baseUrl: providerData.baseUrl || "http://localhost:8000/v1",
-      authType: providerData.authType || "bearer",
-      headerName: providerData.headerName || "Authorization",
-      userApiKey: providerData.userApiKey || "",
+      name: providerData.name || 'Custom Provider',
+      category: 'custom',
+      baseUrl: providerData.baseUrl || 'http://localhost:8000/v1',
+      authType: providerData.authType || 'bearer',
+      headerName: providerData.headerName || 'Authorization',
+      userApiKey: providerData.userApiKey || '',
       isFree: providerData.isFree || false,
       requiresAuth: providerData.requiresAuth !== false,
-      website: providerData.website || "",
-      description: providerData.description || "Nhà cung cấp tùy chỉnh người dùng.",
-      icon: "Cpu",
+      website: providerData.website || '',
+      description: providerData.description || 'Nhà cung cấp tùy chỉnh người dùng.',
+      icon: 'Cpu',
       enabled: true,
-      models: providerData.models || [{ id: `${id}-model`, name: "Default Model", contextWindow: 32000, isFree: true }]
+      models: providerData.models || [
+        { id: `${id}-model`, name: 'Default Model', contextWindow: 32000, isFree: true },
+      ],
     };
 
     this.customProviders.push(newProvider);
@@ -454,7 +484,7 @@ class DbService {
   }
 
   deleteCustomProvider(id) {
-    this.customProviders = this.customProviders.filter(p => p.id !== id);
+    this.customProviders = this.customProviders.filter((p) => p.id !== id);
     writeJsonFile(CUSTOM_PROVIDERS_FILE, this.customProviders);
     return true;
   }
@@ -465,18 +495,19 @@ class DbService {
   }
 
   createKey({ name, role, rateLimit }) {
-    const randomHex = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+    const randomHex =
+      Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
     const newKey = {
       id: `key-${Date.now()}`,
       key: `sk-wenker-${randomHex}`,
       name: name || `Key ${this.keys.length + 1}`,
-      role: role || "user",
+      role: role || 'user',
       createdAt: new Date().toISOString(),
       usageCount: 0,
       promptTokens: 0,
       completionTokens: 0,
       rateLimit: rateLimit || 1000,
-      isActive: true
+      isActive: true,
     };
     this.keys.push(newKey);
     writeJsonFile(KEYS_FILE, this.keys);
@@ -484,13 +515,13 @@ class DbService {
   }
 
   deleteKey(id) {
-    this.keys = this.keys.filter(k => k.id !== id);
+    this.keys = this.keys.filter((k) => k.id !== id);
     writeJsonFile(KEYS_FILE, this.keys);
     return true;
   }
 
   toggleKey(id) {
-    const key = this.keys.find(k => k.id === id);
+    const key = this.keys.find((k) => k.id === id);
     if (key) {
       key.isActive = !key.isActive;
       writeJsonFile(KEYS_FILE, this.keys);
@@ -503,13 +534,13 @@ class DbService {
     if (!keyStr) return null;
     // Strip "Bearer " prefix if provided
     const cleanKey = keyStr.replace(/^Bearer\s+/i, '').trim();
-    return this.keys.find(k => k.key === cleanKey && k.isActive);
+    return this.keys.find((k) => k.key === cleanKey && k.isActive);
   }
 
   incrementKeyUsage(keyStr, promptTokens = 0, completionTokens = 0) {
     if (!keyStr) return;
     const cleanKey = keyStr.replace(/^Bearer\s+/i, '').trim();
-    const key = this.keys.find(k => k.key === cleanKey);
+    const key = this.keys.find((k) => k.key === cleanKey);
     if (key) {
       key.usageCount = (key.usageCount || 0) + 1;
       key.promptTokens = (key.promptTokens || 0) + promptTokens;
@@ -538,7 +569,7 @@ class DbService {
     const logItem = {
       id: `log-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       timestamp: new Date().toISOString(),
-      ...entry
+      ...entry,
     };
     this.logs.push(logItem);
     // Keep max 500 logs
@@ -548,31 +579,36 @@ class DbService {
     writeJsonFile(LOGS_FILE, this.logs);
     // Day log moi nguoc ve moi dashboard dang mo Live tail (SSE). Khong cho loi
     // ghi log that bai lam roi vong goi chinh cua proxy.
-    try { eventBus.broadcast('log', logItem); } catch (e) { /* stream optional */ }
+    try {
+      eventBus.broadcast('log', logItem);
+    } catch (e) {
+      /* stream optional */
+    }
     return logItem;
   }
 
   getStats() {
     const totalRequests = this.logs.length;
-    const successfulRequests = this.logs.filter(l => l.status >= 200 && l.status < 300).length;
+    const successfulRequests = this.logs.filter((l) => l.status >= 200 && l.status < 300).length;
     const failedRequests = totalRequests - successfulRequests;
-    
+
     let totalPromptTokens = 0;
     let totalCompletionTokens = 0;
     let totalLatency = 0;
 
-    this.logs.forEach(l => {
-      totalPromptTokens += (l.promptTokens || 0);
-      totalCompletionTokens += (l.completionTokens || 0);
-      totalLatency += (l.latencyMs || 0);
+    this.logs.forEach((l) => {
+      totalPromptTokens += l.promptTokens || 0;
+      totalCompletionTokens += l.completionTokens || 0;
+      totalLatency += l.latencyMs || 0;
     });
 
     const avgLatencyMs = totalRequests > 0 ? Math.round(totalLatency / totalRequests) : 0;
-    const successRate = totalRequests > 0 ? Math.round((successfulRequests / totalRequests) * 100) : 100;
+    const successRate =
+      totalRequests > 0 ? Math.round(successfulRequests / totalRequests * 100) : 100;
 
     const allProviders = this.getAllProviders();
-    const enabledProviders = allProviders.filter(p => p.enabled).length;
-    const freeProviders = allProviders.filter(p => p.isFree).length;
+    const enabledProviders = allProviders.filter((p) => p.enabled).length;
+    const freeProviders = allProviders.filter((p) => p.isFree).length;
 
     return {
       totalRequests,
@@ -586,7 +622,7 @@ class DbService {
       totalProviders: allProviders.length,
       enabledProviders,
       freeProviders,
-      totalKeys: this.keys.length
+      totalKeys: this.keys.length,
     };
   }
 
@@ -604,7 +640,9 @@ class DbService {
     const nameById = {};
     try {
       for (const p of this.getAllProviders()) nameById[p.id] = p.name;
-    } catch (e) { /* catalog unavailable: fall back to ids */ }
+    } catch (e) {
+      /* catalog unavailable: fall back to ids */
+    }
 
     const inWindow = this.logs.filter((l) => {
       const t = Date.parse(l.timestamp);
@@ -618,21 +656,37 @@ class DbService {
       const key = [
         d.getFullYear(),
         String(d.getMonth() + 1).padStart(2, '0'),
-        String(d.getDate()).padStart(2, '0')
+        String(d.getDate()).padStart(2, '0'),
       ].join('-');
-      daily[key] = { date: key, requests: 0, tokens: 0, cacheHits: 0, fallbacks: 0, failed: 0, avgLatencySum: 0 };
+      daily[key] = {
+        date: key,
+        requests: 0,
+        tokens: 0,
+        cacheHits: 0,
+        fallbacks: 0,
+        failed: 0,
+        avgLatencySum: 0,
+      };
     }
 
     const providerAgg = {};
     const modelAgg = {};
 
-    let requests = 0, success = 0, failed = 0, cacheHits = 0, fallbacks = 0;
-    let promptTokens = 0, completionTokens = 0, latencySum = 0, latencyCount = 0;
+    let requests = 0,
+      success = 0,
+      failed = 0,
+      cacheHits = 0,
+      fallbacks = 0;
+    let promptTokens = 0,
+      completionTokens = 0,
+      latencySum = 0,
+      latencyCount = 0;
 
     for (const l of inWindow) {
       requests++;
       const ok = l.status >= 200 && l.status < 300;
-      if (ok) success++; else failed++;
+      if (ok) success++;
+      else failed++;
       if (l.cached) cacheHits++;
       if (l.fallbackFrom) fallbacks++;
 
@@ -641,7 +695,10 @@ class DbService {
       promptTokens += pt;
       completionTokens += ct;
       const tok = pt + ct;
-      if (typeof l.latencyMs === 'number') { latencySum += l.latencyMs; latencyCount++; }
+      if (typeof l.latencyMs === 'number') {
+        latencySum += l.latencyMs;
+        latencyCount++;
+      }
 
       const dayKey = (l.timestamp || '').slice(0, 10);
       const bucket = daily[dayKey];
@@ -655,10 +712,17 @@ class DbService {
       }
 
       const pid = l.providerId || 'unknown';
-      const pa = providerAgg[pid] || (providerAgg[pid] = {
-        providerId: pid, name: nameById[pid] || pid,
-        requests: 0, tokens: 0, ok: 0, fallbacks: 0, latencySum: 0
-      });
+      const pa =
+        providerAgg[pid] ||
+        (providerAgg[pid] = {
+          providerId: pid,
+          name: nameById[pid] || pid,
+          requests: 0,
+          tokens: 0,
+          ok: 0,
+          fallbacks: 0,
+          latencySum: 0,
+        });
       pa.requests++;
       pa.tokens += tok;
       if (ok) pa.ok++;
@@ -666,7 +730,8 @@ class DbService {
       if (typeof l.latencyMs === 'number') pa.latencySum += l.latencyMs;
 
       const mid = l.resolvedModel || l.model || 'unknown';
-      const ma = modelAgg[mid] || (modelAgg[mid] = { model: mid, providerId: pid, requests: 0, tokens: 0 });
+      const ma =
+        modelAgg[mid] || (modelAgg[mid] = { model: mid, providerId: pid, requests: 0, tokens: 0 });
       ma.requests++;
       ma.tokens += tok;
     }
@@ -674,8 +739,8 @@ class DbService {
     const byProvider = Object.values(providerAgg)
       .map((p) => ({
         ...p,
-        successRate: p.requests ? Math.round((p.ok / p.requests) * 100) : 0,
-        avgLatencyMs: p.requests ? Math.round(p.latencySum / p.requests) : 0
+        successRate: p.requests ? Math.round(p.ok / p.requests * 100) : 0,
+        avgLatencyMs: p.requests ? Math.round(p.latencySum / p.requests) : 0,
       }))
       .sort((a, b) => b.requests - a.requests);
 
@@ -690,7 +755,7 @@ class DbService {
       cacheHits: d.cacheHits,
       fallbacks: d.fallbacks,
       failed: d.failed,
-      avgLatencyMs: d.requests ? Math.round(d.avgLatencySum / d.requests) : 0
+      avgLatencyMs: d.requests ? Math.round(d.avgLatencySum / d.requests) : 0,
     }));
 
     return {
@@ -698,7 +763,7 @@ class DbService {
         days: span,
         logCap: this.logs.length,
         counted: requests,
-        truncated: this.logs.length >= 500 && inWindow.length < this.logs.length
+        truncated: this.logs.length >= 500 && inWindow.length < this.logs.length,
       },
       totals: {
         requests,
@@ -710,12 +775,12 @@ class DbService {
         completionTokens,
         totalTokens: promptTokens + completionTokens,
         avgLatencyMs: latencyCount ? Math.round(latencySum / latencyCount) : 0,
-        successRate: requests ? Math.round((success / requests) * 100) : 0,
-        cacheHitRate: requests ? Math.round((cacheHits / requests) * 100) : 0
+        successRate: requests ? Math.round(success / requests * 100) : 0,
+        cacheHitRate: requests ? Math.round(cacheHits / requests * 100) : 0,
       },
       daily: dailySeries,
       byProvider,
-      byModel
+      byModel,
     };
   }
   // ---- Sessions (login gate) ----
@@ -725,13 +790,13 @@ class DbService {
 
   createSession(pin) {
     // One live session per user pin: logging in again replaces the old token.
-    this.sessions = this.sessions.filter(s => s.pin !== pin);
+    this.sessions = this.sessions.filter((s) => s.pin !== pin);
     const token = crypto.randomBytes(24).toString('hex');
     const session = {
       token,
       pin,
       createdAt: new Date().toISOString(),
-      lastSeenAt: new Date().toISOString()
+      lastSeenAt: new Date().toISOString(),
     };
     this.sessions.push(session);
     // Keep the store from growing forever.
@@ -744,8 +809,10 @@ class DbService {
 
   validateSession(token) {
     if (!token) return null;
-    const clean = String(token).replace(/^Bearer\s+/i, '').trim();
-    const session = this.sessions.find(s => s.token === clean);
+    const clean = String(token)
+      .replace(/^Bearer\s+/i, '')
+      .trim();
+    const session = this.sessions.find((s) => s.token === clean);
     if (!session) return null;
     session.lastSeenAt = new Date().toISOString();
     writeJsonFile(SESSIONS_FILE, this.sessions);
@@ -753,7 +820,7 @@ class DbService {
   }
 
   clearSession(token) {
-    this.sessions = this.sessions.filter(s => s.token !== token);
+    this.sessions = this.sessions.filter((s) => s.token !== token);
     writeJsonFile(SESSIONS_FILE, this.sessions);
     return true;
   }
@@ -782,7 +849,10 @@ class DbService {
     const tokensUsed = user.tokens;
     const unlimited = !(limit > 0);
     const tokenCap = limit * QUOTA_TOKENS_PER_REQUEST;
-    const used = Math.max(user.used, tokenCap > 0 ? Math.ceil(tokensUsed / QUOTA_TOKENS_PER_REQUEST) : 0);
+    const used = Math.max(
+      user.used,
+      tokenCap > 0 ? Math.ceil(tokensUsed / QUOTA_TOKENS_PER_REQUEST) : 0,
+    );
     const remaining = unlimited ? null : Math.max(0, limit - used);
     return {
       pin: user.pin,
@@ -794,7 +864,7 @@ class DbService {
       bonusUsed: user.bonusUsed,
       adCreditAmount: user.adCreditAmount,
       adCreditsLeft: Math.max(0, user.adCreditsMax - user.bonusUsed),
-      exhausted: !unlimited && remaining <= 0
+      exhausted: !unlimited && remaining <= 0,
     };
   }
 
@@ -822,7 +892,11 @@ class DbService {
     const user = this._ensureQuotaDay(this.getQuotaAccount(subject));
     const bonus = user.adCreditAmount;
     if (user.bonusUsed >= user.adCreditsMax) {
-      return { granted: false, quota: this.getQuota(subject), reason: 'Het luot xem quang cao trong hom nay.' };
+      return {
+        granted: false,
+        quota: this.getQuota(subject),
+        reason: 'Het luot xem quang cao trong hom nay.',
+      };
     }
     user.dailyLimit += bonus;
     user.bonusUsed += bonus;
@@ -846,7 +920,7 @@ class DbService {
     const item = {
       id: `dl-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       timestamp: new Date().toISOString(),
-      ...entry
+      ...entry,
     };
     this.registry.downloads.push(item);
     if (this.registry.downloads.length > 300) {
@@ -857,7 +931,7 @@ class DbService {
   }
 
   removeDownload(id) {
-    this.registry.downloads = this.registry.downloads.filter(d => d.id !== id);
+    this.registry.downloads = this.registry.downloads.filter((d) => d.id !== id);
     writeJsonFile(REGISTRY_FILE, this.registry);
     return true;
   }

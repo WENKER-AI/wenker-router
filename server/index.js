@@ -10,6 +10,14 @@ const authRouter = require('./routes/auth');
 
 // Rate Limiting Middleware - Tuần 1
 const { apiLimiter, adminLimiter, healthLimiter } = require('./middlewares/rateLimiter');
+// Input Sanitization Middleware - Tuần 1: Prompt injection protection
+const { inputSanitizer } = require('./middlewares/inputSanitizer');
+// Plugin Auth Middleware - Tuần 1: Protect plugin endpoints
+const { requirePluginAdmin, verifyPluginSignature, pluginRateLimiter, pluginAuditLogger } = require('./middlewares/pluginAuth');
+// Structured Logging Middleware - Tuần 2: Correlation IDs and structured logs
+const { correlationIdMiddleware, requestLoggerMiddleware, errorLoggerMiddleware } = require('./middlewares/structuredLogger');
+// Error Formatter - Tuần 2: Standardized error responses
+const { standardizedErrorHandler, responseFormatter } = require('./middlewares/errorFormatter');
 
 // Guard: khi terminal/pipe cua stdout bi dong giua chung (chay nen, dong cua so
 // cmd, hoac process bi quan ly boi `pm2`/`systemd`...), moi lan console.log co the
@@ -31,6 +39,9 @@ require('./services/proxyFetch').install();
 // qua SSE den TOAN BO dashboard dang mo cua server nay (banner bao cap nhat).
 require('./services/updateService').start();
 
+// Proactive Health Checker - Tuần 2: Background provider health monitoring
+const proactiveHealthChecker = require('./services/proactiveHealthChecker');
+
 const app = express();
 const settings = db.getSettings();
 const PORT = process.env.PORT || settings.port || 3600;
@@ -49,6 +60,13 @@ app.use(
 // Body parser
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Response Formatter - Tuần 2: Standardized response format
+app.use(responseFormatter);
+
+// Structured Logging - Tuần 2: Correlation IDs and structured logs
+app.use(correlationIdMiddleware);
+app.use(requestLoggerMiddleware);
 
 // Logging middleware
 app.use((req, res, next) => {
@@ -106,11 +124,41 @@ app.use('/api', (req, res, next) => {
   });
 });
 
-// API Routes - Tuần 1: Áp dụng Rate Limiting
-app.use('/v1', apiLimiter, openaiRouter);
-app.use('/v1', apiLimiter, anthropicRouter);
+// API Routes - Tuần 1: Áp dụng Rate Limiting + Input Sanitization
+app.use('/v1', apiLimiter, inputSanitizer, openaiRouter);
+app.use('/v1', apiLimiter, inputSanitizer, anthropicRouter);
 app.use('/api', adminLimiter, adminRouter);
 app.use('/api/auth', authRouter); // Auth không bị rate limit để đăng nhập được
+
+// Plugin Routes - Tuần 1: Yêu cầu admin authentication
+app.get('/api/plugins', adminLimiter, requirePluginAdmin, pluginAuditLogger, (req, res) => {
+  res.json({
+    plugins: [],
+    count: 0,
+    message: 'Plugin system not fully implemented in JS version. See server/index.ts for full implementation.',
+  });
+});
+
+app.post('/api/plugins/:id/register', adminLimiter, pluginRateLimiter, requirePluginAdmin, verifyPluginSignature, pluginAuditLogger, (req, res) => {
+  res.status(501).json({
+    error: {
+      message: 'Plugin registration not implemented in JS version. See server/index.ts for full implementation.',
+      type: 'not_implemented',
+      code: 'plugin_registration_not_implemented',
+    },
+  });
+});
+
+app.post('/api/plugins/:id/unregister', adminLimiter, pluginRateLimiter, requirePluginAdmin, pluginAuditLogger, (req, res) => {
+  res.status(501).json({
+    error: {
+      message: 'Plugin unregistration not implemented in JS version. See server/index.ts for full implementation.',
+      type: 'not_implemented',
+      code: 'plugin_unregistration_not_implemented',
+    },
+  });
+});
+
 // Unknown /v1/* endpoints -> clean OpenAI-style JSON error (not an HTML stack trace)
 app.all('/v1/*', (req, res) => {
   res.status(404).json({
@@ -135,15 +183,35 @@ app.get('/health', healthLimiter, (req, res) => {
   });
 });
 
+// Prometheus Metrics Endpoint - Tuần 2
+const metricsService = require('./services/metricsService');
+app.get('/metrics', async (req, res) => {
+  try {
+    res.set('Content-Type', metricsService.getContentType());
+    res.send(await metricsService.getMetrics());
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// Metrics as JSON for debugging
+app.get('/metrics/json', async (req, res) => {
+  try {
+    res.json(await metricsService.getMetricsAsJson());
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Serve frontend static build if available
 const clientDistPath = path.join(__dirname, '..', 'client', 'dist');
 app.use(express.static(clientDistPath));
 
-// Trang giới thiệu/markdown tĩnh (web/) được phục vụ dưới /web để không đụng
+// Trang giới thiệu/markdown tĩnh (web/) được phục vụ dưới /wenker để không đụng
 // asset của dashboard (dashboard chiếm /assets/*).
 const webPath = path.join(__dirname, '..', 'web');
-app.use('/web', express.static(webPath));
-app.get('/web', (req, res) => res.redirect('/web/'));
+app.use('/wenker', express.static(webPath));
+app.get('/wenker', (req, res) => res.redirect('/wenker/'));
 
 const fs = require('fs');
 const clientIndex = path.join(clientDistPath, 'index.html');
@@ -160,7 +228,7 @@ app.get('*', (req, res) => {
         '<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>404</title>' +
           '<style>body{font-family:system-ui;background:#05070f;color:#eaf2ff;display:grid;place-items:center;height:100vh;margin:0}' +
           'a{color:#7ee787}</style></head><body><div style="text-align:center"><h1>Off. 404</h1>' +
-          '<p>Không tìm thấy tài nguyên này.</p><p><a href="/web/404.html">Chơi mini game cá voi</a> · <a href="/">Về dashboard</a></p></div></body></html>',
+          '<p>Không tìm thấy tài nguyên này.</p><p><a href="/wenker/404.html">Chơi mini game cá voi</a> · <a href="/">Về dashboard</a></p></div></body></html>,'
       );
   }
   if (fs.existsSync(clientIndex)) {
@@ -169,7 +237,7 @@ app.get('*', (req, res) => {
     // không cần đẩy mọi path về index.html; path sai nên trả 404 thật.
     if (req.path !== '/' && fs.existsSync(notFoundPage)) {
       let html = fs.readFileSync(notFoundPage, 'utf8');
-      html = html.replace('<head>', '<head><base href="/web/">');
+      html = html.replace('<head>', '<head><base href="/wenker/">');
       return res.status(404).type('html').send(html);
     }
     return res.sendFile(clientIndex);
@@ -205,36 +273,11 @@ app.get('*', (req, res) => {
     `);
 });
 
-// Central error handler: malformed JSON / oversized body / uncaught route errors
-app.use((err, req, res, next) => {
-  if (res.headersSent) return next(err);
-  const status = err.status || err.statusCode || (err.type === 'entity.parse.failed' ? 400 : 500);
-  if (status >= 500) console.error('Request error:', err.message);
-  const isAnthropic = req.originalUrl.startsWith('/v1/messages');
-  const message =
-    err.type === 'entity.parse.failed'
-      ? 'Body request không phải JSON hợp lệ.'
-      : err.type === 'entity.too.large'
-        ? 'Payload vượt quá giới hạn kích thước của server.'
-        : err.message || 'Internal Server Error';
+// Error Logger Middleware - Tuần 2: Structured error logging
+app.use(errorLoggerMiddleware);
 
-  if (isAnthropic) {
-    return res
-      .status(status)
-      .json({
-        type: 'error',
-        error: { type: status >= 500 ? 'api_error' : 'invalid_request_error', message },
-      });
-  }
-  res.status(status).json({
-    error: {
-      message,
-      type: status >= 500 ? 'internal_error' : 'invalid_request_error',
-      param: null,
-      code: err.type || 'internal_error',
-    },
-  });
-});
+// Standardized Error Handler - Tuần 2: Consistent error format
+app.use(standardizedErrorHandler);
 
 // Start Server
 app.listen(PORT, HOST, () => {
@@ -248,9 +291,10 @@ app.listen(PORT, HOST, () => {
   if (def) {
     let host = def.baseUrl || '';
     try {
-      host = new URL(def.baseUrl).host;
+      const parsed = new URL(def.baseUrl);
+      host = parsed.hostname + (parsed.port ? `:${parsed.port}` : '');
     } catch (e) {
-      console.warn('[config] Invalid baseUrl, keeping template:', def.baseUrl);
+      host = String(def.baseUrl || '').replace(/:\/\/[^@]+@/, '://***@');
     }
     const needsKey = def.requiresAuth || def.authType !== 'none';
     const keyState = needsKey
@@ -262,15 +306,15 @@ app.listen(PORT, HOST, () => {
     const label = `${def.name}: `.padEnd(28);
     tierLine = `${label}${(def.models || []).length} model · nguon ${host || '?'} · ${keyState}`;
   }
-  console.log(`
+console.log(`
 ============================================================
-       ██╗    ██╗███████╗███╗   ██╗██╗  ██╗███████╗██████╗ 
-       ██║    ██║██╔════╝████╗  ██║██║ ██╔╝██╔════╝██╔══██╗
-       ██║ █╗ ██║█████╗  ██╔██╗ ██║█████╔╝ █████╗  ██████╔╝
-       ██║███╗██║██╔══╝  ██║╚██╗██║██╔═██╗ ██╔══╝  ██╔══██╗
-       ╚███╔███╔╝███████╗██║ ╚████║██║  ██╗███████╗██║  ██║
-        ╚══╝╚══╝ ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
-              Local AI Proxy Router Gateway v${PKG.version}
+     ██╗    ██╗███████╗███╗   ██╗██╗  ██╗███████╗██████╗ 
+     ██║    ██║██╔════╝████╗  ██║██║ ██╔╝██╔════╝██╔══██╗
+     ██║ █╗ ██║█████╗  ██╔██╗ ██║█████╔╝ █████╗  ██████╔╝
+     ██║███╗██║██╔══╝  ██║╚██╗██║██╔═██╗ ██╔══╝  ██╔══██╗
+     ╚███╔███╔╝███████╗██║ ╚████║██║  ██╗███████╗██║  ██║
+      ╚══╝╚══╝ ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+            Local AI Proxy Router Gateway v${PKG.version}
 ============================================================
   Core Server Running at:    http://localhost:${PORT}
   OpenAI API Base:           http://localhost:${PORT}/v1
@@ -289,4 +333,8 @@ app.listen(PORT, HOST, () => {
   API Key:  [USE YOUR KEY HERE]
 ============================================================
   `);
+
+  // Initialize and start proactive health checker
+  proactiveHealthChecker.init(db.getSettings());
+  proactiveHealthChecker.start();
 });

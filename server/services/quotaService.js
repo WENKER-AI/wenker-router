@@ -22,7 +22,9 @@ const QUOTA_EXHAUSTED_HINT =
   'hoac xem quang cao de nhan them luot chat.';
 
 function cleanToken(value) {
-  return String(value || '').replace(/^Bearer\s+/i, '').trim();
+  return String(value || '')
+    .replace(/^Bearer\s+/i, '')
+    .trim();
 }
 
 /**
@@ -37,7 +39,7 @@ function resolveSubject(req) {
       kind: 'user',
       pin: session.pin,
       enforce: true,
-      adBonusAllowed: true
+      adBonusAllowed: true,
     };
   }
 
@@ -49,7 +51,7 @@ function resolveSubject(req) {
       kind: 'key',
       pin: known ? known.name : rawKey,
       enforce: Boolean(db.getSettings().enforceApiKeyQuota),
-      adBonusAllowed: false
+      adBonusAllowed: false,
     };
   }
 
@@ -57,7 +59,7 @@ function resolveSubject(req) {
     id: `anon:${req.ip || req.headers['x-forwarded-for'] || 'local'}`,
     kind: 'anon',
     enforce: Boolean(db.getSettings().enforceAnonymousQuota),
-    adBonusAllowed: false
+    adBonusAllowed: false,
   };
 }
 
@@ -83,7 +85,8 @@ function tryConsume(subject, estimatedTokens = 0) {
  */
 function commit(subject, promptTokens = 0, completionTokens = 0) {
   if (!subject || !subject.enforce) return null;
-  const tokens = Math.max(1, Number(promptTokens) || 0) + Math.max(1, Number(completionTokens) || 0);
+  const tokens =
+    Math.max(1, Number(promptTokens) || 0) + Math.max(1, Number(completionTokens) || 0);
   return db.chargeQuota(subject.id, tokens);
 }
 
@@ -103,8 +106,8 @@ function respondExhausted(req, res, subject) {
       error: {
         type: 'invalid_request_error',
         code: 'quota_exhausted',
-        message: QUOTA_EXHAUSTED_MESSAGE
-      }
+        message: QUOTA_EXHAUSTED_MESSAGE,
+      },
     });
   }
   return res.status(409).json({
@@ -114,8 +117,8 @@ function respondExhausted(req, res, subject) {
       param: null,
       code: 'quota_exhausted',
       hint: QUOTA_EXHAUSTED_HINT,
-      quota: quota
-    }
+      quota: quota,
+    },
   });
 }
 
@@ -130,5 +133,5 @@ module.exports = {
   // Only the genuine anonymous Pollinations pool is metered (wenker-cloud + its
   // free twin). wenker-vip / wenker-community now point at keyed upstreams (izzi /
   // xkiro) and are protected by their own account balance, like openrouter/groq.
-  meteredProviders: ['wenker-cloud', 'pollinations']
+  meteredProviders: ['wenker-cloud', 'pollinations'],
 };

@@ -14,12 +14,7 @@ const router = express.Router();
 const db = require('../services/dbService');
 
 function readToken(req) {
-  return (
-    req.headers['x-wenker-session'] ||
-    req.headers['authorization'] ||
-    req.query.session ||
-    ''
-  );
+  return req.headers['x-wenker-session'] || req.headers['authorization'] || req.query.session || '';
 }
 
 // The passcodes are shown on the login screen on purpose - this is a human check,
@@ -30,7 +25,7 @@ router.get('/pins', (req, res) => {
     hint: 'Nhap mat khau la 1 ky tu so tu 1 den 9 (in o man hinh dang nhap).',
     dailyLimit: Number(db.settings.wenkerCloudDailyLimit ?? 50),
     adCreditAmount: db.getUserByPin('1').adCreditAmount,
-    adCreditsMax: db.getUserByPin('1').adCreditsMax
+    adCreditsMax: db.getUserByPin('1').adCreditsMax,
   });
 });
 
@@ -39,7 +34,7 @@ router.post('/login', (req, res) => {
   if (!db.pins.includes(pin)) {
     return res.status(401).json({
       success: false,
-      error: 'Sai mat khau xac minh. Mat khau la 1 ky tu so tu 1 den 9.'
+      error: 'Sai mat khau xac minh. Mat khau la 1 ky tu so tu 1 den 9.',
     });
   }
   const session = db.createSession(pin);
@@ -47,12 +42,16 @@ router.post('/login', (req, res) => {
     success: true,
     token: session.token,
     pin,
-    quota: db.getQuota(pin)
+    quota: db.getQuota(pin),
   });
 });
 
 router.post('/logout', (req, res) => {
-  db.clearSession(String(readToken(req)).replace(/^Bearer\s+/i, '').trim());
+  db.clearSession(
+    String(readToken(req))
+      .replace(/^Bearer\s+/i, '')
+      .trim(),
+  );
   res.json({ success: true });
 });
 
@@ -89,7 +88,7 @@ router.post('/quota/ad-credit', (req, res) => {
     granted: result.granted,
     bonus: result.bonus || 0,
     reason: result.reason || null,
-    quota: result.quota
+    quota: result.quota,
   });
 });
 

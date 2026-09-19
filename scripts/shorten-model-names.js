@@ -22,7 +22,9 @@ for (const [pid, ov] of Object.entries(po)) {
     if (!m.name) continue;
     // "id  (tra loi thuc te: x)" -> "id"; hoac ten nao dai hon id + 6 ky tu
     // va chua duoi ngoac don -> cat bo duoi ngoac.
-    const stripped = m.name.replace(/\s*\((?:tra loi thuc te|thực|thuc)\s*:[^)]*\)\s*$/i, '').trim();
+    const stripped = m.name
+      .replace(/\s*\((?:tra loi thuc te|thực|thuc)\s*:[^)]*\)\s*$/i, '')
+      .trim();
     if (stripped && stripped !== m.name) {
       console.log(`[${pid}] "${m.name}"  ->  "${stripped}"`);
       m.name = stripped;

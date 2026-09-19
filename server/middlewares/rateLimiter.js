@@ -14,6 +14,7 @@
 
 const rateLimit = require('express-rate-limit');
 const db = require('../services/dbService');
+const quota = require('../services/quotaService');
 
 /**
  * Rate Limit Configuration cho các tier khác nhau
@@ -103,6 +104,24 @@ function getUserTier(req) {
     }
   }
   
+  // For free tier, check if user has quota remaining
+  // This helps prevent one user from consuming all free tier quota
+  if (apiKey === 'sk-wenker-free-playground' || !apiKey) {
+    // Check quota for anonymous users
+    const ip = req.ip || req.socket.remoteAddress || 'unknown';
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    const subject = `anon:${ip}:${userAgent.substring(0, 50)}`;
+    
+    try {
+      const quotaInfo = db.getQuota(subject);
+      if (quotaInfo && quotaInfo.exhausted) {
+        return 'exhausted'; // Special tier for exhausted quota
+      }
+    } catch (err) {
+      // Ignore
+    }
+  }
+  
   return 'free';
 }
 
@@ -125,6 +144,22 @@ function createTieredLimiter(tier, endpointType = 'api') {
       const userTier = getUserTier(req);
       const limitConfig = RATE_LIMIT_CONFIG[userTier] || RATE_LIMIT_CONFIG.default;
       
+      // Special handling for exhausted free tier
+      if (userTier === 'exhausted') {
+        return res.status(429).json({
+          error: {
+            message: 'Hết quota miễn phí hôm nay. Hãy nhập API Key cho OpenRouter/Groq/Gemini/NVIDIA/SambaNova trong tab "Nhà Cung Cấp" để tiếp tục.',
+            type: 'rate_limit_exceeded',
+            code: 'FREE_QUOTA_EXHAUSTED',
+            retryAfter: req.rateLimit.resetTime,
+            tier: 'free',
+            limit: 0,
+            windowMs: config.windowMs,
+            hint: 'Xem tab "Nhà Cung Cấp" để nhập free API key từ các nhà cung cấp hỗ trợ.',
+          },
+        });
+      }
+      
       res.status(429).json({
         error: {
           message: `${config.message}. Your tier (${userTier}) allows ${limitConfig.max} requests per minute.`,
@@ -139,7 +174,7 @@ function createTieredLimiter(tier, endpointType = 'api') {
     },
     skip: (req) => {
       if (process.env.NODE_ENV === 'test') return false;
-      const LOOPBACK = /^(::1|::ffff:127\.0\.0\.1|127(\._\d+){3})$/;
+      const LOOPBACK = /^(::1|::ffff:127\.0\.0\.1|127(\.\d+){3})$/;
       const remote = req.socket.remoteAddress || '';
       return LOOPBACK.test(remote);
     },

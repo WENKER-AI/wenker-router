@@ -14,27 +14,27 @@ const ASSETS_CACHE_NAME = 'wenker-assets-v2';
 
 // Files to cache for offline
 const APP_SHELL = [
-  '/web/',
-  '/web/index.html',
-  '/web/landing.html',
-  '/web/404.html',
-  '/web/assets/favicon-w.svg',
-  '/web/assets/og-image.png',
-  '/web/assets/landing.css',
-  '/web/assets/landing.js',
-  '/web/assets/i18n.js',
+  '/wenker/',
+  '/wenker/index.html',
+  '/wenker/landing.html',
+  '/wenker/404.html',
+  '/wenker/assets/favicon-w.svg',
+  '/wenker/assets/banner.png',
+  '/wenker/assets/landing.css',
+  '/wenker/assets/landing.js',
+  '/wenker/assets/i18n.js',
 ];
 
 // Cache assets with versioning
 const ASSETS_TO_CACHE = [
-  '/web/assets/favicon-w.svg',
-  '/web/assets/og-image.png',
-  '/web/assets/landing.css',
-  '/web/assets/landing.js',
-  '/web/assets/i18n.js',
-  '/web/assets/lang.js',
-  '/web/assets/icons.js',
-  '/web/assets/games.js',
+  '/wenker/assets/favicon-w.svg',
+  '/wenker/assets/banner.png',
+  '/wenker/assets/landing.css',
+  '/wenker/assets/landing.js',
+  '/wenker/assets/i18n.js',
+  '/wenker/assets/lang.js',
+  '/wenker/assets/icons.js',
+  '/wenker/assets/games.js',
 ];
 
 // Install Service Worker
@@ -68,7 +68,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   
   // Cache CSS, JS, fonts
-  if (url.pathname.includes('/web/assets/')) {
+  if (url.pathname.includes('/wenker/assets/')) {
     event.respondWith(
       caches.open(ASSETS_CACHE_NAME).then((cache) => {
         return cache.match(event.request).then((cachedResponse) => {
@@ -150,7 +150,7 @@ self.addEventListener('push', (event) => {
   if (data) {
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: '/web/assets/favicon-w.svg',
+      icon: '/wenker/assets/favicon-w.svg',
       data: data.url,
     });
   }
@@ -163,4 +163,4 @@ self.addEventListener('message', (event) => {
   }
 });
 
-console.log('[SW] WENKER ADS Service Worker loaded');
+console.log('[SW] WENKER Service Worker loaded');

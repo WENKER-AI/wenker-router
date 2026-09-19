@@ -5,8 +5,22 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 // và có thể đổi bất cứ lúc nào bằng nút globe trên Navbar.
 
 const STORAGE_KEY = 'wenker.ui.lang';
-export const LANGS = ['vi', 'en', 'zh', 'fr'];
-export const LANG_NAMES = { vi: 'Tiếng Việt', en: 'English', zh: '中文', fr: 'Français' };
+
+// 30 ngôn ngữ (vi nguồn + 29 đích), khớp bộ từ điển scripts/translate-all.js.
+export const LANGS = ['vi','en','fr','de','es','pt','it','nl','pl','ru','uk','cs','hu','ro','bg','el','tr','ar','fa','he','hi','bn','ur','ta','th','id','ms','ja','ko','zh'];
+export const RTL = { ar: 1, fa: 1, ur: 1, he: 1 };
+export const LANG_NAMES = {
+  vi: 'Tiếng Việt', en: 'English', fr: 'Français', de: 'Deutsch', es: 'Español',
+  pt: 'Português', it: 'Italiano', nl: 'Nederlands', pl: 'Polski', ru: 'Русский',
+  uk: 'Українська', cs: 'Čeština', hu: 'Magyar', ro: 'Română', bg: 'Български',
+  el: 'Ελληνικά', tr: 'Türkçe', ar: 'العربية', fa: 'فارسی', he: 'עברית',
+  hi: 'हिन्दी', bn: 'বাংলা', ur: 'اردو', ta: 'தமிழ்', th: 'ไทย',
+  id: 'Bahasa Indonesia', ms: 'Bahasa Melayu', ja: '日本語', ko: '한국어', zh: '中文',
+};
+
+// Từ điển ngoài cho 26 ngôn ngữ KHÔNG nhúng sẵn trong STRINGS (vi/en/zh/fr đã inline).
+// Mỗi file client/src/i18n/<lang>.json = { "<chuỗi vi>": "<bản dịch>" }.
+const EXT_LOADERS = import.meta.glob('./i18n/*.json');
 
 const STRINGS = {
   // ---------- Navbar ----------
@@ -269,6 +283,8 @@ const STRINGS = {
   'h.stale': { vi: 'Cũ {n}p', en: 'Old {n}m', zh: '{n} 分钟前', fr: 'Ancien {n}m' },
   'h.alive': { vi: 'Sống {n}ms', en: 'Live {n}ms', zh: '存活 {n}ms', fr: 'Vif {n}ms' },
   'h.needKey': { vi: 'Cần key', en: 'Needs key', zh: '需要密钥', fr: 'Clé requise' },
+  'h.keyInvalid': { vi: 'Key bị từ chối', en: 'Key rejected', zh: '密钥被拒', fr: 'Clé rejetée' },
+  'h.keyExhausted': { vi: 'Hết hạn mức/vốn', en: 'Out of credits', zh: '余额/额度不足', fr: 'Crédits épuisés' },
   'h.freeOut': { vi: 'Hết lượt free', en: 'Free quota out', zh: '免费额度用尽', fr: 'Quota gratuit épuisé' },
   'h.dead': { vi: 'Chết', en: 'Down', zh: '已下线', fr: 'Hors ligne' },
   'prov.free': { vi: 'Miễn phí', en: 'Free', zh: '免费', fr: 'Gratuit' },
@@ -311,6 +327,9 @@ const STRINGS = {
   'prov.oldResult': { vi: 'Kết quả cũ ({n} phút trước)', en: 'Stale result ({n} min ago)', zh: '旧结果（{n} 分钟前）', fr: 'Résultat ancien ({n} min)' },
   'prov.aliveStatus': { vi: 'Đang sống ({n}ms)', en: 'Live ({n}ms)', zh: '存活（{n}ms）', fr: 'Actif ({n}ms)' },
   'prov.needKeyStatus': { vi: 'Cần API Key', en: 'Needs API key', zh: '需要 API 密钥', fr: 'Clé API requise' },
+  'prov.keyInvalidStatus': { vi: 'Key đã lưu bị upstream từ chối (sai/hết hạn/đã thu hồi)', en: 'Stored key was rejected upstream (wrong/expired/revoked)', zh: '已保存的密钥被上游拒绝（错误/过期/已撤销）', fr: 'La clé enregistrée a été rejetée en amont (invalide/expirée/révoquée)' },
+  'prov.keyExhaustedStatus': { vi: 'Key đã lưu nhưng tài khoản hết hạn mức/vốn — cần nạp tiền', en: 'Stored key works but the account is out of credits — top up', zh: '密钥有效但账户余额/额度不足——请充值', fr: 'Clé valide mais compte à court de crédits — rechargez' },
+  'prov.maskHint': { vi: 'Ô này đang hiển thị key đã lưu dưới dạng che (gồm dấu ••••) — đây là bảo mật, KHÔNG phải lỗi. Giữ nguyên & bấm Lưu để giữ key; muốn đổi key thì xóa sạch ô và dán key mới.', en: 'A saved key is shown here in masked form (containing ••••) — this is security, NOT a bug. Leave it as-is & save to keep it; to replace it, clear the field and paste the new key.', zh: '此处以掩码形式显示已保存的密钥（含 ••••）——这是安全措施，并非故障。保持原样并保存可保留密钥；如需更换，请清空输入框后粘贴新密钥。', fr: 'La clé enregistrée s\u2019affiche ici masquée (avec ••••) — c\u2019est une sécurité, PAS un bug. Laissez tel quel et enregistrez pour la conserver ; pour la remplacer, videz le champ et collez la nouvelle clé.' },
   'prov.freeOutStatus': { vi: 'Nguồn sống nhưng hết lượt miễn phí — thêm key miễn phí để tiếp tục', en: 'Source is live but free quota is out — add a free key to continue', zh: '来源存活但免费额度用尽——添加免费密钥以继续', fr: 'Source active mais quota gratuit épuisé — ajoutez une clé gratuite' },
   'prov.noAnswerStatus': { vi: 'Không trả lời', en: 'No answer', zh: '无应答', fr: 'Aucune réponse' },
   'prov.howToGetKey': { vi: 'Cách lấy API Key miễn phí', en: 'How to get a free API key', zh: '如何获取免费 API 密钥', fr: 'Obtenir une clé API gratuite' },

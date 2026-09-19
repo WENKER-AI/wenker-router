@@ -24,17 +24,32 @@ const ADDONS_FILE = path.join(DATA_DIR, 'addons.json');
 const SHADES = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
 // Blend weight per shade: positive = toward white, negative = toward black.
 const MIX = {
-  50: 0.92, 100: 0.78, 200: 0.58, 300: 0.32, 400: 0.1,
-  500: 0, 600: -0.16, 700: -0.34, 800: -0.5, 900: -0.68, 950: -0.84
+  50: 0.92,
+  100: 0.78,
+  200: 0.58,
+  300: 0.32,
+  400: 0.1,
+  500: 0,
+  600: -0.16,
+  700: -0.34,
+  800: -0.5,
+  900: -0.68,
+  950: -0.84,
 };
 
 function hexToRgb(hex) {
   if (typeof hex !== 'string') return null;
   const h = hex.replace('#', '').trim();
-  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+  const full =
+    h.length === 3
+      ? h
+        .split('')
+        .map((c) => c + c)
+        .join('')
+      : h;
   if (!/^[0-9a-f]{6}$/i.test(full)) return null;
   const n = parseInt(full, 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  return [n >> 16 & 255, n >> 8 & 255, n & 255];
 }
 
 function mix(rgb, amount) {
@@ -50,7 +65,7 @@ const luma = (rgb) => Math.round((rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 
 // readability floor: the colour is pulled toward white until it is bright enough.
 const TEXT_FLOOR = {
   slate: { 300: 168, 400: 124, 500: 84 },
-  cyan: { 300: 168, 400: 140 }
+  cyan: { 300: 168, 400: 140 },
 };
 
 function readable(rgb, floor) {
@@ -70,7 +85,8 @@ function expandTheme(spec) {
 
   const accent = hexToRgb(spec.accent);
   if (accent) {
-    for (const s of SHADES) out[`--color-cyan-${s}`] = readable(mix(accent, MIX[s]), TEXT_FLOOR.cyan[s]).join(' ');
+    for (const s of SHADES)
+      out[`--color-cyan-${s}`] = readable(mix(accent, MIX[s]), TEXT_FLOOR.cyan[s]).join(' ');
     out['--accent-cyan'] = spec.accent;
   }
 
@@ -78,7 +94,8 @@ function expandTheme(spec) {
   if (surface) {
     // Neutralise the surface a little so large areas stay readable, then build the ramp.
     const base = surface.map((c) => Math.round(c * 0.6 + 8));
-    for (const s of SHADES) out[`--color-slate-${s}`] = readable(mix(base, MIX[s]), TEXT_FLOOR.slate[s]).join(' ');
+    for (const s of SHADES)
+      out[`--color-slate-${s}`] = readable(mix(base, MIX[s]), TEXT_FLOOR.slate[s]).join(' ');
     out['--bg-primary'] = spec.surface;
     out['--bg-secondary'] = `rgb(${mix(base, -0.2).join(' ')})`;
     out['--bg-card'] = `rgb(${mix(base, 0.05).join(' ')})`;
@@ -117,8 +134,8 @@ const BUILTIN_ADDONS = [
       '--color-slate-300': '203 213 225',
       '--color-slate-400': '148 163 184',
       '--color-slate-500': '100 116 139',
-      '--color-slate-950': '2 6 23'
-    }
+      '--color-slate-950': '2 6 23',
+    },
   },
   {
     id: 'wenker.theme.emerald',
@@ -128,7 +145,7 @@ const BUILTIN_ADDONS = [
     builtin: true,
     author: 'WENKER',
     description: 'X luc bao tren nen den tuyet, kieu terminal hacker.',
-    theme: { accent: '#10b981', surface: '#04120c', text: '#d1fae5', radius: '10px' }
+    theme: { accent: '#10b981', surface: '#04120c', text: '#d1fae5', radius: '10px' },
   },
   {
     id: 'wenker.theme.synthwave',
@@ -138,7 +155,7 @@ const BUILTIN_ADDONS = [
     builtin: true,
     author: 'WENKER',
     description: 'Hong tim neon retro-80s, tuong phan cao, bo goc nhieu.',
-    theme: { accent: '#f472b6', surface: '#150a26', text: '#fdf4ff', radius: '18px' }
+    theme: { accent: '#f472b6', surface: '#150a26', text: '#fdf4ff', radius: '18px' },
   },
   {
     id: 'wenker.theme.contrast',
@@ -148,7 +165,13 @@ const BUILTIN_ADDONS = [
     builtin: true,
     author: 'WENKER',
     description: 'Tuong phan toi da cho de doc: nen den, accent xanh troi sang.',
-    theme: { accent: '#38bdf8', surface: '#000000', text: '#ffffff', radius: '8px', '--glass-alpha': '0.95' }
+    theme: {
+      accent: '#38bdf8',
+      surface: '#000000',
+      text: '#ffffff',
+      radius: '8px',
+      '--glass-alpha': '0.95',
+    },
   },
   {
     id: 'wenker.theme.ember',
@@ -158,7 +181,7 @@ const BUILTIN_ADDONS = [
     builtin: true,
     author: 'WENKER',
     description: 'Hổ phách ấm trên nền nâu đen, dịu mắt cho ca đêm.',
-    theme: { accent: '#f59e0b', surface: '#12100a', text: '#fef3c7', radius: '12px' }
+    theme: { accent: '#f59e0b', surface: '#12100a', text: '#fef3c7', radius: '12px' },
   },
   {
     id: 'wenker.theme.paper',
@@ -167,7 +190,8 @@ const BUILTIN_ADDONS = [
     type: 'theme',
     builtin: true,
     author: 'WENKER',
-    description: 'Sach trang sang trong: dao nguoc thang zinc sang nen, giu accent indigo — che do sang tuy chon.',
+    description:
+      'Sach trang sang trong: dao nguoc thang zinc sang nen, giu accent indigo — che do sang tuy chon.',
     theme: {
       // Dao nguoc hoan toan thang slate: moi class bg-slate-900/950 (card, input,
       // header) va text-slate-100..500 (chu the) tu dong doi sang sang/toi ma
@@ -208,8 +232,8 @@ const BUILTIN_ADDONS = [
       '--text-muted': '#71717a',
       '--accent-cyan': '#4f46e5',
       '--sea-shadow': '0 1px 2px rgba(0, 0, 0, 0.06)',
-      '--sea-shadow-lg': '0 10px 30px -12px rgba(0, 0, 0, 0.15)'
-    }
+      '--sea-shadow-lg': '0 10px 30px -12px rgba(0, 0, 0, 0.15)',
+    },
   },
   {
     id: 'wenker.addon.copyids',
@@ -219,8 +243,8 @@ const BUILTIN_ADDONS = [
     builtin: true,
     author: 'WENKER',
     description: 'Them nut "Copy toan bo ID dang song" trong Model Finder.',
-    snippet: 'copy_alive_ids'
-  }
+    snippet: 'copy_alive_ids',
+  },
 ];
 
 function readAddons() {
@@ -250,7 +274,12 @@ const ALLOWED_TYPES = ['theme', 'provider', 'snippet'];
 const SAFE_CSS_VALUE = /^[0-9a-zA-Z#%(),.\s/+*-]{1,64}$/;
 function unsafeVars(resolved) {
   return Object.entries(resolved)
-    .filter(([, v]) => !SAFE_CSS_VALUE.test(String(v)) || /url\s*\(/i.test(String(v)) || /expression/i.test(String(v)))
+    .filter(
+      ([, v]) =>
+        !SAFE_CSS_VALUE.test(String(v)) ||
+        /url\s*\(/i.test(String(v)) ||
+        /expression/i.test(String(v)),
+    )
     .map(([k]) => k);
 }
 
@@ -295,7 +324,7 @@ class AddonService {
   // readability floors) reaches add-ons that were installed earlier.
   list() {
     return [...BUILTIN_ADDONS, ...this.custom].map((a) =>
-      a.type === 'theme' ? { ...a, resolved: expandTheme(a.theme || {}) } : a
+      a.type === 'theme' ? { ...a, resolved: expandTheme(a.theme || {}) } : a,
     );
   }
 
@@ -324,7 +353,7 @@ class AddonService {
       builtin: false,
       author: manifest.author || 'user',
       description: manifest.description || '',
-      installedAt: new Date().toISOString()
+      installedAt: new Date().toISOString(),
     };
     if (manifest.type === 'theme') {
       clean.theme = manifest.theme;
@@ -344,7 +373,10 @@ class AddonService {
     const before = this.custom.length;
     this.custom = this.custom.filter((a) => a.id !== id);
     writeAddons(this.custom);
-    return { ok: this.custom.length < before, builtinProtected: BUILTIN_ADDONS.some((a) => a.id === id) };
+    return {
+      ok: this.custom.length < before,
+      builtinProtected: BUILTIN_ADDONS.some((a) => a.id === id),
+    };
   }
 }
 

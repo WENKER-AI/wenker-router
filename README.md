@@ -8,6 +8,7 @@
   <strong>一个端口，统一所有 AI 工具。</strong><br/>
   自托管的 OpenAI + Anthropic 双协议网关，内置 <b>181</b> 家模型供应商、登记 <b>269</b> 个模型条目，
   网关实测对外可路由 <b>560+</b> 个模型 ID（含历史别名），开箱即用地对接 Claude Code、Cursor、Cline、OpenWebUI、Aider、Continue 等。
+  <br/><i>Lưu ý: 560+ là số model ID có thể route (kể alias lịch sử), 269 là số model khai báo tĩnh. Free tier (Pollinations/DuckDuckGo) có giới hạn quota và có thể trả 402/429. P2P module hiện tại cần cập nhật dependency để chạy.</i>
 </p>
 
 <p align="center">
@@ -528,9 +529,9 @@ flowchart LR
 
 ## 静态站点与 404 小游戏
 
-除了登录后的控制台，仓库还带一个**纯静态营销/文档站**（`web/`），无需构建、无 CDN、无埋点，可直接用 `file://` 打开，也可由后端挂载在 **`/web`**：
+除了登录后的控制台，仓库还带一个**纯静态营销/文档站**（`web/`），无需构建、无 CDN、无埋点，可直接用 `file://` 打开，也可由后端挂载在 **`/wenker`**：
 
-- `http://localhost:3600/web/` —— 介绍 / 特性 / 安装 / 文档 / 生态 / 仓库 / 致谢。
+- `http://localhost:3600/wenker/` —— 介绍 / 特性 / 安装 / 文档 / 生态 / 仓库 / 致谢。
 - 全站**四语**：越南语、英语、中文、法语，右上角一键切换，选择记在 `localStorage`。
 - 图标全部是**手绘点阵 SVG**（不是 emoji），与"像素鱼"配色一致。
 - 标签页采用类 Mistral 的**滑动下划线指示器**动画。
@@ -599,6 +600,24 @@ A：删掉 `WENKER_HOME` 目录即可（示例数据在 `data/`，下次运行�
 
 **Q：支持 Docker 吗？**
 A：本质就是一个 Node 进程 + 一个数据目录，容器化时把 `WENKER_HOME` 挂成卷即可。
+
+---
+
+## ⚠️ Hiện trạng & Hạn chế (Honest Status)
+
+Để minh bạch cho người dùng và contributor:
+
+| Tính năng | Trạng thái | Ghi chú |
+|-----------|------------|---------|
+| **SSE Streaming** | ✅ Đã hỗ trợ | `/v1/chat/completions?stream=true` hoạt động cho keyed providers. Free tier (Pollinations/DuckDuckGo) emit SSE locally từ response non-stream. |
+| **P2P Network** | ⚠️ **Chưa sẵn sàng production** | Code ở `server/p2p/` nhưng dependency `@libp2p/core` v1.x không còn trên npm. Cần update lên libp2p mới (`@libp2p/interface-*`, `@libp2p/tcp`, `@libp2p/websockets`, `@chainsafe/libp2p-noise`, `@chainsafe/libp2p-yamux`, `@libp2p/mdns`, `@libp2p/floodsub` / `@libp2p/gossipsub`). |
+| **Free Tier (Pollinations/DuckDuckGo)** | ⚠️ Unreliable | Thường 402/429/503. Không phù hợp production. Hãy nhập free key cho OpenRouter/Groq/Gemini/NVIDIA/SambaNova. |
+| **Provider Health Check** | ✅ Manual / On-demand | Chưa có background proactive health check định kỳ. UI có nút "Ping" nhưng không tự động chạy nền. |
+| **Circuit Breaker** | ✅ Đã implement (`server/services/circuitBreaker.js`) | Đã tích hợp trong `proxyService._directChat`. Configurable qua Settings. |
+| **Input Sanitization** | ❌ Chưa có | Cần thêm middleware sanitize `messages.content` chống prompt injection. |
+| **Plugin API Auth** | ❌ Chưa có | Endpoint `/api/plugins/*` chưa yêu cầu admin key. |
+| **Metrics / Observability** | ⚠️ Partial | `prom-client` đã trong deps nhưng chưa expose `/metrics` endpoint. |
+| **Test Coverage** | ~5% | Chỉ rate limiter có test. Services/routes khác chưa có unit/integration test. |
 
 ---
 

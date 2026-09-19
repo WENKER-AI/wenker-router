@@ -14,7 +14,11 @@ const CATS = [
 ];
 
 function host(u) {
-  try { return new URL(u).hostname; } catch (e) { return ''; }
+  try {
+    return new URL(u).hostname;
+  } catch (e) {
+    return '';
+  }
 }
 function logo(p) {
   const h = host(p.website || p.baseUrl || '');
@@ -35,8 +39,8 @@ for (const [key, label] of CATS) {
   const list = (byCat[key] || []).sort((a, b) => a.name.localeCompare(b.name));
   if (!list.length) continue;
   out += `\n### ${label} — ${list.length} 家\n\n`;
-  out += `|  | 名称 | 模型数 | 鉴权 | 官网 |\n`;
-  out += `|---|---|---:|---|---|\n`;
+  out += '|  | 名称 | 模型数 | 鉴权 | 官网 |\n';
+  out += '|---|---|---:|---|---|\n';
   for (const p of list) {
     const mc = p.models ? p.models.length : 0;
     totalModels += mc;

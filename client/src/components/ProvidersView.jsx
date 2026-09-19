@@ -347,8 +347,8 @@ export default function ProvidersView() {
               rose: 'bg-rose-500/15 text-rose-400 border-rose-500/30'
             };
             const DOT_TONES = { slate: 'bg-slate-500', emerald: 'bg-emerald-400', amber: 'bg-amber-400', rose: 'bg-rose-400' };
-            const healthTone = !h ? 'slate' : (h.stale ? 'slate' : h.ok ? 'emerald' : (h.needsKey || h.keyWouldHelp) ? 'amber' : 'rose');
-            const healthLabel = !h ? t('h.notTested') : h.stale ? t('h.stale', { n: Math.round(h.ageMs / 60000) }) : h.ok ? t('h.alive', { n: h.latencyMs || 0 }) : h.needsKey ? t('h.needKey') : h.keyWouldHelp ? t('h.freeOut') : t('h.dead');
+            const healthTone = !h ? 'slate' : (h.stale ? 'slate' : h.ok ? 'emerald' : (h.needsKey || h.keyWouldHelp || h.keyInvalid || h.keyExhausted) ? 'amber' : 'rose');
+            const healthLabel = !h ? t('h.notTested') : h.stale ? t('h.stale', { n: Math.round(h.ageMs / 60000) }) : h.ok ? t('h.alive', { n: h.latencyMs || 0 }) : h.needsKey ? t('h.needKey') : h.keyInvalid ? t('h.keyInvalid') : h.keyExhausted ? t('h.keyExhausted') : h.keyWouldHelp ? t('h.freeOut') : t('h.dead');
 
             return (
               <div
@@ -575,6 +575,11 @@ export default function ProvidersView() {
                   placeholder={selectedProvider.requiresAuth ? 'sk-...' : t('prov.noKeyPlaceholder')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:border-cyan-500 focus:outline-none"
                 />
+                {selectedProvider.hasApiKey && (
+                  <p className="mt-1.5 text-[11px] leading-relaxed text-cyan-200/80">
+                    {t('prov.maskHint')}
+                  </p>
+                )}
                 {!selectedProvider.requiresAuth && (
                   <p className="mt-1.5 text-[11px] leading-relaxed text-slate-500">
                     {t('prov.noKeyHelp')}
@@ -744,7 +749,7 @@ export default function ProvidersView() {
                     <InfoRow label={t('prov.savedCookie')} value={dp.userCookie ? t('common.yes') : t('common.no')} />
                     {(() => {
                       const dh = health[dp.id];
-                      const label = !dh ? t('prov.notChecked') : dh.stale ? t('prov.oldResult', { n: Math.round(dh.ageMs / 60000) }) : dh.ok ? t('prov.aliveStatus', { n: dh.latencyMs || 0 }) : dh.needsKey ? `${t('prov.needKeyStatus')}${dh.error ? ` — ${dh.error}` : ''}` : dh.keyWouldHelp ? `${t('prov.freeOutStatus')} (${dh.error})` : `${t('prov.noAnswerStatus')} — ${dh.error}`;
+                      const label = !dh ? t('prov.notChecked') : dh.stale ? t('prov.oldResult', { n: Math.round(dh.ageMs / 60000) }) : dh.ok ? t('prov.aliveStatus', { n: dh.latencyMs || 0 }) : dh.needsKey ? `${t('prov.needKeyStatus')}${dh.error ? ` — ${dh.error}` : ''}` : dh.keyInvalid ? `${t('prov.keyInvalidStatus')} — ${dh.error}` : dh.keyExhausted ? `${t('prov.keyExhaustedStatus')} — ${dh.error}` : dh.keyWouldHelp ? `${t('prov.freeOutStatus')} (${dh.error})` : `${t('prov.noAnswerStatus')} — ${dh.error}`;
                       return <InfoRow label={t('prov.checkStatus')} value={label} />;
                     })()}
                   </div>

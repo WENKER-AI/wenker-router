@@ -39,9 +39,9 @@ const PRIVATE_RE = new RegExp(
     '^0\\.0\\.0\\.0$',
     '^::1$',
     '^f[cd][0-9a-f]{2}:', // IPv6 ULA fc00::/7
-    '\\.local$'
+    '\\.local$',
   ].join('|'),
-  'i'
+  'i',
 );
 
 function hostFromInput(input) {
@@ -49,7 +49,8 @@ function hostFromInput(input) {
     let raw;
     if (typeof input === 'string') raw = input;
     else if (input instanceof URL) raw = input.href;
-    else if (input && typeof input.url === 'string') raw = input.url; // Request
+    else if (input && typeof input.url === 'string')
+      raw = input.url; // Request
     else return '';
     // Cho phep duong dan tuong doi ("", "/v1") -> khong co host -> bypass.
     const u = new URL(raw, 'http://127.0.0.1');
@@ -62,7 +63,12 @@ function hostFromInput(input) {
 function parseNoProxy(list) {
   return String(list || '')
     .split(',')
-    .map((s) => s.trim().replace(/^\*?\./, '').toLowerCase())
+    .map((s) =>
+      s
+        .trim()
+        .replace(/^\*?\./, '')
+        .toLowerCase(),
+    )
     .filter(Boolean);
 }
 
@@ -88,7 +94,9 @@ function getAgent(settings, host) {
     try {
       agentCache.set(proxyUrl, new ProxyAgent(proxyUrl));
     } catch (e) {
-      console.warn(`[proxy] ProxyAgent("${proxyUrl}") khong khoi tao duoc (${e.message}); dung ket noi truc tiep.`);
+      console.warn(
+        `[proxy] ProxyAgent("${proxyUrl}") khong khoi tao duoc (${e.message}); dung ket noi truc tiep.`,
+      );
       return null;
     }
   }
@@ -98,7 +106,11 @@ function getAgent(settings, host) {
 /** Goi khi settings doi: dong agent cu de pick up proxyUrl moi / tat proxy. */
 function reset() {
   for (const agent of agentCache.values()) {
-    try { agent.close(); } catch (e) { /* best-effort */ }
+    try {
+      agent.close();
+    } catch (e) {
+      /* best-effort */
+    }
   }
   agentCache = new Map();
 }
@@ -139,14 +151,22 @@ async function testProxy(proxyUrl) {
   try {
     const res = await nativeFetch('http://ifconfig.me/ip', {
       dispatcher: agent,
-      signal: AbortSignal.timeout(10000)
+      signal: AbortSignal.timeout(10000),
     });
     const text = (await res.text()).trim();
     return { ok: res.ok, status: res.status, ip: text.slice(0, 64), latencyMs: Date.now() - start };
   } catch (e) {
-    return { ok: false, latencyMs: Date.now() - start, error: `${e.name || 'Error'}: ${e.message}` };
+    return {
+      ok: false,
+      latencyMs: Date.now() - start,
+      error: `${e.name || 'Error'}: ${e.message}`,
+    };
   } finally {
-    try { agent.close(); } catch (e) { /* ignore */ }
+    try {
+      agent.close();
+    } catch (e) {
+      /* ignore */
+    }
   }
 }
 

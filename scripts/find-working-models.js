@@ -26,7 +26,7 @@ function req(method, path, body, timeoutMs) {
       },
       (res) => {
         let buf = '';
-        res.on('data', (c) => (buf += c));
+        res.on('data', (c) => buf += c);
         res.on('end', () => {
           let json = null;
           try {
@@ -36,9 +36,11 @@ function req(method, path, body, timeoutMs) {
           }
           resolve({ status: res.statusCode, text: buf, json, ms: Date.now() - t0 });
         });
-      }
+      },
     );
-    r.on('error', (e) => resolve({ status: 0, text: e.code || e.message, json: null, ms: Date.now() - t0 }));
+    r.on('error', (e) =>
+      resolve({ status: 0, text: e.code || e.message, json: null, ms: Date.now() - t0 }),
+    );
     r.on('timeout', () => {
       r.destroy();
       resolve({ status: -1, text: 'timeout', json: null, ms: Date.now() - t0 });
@@ -66,7 +68,7 @@ function extractText(status, text, json) {
       try {
         const o = JSON.parse(payload);
         const d = o.choices && o.choices[0];
-        if (d) out += (d.delta && d.delta.content) || d.text || '';
+        if (d) out += d.delta && d.delta.content || d.text || '';
       } catch (e) {
         /* chunk chua du */
       }
@@ -99,15 +101,21 @@ async function main() {
   const all = m.json.data.filter((x) => x && x.id && !String(x.id).includes('/'));
 
   // Nhan dien theo nhom: model nao KHONG can key -> thu truoc
-  const rank = (x) => (x.wenker_needs_key === false ? 0 : x.wenker_free ? 1 : 2);
+  const rank = (x) => x.wenker_needs_key === false ? 0 : x.wenker_free ? 1 : 2;
   const candidates = all
     .slice()
     .sort((a, b) => rank(a) - rank(b))
     .slice(0, LIMIT);
 
   console.log(
-    '/v1/models: ' + m.json.data.length + ' entry, ' + all.length + ' model tran. ' +
-      'Thu ' + candidates.length + ' model (uu tien khong can key).\n'
+    '/v1/models: ' +
+      m.json.data.length +
+      ' entry, ' +
+      all.length +
+      ' model tran. ' +
+      'Thu ' +
+      candidates.length +
+      ' model (uu tien khong can key).\n',
   );
 
   const results = [];
@@ -135,9 +143,14 @@ async function main() {
         preview: content.replace(/\s+/g, ' ').slice(0, 90),
         hint: ok ? '' : errHint(r.status, r.text, r.json),
       };
-      const line = (ok ? 'OK   ' : 'FAIL ') + model.id.padEnd(38) +
-        ' [' + (results[idx].provider + '').padEnd(20) + '] ' +
-        String(r.ms).padStart(6) + 'ms  ' +
+      const line =
+        (ok ? 'OK   ' : 'FAIL ') +
+        model.id.padEnd(38) +
+        ' [' +
+        (results[idx].provider + '').padEnd(20) +
+        '] ' +
+        String(r.ms).padStart(6) +
+        'ms  ' +
         (ok ? '"' + results[idx].preview + '"' : results[idx].hint);
       console.log(line);
     }
@@ -148,7 +161,9 @@ async function main() {
   console.log('\n================ KET LUAN ================');
   console.log('Model TRA LOI DUOC THAT: ' + working.length + ' / ' + results.length);
   for (const w of working) {
-    console.log('  ' + w.id + '   (' + w.ms + 'ms, ' + w.len + ' ky tu, provider=' + w.provider + ')');
+    console.log(
+      '  ' + w.id + '   (' + w.ms + 'ms, ' + w.len + ' ky tu, provider=' + w.provider + ')',
+    );
   }
   const byReason = {};
   for (const r of results) if (!r.ok) byReason[r.hint] = (byReason[r.hint] || 0) + 1;
@@ -157,8 +172,15 @@ async function main() {
     console.log('  ' + String(v).padStart(3) + ' x  ' + k);
   }
   const provAlive = new Set(working.map((w) => w.provider));
-  console.log('\nNHOM PROVIDER CON SONG THAT: ' + (provAlive.size ? [...provAlive].join(', ') : 'KHONG CO'));
-  console.log('\n-> Copilot/Cline nen dung: ' + (working.length ? working.map((w) => w.id).join(' | ') : 'CHUA CO - can them API key mien phi (Groq/OpenRouter/Gemini) qua dashboard roi doi bo loc sang "all"'));
+  console.log(
+    '\nNHOM PROVIDER CON SONG THAT: ' + (provAlive.size ? [...provAlive].join(', ') : 'KHONG CO'),
+  );
+  console.log(
+    '\n-> Copilot/Cline nen dung: ' +
+      (working.length
+        ? working.map((w) => w.id).join(' | ')
+        : 'CHUA CO - can them API key mien phi (Groq/OpenRouter/Gemini) qua dashboard roi doi bo loc sang "all"'),
+  );
 }
 
 main().catch((e) => console.log('FATAL', e));

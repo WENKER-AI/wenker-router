@@ -5,9 +5,9 @@
 
 const db = require('./dbService');
 
-const POLLINATIONS_URL = "https://text.pollinations.ai/openai";
-const POLLINATIONS_MODELS_URL = "https://text.pollinations.ai/models";
-const FALLBACK_MODEL = "openai-fast";
+const POLLINATIONS_URL = 'https://text.pollinations.ai/openai';
+const POLLINATIONS_MODELS_URL = 'https://text.pollinations.ai/models';
+const FALLBACK_MODEL = 'openai-fast';
 const REQUEST_TIMEOUT_MS = 45000;
 // A single WENKER request must never hang for minutes behind upstream retries.
 const UPSTREAM_DEADLINE_MS = 25000;
@@ -20,9 +20,9 @@ const DDG_DOWN_MS = 60 * 1000;
  * answer the client with an honest code (402/429/503) instead of a generic 500.
  */
 class UpstreamError extends Error {
-  constructor(message, status = 502, code = "upstream_error") {
+  constructor(message, status = 502, code = 'upstream_error') {
     super(message);
-    this.name = "UpstreamError";
+    this.name = 'UpstreamError';
     this.status = status;
     this.code = code;
   }
@@ -36,7 +36,7 @@ class UpstreamError extends Error {
 const UPSTREAM_REFUSAL_200 =
   /reached its budget|raise the budget|API key used for this request|topping up the wallet does not raise this limit/i;
 function looksLikeRefusal(content) {
-  if (typeof content !== "string") return false;
+  if (typeof content !== 'string') return false;
   const t = content.trim();
   if (!t || t.length > 600) return false;
   return UPSTREAM_REFUSAL_200.test(t);
@@ -77,7 +77,7 @@ class FreeProxyService {
           }
         }
       } catch (err) {
-        console.warn("[Pollinations] model list unavailable:", err.message);
+        console.warn('[Pollinations] model list unavailable:', err.message);
       }
     }
 
@@ -87,7 +87,7 @@ class FreeProxyService {
       if (this._modelsCache.has(name)) return name;
     }
     // Preferred model was retired upstream -> use the first model the API actually serves
-    const first = Array.from(this._modelsCache).find(n => !n.includes(" ")) || FALLBACK_MODEL;
+    const first = Array.from(this._modelsCache).find((n) => !n.includes(' ')) || FALLBACK_MODEL;
     console.warn(`[Pollinations] model "${preferred}" not offered upstream, using "${first}"`);
     return first;
   }
@@ -100,12 +100,15 @@ class FreeProxyService {
   _enqueue(task, deadlineAt) {
     const run = this._queue.then(() => {
       if (deadlineAt && Date.now() > deadlineAt) {
-        throw new Error("Upstream queue is saturated (request deadline exceeded)");
+        throw new Error('Upstream queue is saturated (request deadline exceeded)');
       }
       return task();
     }, task);
     // keep the chain alive even if the task rejects
-    this._queue = run.then(() => undefined, () => undefined);
+    this._queue = run.then(
+      () => undefined,
+      () => undefined,
+    );
     return run;
   }
 
@@ -129,7 +132,7 @@ class FreeProxyService {
    * not the provider id.
    */
   isPollinationsProvider(provider) {
-    return Boolean(provider) && /pollinations\.ai/i.test(String(provider.baseUrl || ""));
+    return Boolean(provider) && /pollinations\.ai/i.test(String(provider.baseUrl || ''));
   }
 
   _pollinationsKey() {
@@ -137,12 +140,14 @@ class FreeProxyService {
       // Only a Pollinations-based provider may feed an Authorization key to
       // text.pollinations.ai. Any WENKER tier re-pointed elsewhere is skipped so its
       // xkiro / izzi key can never leak to Pollinations.
-      for (const id of ["wenker-cloud", "pollinations"]) {
+      for (const id of ['wenker-cloud', 'pollinations']) {
         const p = db.getProviderById(id);
         if (p && p.userApiKey && this.isPollinationsProvider(p)) return String(p.userApiKey).trim();
       }
-    } catch (e) { /* db not ready */ }
-    return "";
+    } catch (e) {
+      /* db not ready */
+    }
+    return '';
   }
 
   /**
@@ -152,58 +157,69 @@ class FreeProxyService {
    */
   _pollinationsUrl() {
     try {
-      for (const id of ["wenker-cloud", "pollinations"]) {
+      for (const id of ['wenker-cloud', 'pollinations']) {
         const p = db.getProviderById(id);
         const base = p && p.baseUrl;
         // Skip a WENKER tier that has been re-pointed away from Pollinations, otherwise
         // the anonymous path would start calling xkiro/izzi with Pollinations payloads.
         if (p && this.isPollinationsProvider(p) && base && /^https?:\/\//i.test(base)) {
-          const clean = String(base).replace(/\/+$/, "");
-          if (clean.endsWith("/openai") || clean.endsWith("/chat/completions")) return clean;
+          const clean = String(base).replace(/\/+$/, '');
+          if (clean.endsWith('/openai') || clean.endsWith('/chat/completions')) return clean;
           return `${clean}/openai`;
         }
       }
-    } catch (e) { /* fall through */ }
+    } catch (e) {
+      /* fall through */
+    }
     return POLLINATIONS_URL;
   }
 
   _markPollinationsDown(reason) {
     this._pollinationsDisabledUntil = Date.now() + POLLINATIONS_DOWN_MS;
     this._pollinationsDownReason = reason;
-    console.warn(`[Pollinations] free tier unavailable (${reason}) - skipping upstream for ${POLLINATIONS_DOWN_MS / 60000} min`);
+    console.warn(
+      `[Pollinations] free tier unavailable (${reason}) - skipping upstream for ${POLLINATIONS_DOWN_MS / 60000} min`,
+    );
   }
 
   async _postWithRetry(payload, deadlineAt) {
     const attempts = 3;
     let lastErr;
+    const settings = db.getSettings();
+    const freeTierTimeoutMs = settings.defaultFreeTierTimeoutMs || REQUEST_TIMEOUT_MS;
 
     for (let i = 0; i < attempts; i++) {
       const remaining = (deadlineAt || Infinity) - Date.now();
       if (remaining <= 1500) {
-        throw lastErr || new Error("Upstream time budget exhausted");
+        throw lastErr || new Error('Upstream time budget exhausted');
       }
       let response;
       const headers = {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "User-Agent": "WENKER-Router/2.0"
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'User-Agent': 'WENKER-Router/2.0',
       };
       const key = this._pollinationsKey();
-      if (key) headers["Authorization"] = `Bearer ${key}`;
+      if (key) headers['Authorization'] = `Bearer ${key}`;
       try {
         response = await fetch(this._pollinationsUrl(), {
-          method: "POST",
+          method: 'POST',
           headers,
           body: JSON.stringify(payload),
-          signal: AbortSignal.timeout(Math.min(REQUEST_TIMEOUT_MS, remaining))
+          signal: AbortSignal.timeout(Math.min(freeTierTimeoutMs, remaining)),
         });
       } catch (err) {
         // network / timeout failure -> transient, worth another attempt
         lastErr = err;
         if (i < attempts - 1) {
-          const wait = Math.min(1200 * (i + 1), Math.max(0, ((deadlineAt || Infinity) - Date.now()) - 1500));
-          console.warn(`[Pollinations] ${err.message} (attempt ${i + 1}/${attempts}), retrying in ${wait}ms`);
-          await new Promise(r => setTimeout(r, wait));
+          const wait = Math.min(
+            1200 * (i + 1),
+            Math.max(0, (deadlineAt || Infinity) - Date.now() - 1500),
+          );
+          console.warn(
+            `[Pollinations] ${err.message} (attempt ${i + 1}/${attempts}), retrying in ${wait}ms`,
+          );
+          await new Promise((r) => setTimeout(r, wait));
         }
         continue;
       }
@@ -214,19 +230,19 @@ class FreeProxyService {
         // real 402 so the failover chain runs and the client gets an honest error
         // instead of a "COMPLETED" budget message (and so it never reaches the cache).
         if (looksLikeRefusal(parsed.content)) {
-          this._markPollinationsDown("budget refusal in HTTP 200");
+          this._markPollinationsDown('budget refusal in HTTP 200');
           throw new UpstreamError(
-            "Pollinations tu choi (HTTP 200 + 'reached its budget'): tier an danh het ngan sach.",
-            402
+            'Pollinations tu choi (HTTP 200 + \'reached its budget\'): tier an danh het ngan sach.',
+            402,
           );
         }
         return parsed;
       }
 
-      const errText = await response.text().catch(() => "");
+      const errText = await response.text().catch(() => '');
       lastErr = new UpstreamError(
         `Pollinations API returned status ${response.status}: ${errText.slice(0, 200)}`,
-        response.status
+        response.status,
       );
 
       // 402 = anonymous quota/key budget exhausted: retrying only wastes time.
@@ -235,15 +251,18 @@ class FreeProxyService {
         throw lastErr;
       }
 
-      const retryable = response.status === 408 || response.status === 429 || response.status >= 500;
+      const retryable =
+        response.status === 408 || response.status === 429 || response.status >= 500;
       if (!retryable) throw lastErr;
 
       const wait = Math.min(1200 * (i + 1), Math.max(0, remaining - 1500));
-      console.warn(`[Pollinations] HTTP ${response.status} (attempt ${i + 1}/${attempts}), retrying in ${wait}ms`);
-      await new Promise(r => setTimeout(r, wait));
+      console.warn(
+        `[Pollinations] HTTP ${response.status} (attempt ${i + 1}/${attempts}), retrying in ${wait}ms`,
+      );
+      await new Promise((r) => setTimeout(r, wait));
     }
 
-    throw lastErr || new Error("Pollinations request failed");
+    throw lastErr || new Error('Pollinations request failed');
   }
 
   /**
@@ -255,10 +274,12 @@ class FreeProxyService {
       const json = JSON.parse(raw);
       const choice = Array.isArray(json.choices) ? json.choices[0] : null;
       const content = choice?.message?.content ?? choice?.text ?? json.content;
-      if (typeof content === "string") {
+      if (typeof content === 'string') {
         return { content, usage: json.usage || null };
       }
-    } catch (e) { /* not JSON -> treat as plain text */ }
+    } catch (e) {
+      /* not JSON -> treat as plain text */
+    }
     return { content: raw, usage: null };
   }
 
@@ -267,14 +288,15 @@ class FreeProxyService {
    * used only when the upstream does not report usage itself.
    */
   _estimateTokens(text) {
-    return Math.max(0, Math.ceil(String(text || "").length / 4));
+    return Math.max(0, Math.ceil(String(text || '').length / 4));
   }
 
   _estimatePromptTokens(messages) {
     const chars = (Array.isArray(messages) ? messages : []).reduce(
-      (n, m) => n + String(m?.content || "").length, 0
+      (n, m) => n + String(m?.content || '').length,
+      0,
     );
-    return this._estimateTokens("x".repeat(chars));
+    return this._estimateTokens('x'.repeat(chars));
   }
 
   /**
@@ -282,26 +304,35 @@ class FreeProxyService {
    */
   async handlePollinations({ model, messages, stream, res, targetModel }) {
     const safeMessages = this.normalizeMessages(messages);
-    const selectedModel = await this.resolvePollinationsModel(targetModel || this.mapPollinationsModel(model));
+    const selectedModel = await this.resolvePollinationsModel(
+      targetModel || this.mapPollinationsModel(model),
+    );
 
     // Fast fail while the free tier is known to be down (avoids minutes of queueing).
     if (this._isPollinationsDown()) {
       console.warn(`Pollinations circuit open (${this._pollinationsDownReason}).`);
       throw new UpstreamError(
-        `Nguồn miễn phí đang gián đoạn (${this._pollinationsDownReason || "upstream down"}) - thu lại sau ít phút, hoặc nhập API Key miễn phí (enter.pollinations.ai/keys) cho WENKER Cloud.`,
+        `Nguồn miễn phí đang gián đoạn (${this._pollinationsDownReason || 'upstream down'}) - thu lại sau ít phút, hoặc nhập API Key miễn phí (enter.pollinations.ai/keys) cho WENKER Cloud.`,
         503,
-        "upstream_unavailable"
+        'upstream_unavailable',
       );
     }
 
     const deadlineAt = Date.now() + UPSTREAM_DEADLINE_MS;
 
     try {
-      const { content, usage } = await this._enqueue(() => this._postWithRetry({
-        model: selectedModel,
-        messages: safeMessages,
-        referrer: "wenker-router"
-      }, deadlineAt), deadlineAt);
+      const { content, usage } = await this._enqueue(
+        () =>
+          this._postWithRetry(
+            {
+              model: selectedModel,
+              messages: safeMessages,
+              referrer: 'wenker-router',
+            },
+            deadlineAt,
+          ),
+        deadlineAt,
+      );
 
       const promptTokens = usage?.prompt_tokens || this._estimatePromptTokens(safeMessages);
       const completionTokens = usage?.completion_tokens || this._estimateTokens(content);
@@ -313,7 +344,7 @@ class FreeProxyService {
 
       return {
         id: `chatcmpl-${Date.now()}`,
-        object: "chat.completion",
+        object: 'chat.completion',
         created: Math.floor(Date.now() / 1000),
         model: model || selectedModel,
         // Honesty field: which upstream model ACTUALLY answered (aliases like
@@ -322,23 +353,27 @@ class FreeProxyService {
         choices: [
           {
             index: 0,
-            message: { role: "assistant", content },
-            finish_reason: "stop"
-          }
+            message: { role: 'assistant', content },
+            finish_reason: 'stop',
+          },
         ],
         usage: {
           prompt_tokens: promptTokens,
           completion_tokens: completionTokens,
-          total_tokens: promptTokens + completionTokens
-        }
+          total_tokens: promptTokens + completionTokens,
+        },
       };
     } catch (err) {
-      console.warn("Pollinations request failed:", err.message);
+      console.warn('Pollinations request failed:', err.message);
       const status = err.status || 502;
-      const hint = status === 402
-        ? " Tier mien phi da het budget: vao tab Nha Cung Cap > WENKER Cloud > nhap API Key mien phi tu enter.pollinations.ai/keys."
-        : "";
-      const e = new UpstreamError(`Nguon mien phi Pollinations khong phan hoi: ${err.message}${hint}`, status);
+      const hint =
+        status === 402
+          ? ' Tier mien phi da het budget: vao tab Nha Cung Cap > WENKER Cloud > nhap API Key mien phi tu enter.pollinations.ai/keys.'
+          : '';
+      const e = new UpstreamError(
+        `Nguon mien phi Pollinations khong phan hoi: ${err.message}${hint}`,
+        status,
+      );
       throw e;
     }
   }
@@ -349,9 +384,9 @@ class FreeProxyService {
    */
   _writeSse(res, model, content) {
     return new Promise((resolve) => {
-      res.setHeader("Content-Type", "text/event-stream");
-      res.setHeader("Cache-Control", "no-cache");
-      res.setHeader("Connection", "keep-alive");
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
 
       const parts = String(content).match(/[\s\S]{1,24}/g) || [];
       let i = 0;
@@ -359,23 +394,25 @@ class FreeProxyService {
         if (i < parts.length) {
           const sseChunk = {
             id: `chatcmpl-${Date.now()}`,
-            object: "chat.completion.chunk",
+            object: 'chat.completion.chunk',
             created: Math.floor(Date.now() / 1000),
             model: model,
-            choices: [{ index: 0, delta: { content: parts[i] }, finish_reason: null }]
+            choices: [{ index: 0, delta: { content: parts[i] }, finish_reason: null }],
           };
           i++;
           res.write(`data: ${JSON.stringify(sseChunk)}\n\n`);
           setImmediate(tick);
         } else {
-          res.write(`data: ${JSON.stringify({
-            id: `chatcmpl-${Date.now()}`,
-            object: "chat.completion.chunk",
-            created: Math.floor(Date.now() / 1000),
-            model: model,
-            choices: [{ index: 0, delta: {}, finish_reason: "stop" }]
-          })}\n\n`);
-          res.write("data: [DONE]\n\n");
+          res.write(
+            `data: ${JSON.stringify({
+              id: `chatcmpl-${Date.now()}`,
+              object: 'chat.completion.chunk',
+              created: Math.floor(Date.now() / 1000),
+              model: model,
+              choices: [{ index: 0, delta: {}, finish_reason: 'stop' }],
+            })}\n\n`,
+          );
+          res.write('data: [DONE]\n\n');
           res.end();
           resolve();
         }
@@ -388,34 +425,37 @@ class FreeProxyService {
    * Coerce arbitrary client payloads into a valid OpenAI messages array.
    */
   normalizeMessages(messages) {
-    if (typeof messages === "string") {
-      return [{ role: "user", content: messages }];
+    if (typeof messages === 'string') {
+      return [{ role: 'user', content: messages }];
     }
     if (!Array.isArray(messages)) return [];
     return messages
-      .filter(m => m && typeof m === "object")
-      .map(m => {
-        const role = ["system", "user", "assistant", "tool"].includes(m.role) ? m.role : "user";
-        const content = typeof m.content === "string"
-          ? m.content
-          : Array.isArray(m.content)
-            ? m.content.map(c => (typeof c === "string" ? c : c?.text || "")).join("")
-            : m.content == null ? "" : JSON.stringify(m.content);
+      .filter((m) => m && typeof m === 'object')
+      .map((m) => {
+        const role = ['system', 'user', 'assistant', 'tool'].includes(m.role) ? m.role : 'user';
+        const content =
+          typeof m.content === 'string'
+            ? m.content
+            : Array.isArray(m.content)
+              ? m.content.map((c) => typeof c === 'string' ? c : c?.text || '').join('')
+              : m.content == null
+                ? ''
+                : JSON.stringify(m.content);
         const out = { role, content };
         // Tool-calling round-trip: an assistant turn may carry tool_calls (often with
         // content === null) and a tool turn is identified ONLY by tool_call_id.
         // Stripping these fields used to break every agent loop: the upstream model
         // never saw its own calls nor their results, so it could not continue.
-        if (role === "assistant" && Array.isArray(m.tool_calls) && m.tool_calls.length) {
+        if (role === 'assistant' && Array.isArray(m.tool_calls) && m.tool_calls.length) {
           out.tool_calls = m.tool_calls;
         }
-        if (role === "tool" && (m.tool_call_id || m.toolCallId)) {
+        if (role === 'tool' && (m.tool_call_id || m.toolCallId)) {
           out.tool_call_id = String(m.tool_call_id || m.toolCallId);
           if (m.name) out.name = String(m.name);
         }
         return out;
       })
-      .filter(m => m.content !== "" || m.tool_calls || m.tool_call_id);
+      .filter((m) => m.content !== '' || m.tool_calls || m.tool_call_id);
   }
 
   /**
@@ -423,41 +463,45 @@ class FreeProxyService {
    */
   async handleDuckDuckGo({ model, messages, stream, res }) {
     const safeMessages = this.normalizeMessages(messages);
+    const settings = db.getSettings();
+    const freeTierTimeoutMs = settings.defaultFreeTierTimeoutMs || REQUEST_TIMEOUT_MS;
 
     try {
       if (Date.now() < this._ddgDisabledUntil) {
-        throw new Error("DuckDuckGo temporarily disabled (handshake failures)");
+        throw new Error('DuckDuckGo temporarily disabled (handshake failures)');
       }
 
       // 1. Get VQD Token
-      const statusRes = await fetch("https://duckduckgo.com/duckchat/v1/status", {
+      const statusRes = await fetch('https://duckduckgo.com/duckchat/v1/status', {
         headers: {
-          "x-vqd-accept": "1",
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+          'x-vqd-accept': '1',
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
         },
-        signal: AbortSignal.timeout(10000)
+        signal: AbortSignal.timeout(10000),
       });
 
-      const vqd = statusRes.headers.get("x-vqd-4");
+      const vqd = statusRes.headers.get('x-vqd-4');
       if (!vqd) {
         // Back off so we don't burn 10s on every request while DDG is blocking us
         this._ddgDisabledUntil = Date.now() + DDG_DOWN_MS;
-        throw new Error("Unable to obtain DuckDuckGo VQD handshake token");
+        throw new Error('Unable to obtain DuckDuckGo VQD handshake token');
       }
 
       const ddgModel = this.mapDuckDuckGoModel(model);
 
       // 2. Chat with DuckDuckGo
-      const chatRes = await fetch("https://duckduckgo.com/duckchat/v1/chat", {
-        method: "POST",
+      const chatRes = await fetch('https://duckduckgo.com/duckchat/v1/chat', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "x-vqd-4": vqd,
-          "x-vqd-accept": "1",
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+          'Content-Type': 'application/json',
+          'x-vqd-4': vqd,
+          'x-vqd-accept': '1',
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
         },
         body: JSON.stringify({ model: ddgModel, messages: safeMessages }),
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+        signal: AbortSignal.timeout(freeTierTimeoutMs),
       });
 
       if (!chatRes.ok) {
@@ -465,13 +509,13 @@ class FreeProxyService {
       }
 
       if (stream) {
-        res.setHeader("Content-Type", "text/event-stream");
-        res.setHeader("Cache-Control", "no-cache");
-        res.setHeader("Connection", "keep-alive");
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
 
         const reader = chatRes.body.getReader();
-        const decoder = new TextDecoder("utf-8");
-        let buffer = "";
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
         let completionChars = 0;
 
         while (true) {
@@ -479,14 +523,14 @@ class FreeProxyService {
           if (done) break;
           buffer += decoder.decode(value, { stream: true });
 
-          const lines = buffer.split("\n");
+          const lines = buffer.split('\n');
           buffer = lines.pop(); // Keep partial line
 
           for (const line of lines) {
-            if (!line.startsWith("data: ")) continue;
+            if (!line.startsWith('data: ')) continue;
             const dataStr = line.slice(6).trim();
-            if (dataStr === "[DONE]") {
-              res.write("data: [DONE]\n\n");
+            if (dataStr === '[DONE]') {
+              res.write('data: [DONE]\n\n');
               continue;
             }
             try {
@@ -495,12 +539,10 @@ class FreeProxyService {
                 completionChars += parsed.message.length;
                 const chunk = {
                   id: `chatcmpl-${Date.now()}`,
-                  object: "chat.completion.chunk",
+                  object: 'chat.completion.chunk',
                   created: Math.floor(Date.now() / 1000),
                   model: model,
-                  choices: [
-                    { index: 0, delta: { content: parsed.message }, finish_reason: null }
-                  ]
+                  choices: [{ index: 0, delta: { content: parsed.message }, finish_reason: null }],
                 };
                 res.write(`data: ${JSON.stringify(chunk)}\n\n`);
               }
@@ -510,75 +552,81 @@ class FreeProxyService {
           }
         }
 
-        res.write("data: [DONE]\n\n");
+        res.write('data: [DONE]\n\n');
         res.end();
         return {
           streamed: true,
           promptTokens: this._estimatePromptTokens(safeMessages),
-          completionTokens: this._estimateTokens("x".repeat(completionChars))
+          completionTokens: this._estimateTokens('x'.repeat(completionChars)),
         };
       } else {
         // Collect entire stream
         const text = await chatRes.text();
-        let fullContent = "";
-        for (const line of text.split("\n")) {
-          if (line.startsWith("data: ")) {
+        let fullContent = '';
+        for (const line of text.split('\n')) {
+          if (line.startsWith('data: ')) {
             const dataStr = line.slice(6).trim();
-            if (dataStr === "[DONE]") break;
+            if (dataStr === '[DONE]') break;
             try {
               const parsed = JSON.parse(dataStr);
               if (parsed.message) fullContent += parsed.message;
-            } catch (e) {}
+            } catch (e) { /* ignore JSON parse error */ }
           }
         }
 
-        if (!fullContent) throw new Error("DuckDuckGo returned an empty response");
+        if (!fullContent) throw new Error('DuckDuckGo returned an empty response');
 
         return {
           id: `chatcmpl-${Date.now()}`,
-          object: "chat.completion",
+          object: 'chat.completion',
           created: Math.floor(Date.now() / 1000),
           model: model,
           choices: [
-            { index: 0, message: { role: "assistant", content: fullContent }, finish_reason: "stop" }
+            {
+              index: 0,
+              message: { role: 'assistant', content: fullContent },
+              finish_reason: 'stop',
+            },
           ],
           usage: {
             prompt_tokens: this._estimatePromptTokens(safeMessages),
             completion_tokens: this._estimateTokens(fullContent),
-            total_tokens: this._estimatePromptTokens(safeMessages) + this._estimateTokens(fullContent)
-          }
+            total_tokens:
+              this._estimatePromptTokens(safeMessages) + this._estimateTokens(fullContent),
+          },
         };
       }
     } catch (err) {
       // Do NOT silently fall back to Pollinations here: that masked the real
       // DuckDuckGo error and made a ddg-* request report a Pollinations failure.
       // proxyService owns the failover chain, so surface an honest error instead.
-      console.warn("DuckDuckGo request failed:", err.message);
+      console.warn('DuckDuckGo request failed:', err.message);
       throw new UpstreamError(
         `DuckDuckGo không phản hồi (${err.message}). Nguồn này thỉnh thoảng chặn handshake VQD theo IP — thử lại sau ít phút.`,
         503,
-        "duckduckgo_unavailable"
+        'duckduckgo_unavailable',
       );
     }
   }
 
-  mapPollinationsModel(modelId = "") {
-    const lower = String(modelId || "").toLowerCase();
-    if (lower.includes("r1")) return "deepseek-r1";
-    if (lower.includes("coder") || lower.includes("qwen")) return "qwen-coder";
-    if (lower.includes("deepseek")) return "deepseek";
-    if (lower.includes("llama")) return "llama";
-    if (lower.includes("mistral")) return "mistral";
-    if (lower.includes("search") || lower.includes("gemini")) return "searchgpt";
-    return "openai-fast";
+  mapPollinationsModel(modelId = '') {
+    const lower = String(modelId || '').toLowerCase();
+    if (lower.includes('r1')) return 'deepseek-r1';
+    if (lower.includes('coder') || lower.includes('qwen')) return 'qwen-coder';
+    if (lower.includes('deepseek')) return 'deepseek';
+    if (lower.includes('llama')) return 'llama';
+    if (lower.includes('mistral')) return 'mistral';
+    if (lower.includes('search') || lower.includes('gemini')) return 'searchgpt';
+    return 'openai-fast';
   }
 
-  mapDuckDuckGoModel(modelId = "") {
+  mapDuckDuckGoModel(modelId = '') {
     const lower = modelId.toLowerCase();
-    if (lower.includes("claude")) return "claude-3-haiku-20240307";
-    if (lower.includes("llama")) return "meta-llama/Llama-3.3-70B-Instruct-Turbo";
-    if (lower.includes("mixtral") || lower.includes("mistral")) return "mistralai/Mixtral-8x7B-Instruct-v0.1";
-    return "gpt-4o-mini";
+    if (lower.includes('claude')) return 'claude-3-haiku-20240307';
+    if (lower.includes('llama')) return 'meta-llama/Llama-3.3-70B-Instruct-Turbo';
+    if (lower.includes('mixtral') || lower.includes('mistral'))
+      return 'mistralai/Mixtral-8x7B-Instruct-v0.1';
+    return 'gpt-4o-mini';
   }
 }
 

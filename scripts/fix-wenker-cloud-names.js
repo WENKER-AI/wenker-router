@@ -14,7 +14,11 @@ let changed = 0;
 for (const m of wc.models) {
   const real = m.targetModel || m.id;
   const want = `${m.id}  (tra loi thuc te: ${real})`;
-  if (m.name !== want) { m.name = want; m.servedModel = real; changed++; }
+  if (m.name !== want) {
+    m.name = want;
+    m.servedModel = real;
+    changed++;
+  }
 }
 fs.writeFileSync(file + '.bak', raw, 'utf8');
 fs.writeFileSync(file, JSON.stringify(cfg, null, 2), 'utf8');

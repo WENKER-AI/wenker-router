@@ -1,0 +1,151 @@
+{
+  "plugin_root": "C:\\Users\\Administrator\\.zcode\\cli\\plugins\\cache\\zcode-plugins-official\\video2code\\0.6.0",
+  "platform": "windows",
+  "python": "C:\\Users\\Administrator\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+  "checks": [
+    {
+      "id": "py",
+      "label": "python3 ≥ 3.10",
+      "status": "ok",
+      "detail": "3.14.7 at C:\\Users\\Administrator\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+      "why": "hook 与 MCP server 用了 3.10+ 语法 (X | Y 注解)",
+      "need": "Python 3.10 或更高 (CC 调 hook/MCP 用的就是这个解释器)",
+      "auto": false,
+      "fix": []
+    },
+    {
+      "id": "py-mcp",
+      "label": "python 包: mcp==1.9.0",
+      "status": "missing",
+      "detail": "未安装；需要 mcp==1.9.0",
+      "why": "MCP server 本体 — 缺少或装到 2.x 会导致 deploy/clip_video 工具不存在",
+      "need": "pip 包 mcp==1.9.0 (2.x 已删除本插件使用的 Server decorator API)",
+      "auto": true,
+      "fix": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe -m pip install --user --break-system-packages mcp==1.9.0"
+      ]
+    },
+    {
+      "id": "py-cv2",
+      "label": "python 包: cv2",
+      "status": "missing",
+      "detail": "未安装",
+      "why": "clip_video 差分选帧 / 抽帧",
+      "need": "pip 包 opencv-python-headless (装进上面那个解释器, 不是系统里随便哪个 python)",
+      "auto": true,
+      "fix": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe -m pip install opencv-python-headless"
+      ]
+    },
+    {
+      "id": "py-numpy",
+      "label": "python 包: numpy",
+      "status": "missing",
+      "detail": "未安装",
+      "why": "选帧与白帧过滤的数值运算",
+      "need": "pip 包 numpy (装进上面那个解释器, 不是系统里随便哪个 python)",
+      "auto": true,
+      "fix": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe -m pip install numpy"
+      ]
+    },
+    {
+      "id": "py-PIL",
+      "label": "python 包: PIL",
+      "status": "ok",
+      "detail": "C:\\Users\\Administrator\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PIL\\__init__.py",
+      "why": "contact sheet 拼图 / still_crops",
+      "need": "pip 包 pillow (装进上面那个解释器, 不是系统里随便哪个 python)",
+      "auto": true,
+      "fix": []
+    },
+    {
+      "id": "ffmpeg",
+      "label": "ffmpeg + ffprobe",
+      "status": "missing",
+      "detail": "PATH 上找不到: ffmpeg ffprobe",
+      "why": "video MCP 摄入 / clip 抽帧 / 时长探测 / url2video 把录制的 WebM 转成 MP4（必需）",
+      "need": "ffmpeg (含 ffprobe), 且在 PATH 上 —— 版本不挑, 4.x 起都行",
+      "auto": false,
+      "fix": [
+        "winget install --id Gyan.FFmpeg -e",
+        "# 或 choco install ffmpeg / scoop install ffmpeg",
+        "# 装完新开一个终端, 否则 PATH 不刷新"
+      ]
+    },
+    {
+      "id": "node",
+      "label": "node ≥ 20 + npm",
+      "status": "ok",
+      "detail": "v24.19.0 at D:\\program file\\node.js\\node.EXE; npm=D:\\program file\\node.js\\npm.CMD",
+      "why": "webapp 模板构建 (Vite 7 + Tailwind v4)",
+      "need": "Node.js ≥ 20 (Vite 7 要 20.19+ / 22.12+; 建议 LTS) + 自带的 npm",
+      "auto": false,
+      "fix": []
+    },
+    {
+      "id": "bash",
+      "label": "bash 可用",
+      "status": "missing",
+      "detail": "PATH 上找不到: bash",
+      "why": "web-replicate 的 init/relink 是 .sh 脚本",
+      "need": "bash (Windows 上装 Git for Windows 自带的 Git Bash, 或用 WSL)",
+      "auto": false,
+      "fix": [
+        "winget install --id Git.Git -e   # 装完 bash 在 PATH 上",
+        "# 或改用 WSL 里跑 Claude Code"
+      ]
+    },
+    {
+      "id": "symlink",
+      "label": "可创建目录软链",
+      "status": "missing",
+      "detail": "建软链失败: OSError: [WinError 1314] A required privilege is not held by the client: 'C:\\\\Users\\\\ADMINI~1\\\\AppData\\\\Local\\\\Temp\\\\tmpz_u_btfp\\\\src' -> 'C:\\\\Users\\\\ADMINI~1\\\\AppData\\\\Local\\\\Temp\\\\tmpz_u_btfp\\\\link'",
+      "why": "init-webapp.sh 落位后硬断言 node_modules 是软链, 建不出就 abort",
+      "need": "建目录软链的权限 (Windows: 打开「开发者模式」, 或以管理员身份运行)",
+      "auto": false,
+      "fix": [
+        "# 设置 → 隐私和安全性 → 开发者选项 → 开发人员模式 打开, 然后重开终端",
+        "# 或以管理员身份启动终端再跑 init-webapp.sh"
+      ]
+    },
+    {
+      "id": "npm-net",
+      "label": "npm registry 可达",
+      "status": "ok",
+      "detail": "registry 可达",
+      "why": "装依赖的前提; 出网被挡时先炸在这里",
+      "need": "能访问 npm registry (公司网络/代理下经常要额外配置)",
+      "auto": false,
+      "fix": []
+    },
+    {
+      "id": "tmp-space",
+      "label": "本地盘可用空间 ≥ 3G",
+      "status": "na",
+      "detail": "本平台 (windows) 不适用, 无需处理",
+      "why": "node_modules master 缓存 + delta 构建落在本地盘",
+      "need": "\\tmp\\webapp-node-modules 所在盘 ≥ 3G 空闲",
+      "auto": false,
+      "fix": []
+    },
+    {
+      "id": "nm-master",
+      "label": "webapp node_modules 预热",
+      "status": "na",
+      "detail": "本平台 (windows) 不适用, 无需处理",
+      "why": "缺则首次 init-webapp 冷启动 (数分钟)",
+      "need": "与模板 package.json 哈希匹配的 master 缓存 (非必需, 只影响首次耗时)",
+      "auto": true,
+      "fix": []
+    }
+  ],
+  "missing": [
+    "py-mcp",
+    "py-cv2",
+    "py-numpy",
+    "ffmpeg",
+    "bash",
+    "symlink"
+  ]
+}

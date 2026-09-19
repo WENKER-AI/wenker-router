@@ -1,6 +1,6 @@
 {
   "name": "@wenker-ai/wenker-router",
-  "version": "2.1.13",
+  "version": "2.1.15",
   "description": "WENKER Router - Open Source Local AI Proxy Gateway supporting 180+ providers and WENKER Cloud",
   "main": "server/index.js",
   "bin": {
@@ -45,7 +45,8 @@
     "format": "prettier --write \"server/**/*.ts\" \"server/**/*.js\" \"scripts/**/*.js\" \"bin/*.js\" \"web/assets/*.js\"",
     "format:check": "prettier --check \"server/**/*.ts\" \"server/**/*.js\" \"scripts/**/*.js\" \"bin/*.js\" \"web/assets/*.js\"",
     "typecheck": "tsc --noEmit",
-    "test": "npx mocha tests/**/*.test.js --timeout 10000",
+    "test": "node tests/run-tests.js",
+    "test:mocha": "npx mocha tests/**/*.test.js --timeout 10000",
     "test:watch": "npx mocha tests/**/*.test.js --watch --timeout 10000"
   },
   "repository": {

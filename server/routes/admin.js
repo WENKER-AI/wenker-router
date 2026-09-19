@@ -33,7 +33,7 @@ router.get('/providers', (req, res) => {
   const providers = db.getPublicProviders().map((p) => catalogI18n.localizeProvider(p, lang));
   res.json({
     total: providers.length,
-    providers
+    providers,
   });
 });
 
@@ -46,13 +46,16 @@ function stripMaskedSecrets(body) {
   return out;
 }
 
-const publicProvider = (p) => (p ? {
-  ...p,
-  hasApiKey: Boolean(p.userApiKey),
-  hasCookie: Boolean(p.userCookie),
-  userApiKey: db.constructor.maskSecret(p.userApiKey),
-  userCookie: p.userCookie ? '••••(cookie da luu)' : ''
-} : p);
+const publicProvider = (p) =>
+  p
+    ? {
+      ...p,
+      hasApiKey: Boolean(p.userApiKey),
+      hasCookie: Boolean(p.userCookie),
+      userApiKey: db.constructor.maskSecret(p.userApiKey),
+      userCookie: p.userCookie ? '••••(cookie da luu)' : '',
+    }
+    : p;
 
 router.post('/providers/:id', (req, res) => {
   const updated = db.updateProvider(req.params.id, stripMaskedSecrets(req.body));
@@ -207,8 +210,11 @@ router.get('/addons', (req, res) => {
 router.post('/addons/install', (req, res) => {
   let manifest = req.body;
   if (manifest && typeof manifest.source === 'string') {
-    try { manifest = JSON.parse(manifest.source); }
-    catch (e) { return res.status(400).json({ success: false, error: 'Khong parse duoc JSON: ' + e.message }); }
+    try {
+      manifest = JSON.parse(manifest.source);
+    } catch (e) {
+      return res.status(400).json({ success: false, error: 'Khong parse duoc JSON: ' + e.message });
+    }
   }
   if (manifest && manifest.manifest) manifest = manifest.manifest;
   const result = addonService.install(manifest);
@@ -216,7 +222,11 @@ router.post('/addons/install', (req, res) => {
 
   // A "provider" add-on also creates a live custom provider immediately.
   if (result.addon.type === 'provider' && result.addon.provider) {
-    try { db.addCustomProvider(result.addon.provider); } catch (e) { /* ignore dup */ }
+    try {
+      db.addCustomProvider(result.addon.provider);
+    } catch (e) {
+      console.warn('[admin] Duplicate provider ignored:', e.message);
+    }
   }
   res.json({ success: true, addon: result.addon });
 });
@@ -229,7 +239,11 @@ router.delete('/addons/:id', (req, res) => {
   }
   // A provider add-on created a live custom provider - drop it too.
   if (addon && addon.type === 'provider' && addon.provider && addon.provider.id) {
-    try { db.deleteCustomProvider(addon.provider.id); } catch (e) { /* ignore */ }
+    try {
+      db.deleteCustomProvider(addon.provider.id);
+    } catch (e) {
+      console.warn('[admin] Provider deletion failed:', e.message);
+    }
   }
   res.json({ success: true });
 });

@@ -2,6 +2,7 @@ const db = require('./dbService');
 const freeProxyService = require('./freeProxyService');
 const quota = require('./quotaService');
 const circuitBreaker = require('./circuitBreaker');
+const metricsService = require('./metricsService');
 const { UpstreamError } = freeProxyService;
 
 class ProxyService {
@@ -153,9 +154,15 @@ class ProxyService {
    * Direct OpenAI-compatible call used by the failover chain (non-streaming).
    * Sử dụng Circuit Breaker để tránh gửi request đến provider đang fail.
    */
-  async _directChat(provider, targetModel, messages) {
+  async _directChat(provider, targetModel, messages, options = {}) {
     const providerId = provider.id;
     const breaker = circuitBreaker.circuitBreakerManager.getBreaker(providerId);
+    const settings = db.getSettings();
+    
+    // Get timeout from provider config or settings
+    const timeoutMs = provider.requestTimeoutMs || 
+                      settings.defaultRequestTimeoutMs || 
+                      60000;
     
     // Check circuit breaker state
     const canExecute = breaker.canExecute();
@@ -190,7 +197,7 @@ class ProxyService {
         method: 'POST',
         headers,
         body: JSON.stringify({ model: targetModel, messages, stream: false }),
-        signal: AbortSignal.timeout(25000),
+        signal: AbortSignal.timeout(timeoutMs),
       });
       
       if (!r.ok) {
@@ -221,6 +228,7 @@ class ProxyService {
    * Failover chain: when the requested free upstream is down, walk
    * settings.fallbackOrder looking for anything that actually answers.
    * Returns { data, providerId } or null when nothing works.
+   * Implements exponential backoff with jitter to avoid thundering herd.
    */
   async _runFailoverChain(messages, excludeIds) {
     const settings = db.getSettings();
@@ -228,7 +236,13 @@ class ProxyService {
     const tried = new Set(excludeIds || []);
     const errors = [];
 
-    for (const id of order) {
+    // Backoff configuration
+    const baseDelayMs = settings.failoverBaseDelayMs || 1000;
+    const maxDelayMs = settings.failoverMaxDelayMs || 10000;
+    const jitterFactor = settings.failoverJitterFactor || 0.3;
+
+    for (let attempt = 0; attempt < order.length; attempt++) {
+      const id = order[attempt];
       if (tried.has(id)) continue;
       tried.add(id);
       const provider = db.getProviderById(id);
@@ -278,6 +292,18 @@ class ProxyService {
       } catch (err) {
         errors.push(`${id}: ${err.message}`);
         console.warn(`[Failover] ${err.message}`);
+        
+        // Exponential backoff with jitter before next attempt
+        if (attempt < order.length - 1) {
+          const delay = Math.min(
+            baseDelayMs * Math.pow(2, attempt),
+            maxDelayMs
+          );
+          const jitter = delay * jitterFactor * Math.random();
+          const totalDelay = Math.floor(delay + jitter);
+          console.log(`[Failover] Backing off ${totalDelay}ms before next attempt`);
+          await new Promise(resolve => setTimeout(resolve, totalDelay));
+        }
       }
     }
     console.warn(`[Failover] chain exhausted (${errors.length} attempts)`);
@@ -713,11 +739,17 @@ class ProxyService {
         ...hasTools && tool_choice !== undefined && { tool_choice },
       };
 
+      // Get timeout from provider config or settings
+      const settings = db.getSettings();
+      const timeoutMs = provider.requestTimeoutMs || 
+                        settings.defaultRequestTimeoutMs || 
+                        60000;
+
       const upstreamRes = await fetch(targetUrl, {
         method: 'POST',
         headers: upstreamHeaders,
         body: JSON.stringify(upstreamPayload),
-        signal: AbortSignal.timeout(60000),
+        signal: AbortSignal.timeout(timeoutMs),
       });
 
       if (!upstreamRes.ok) {
@@ -749,6 +781,10 @@ class ProxyService {
             }
             // Honest bookkeeping: the ANSWER came from fb.providerId, not the called provider.
             fb.data.wenker_fallback_from = provider.id;
+            
+            // Record fallback metrics
+            metricsService.recordFallback(provider.id, fb.providerId, `upstream_http_${upstreamRes.status}`);
+            
             db.addLog({
               endpoint: '/v1/chat/completions',
               model,
@@ -829,6 +865,18 @@ class ProxyService {
         const latency = Date.now() - startTime;
         const promptTokens = this._estimatePromptTokens(messages);
         const completionTokens = this._estimateTokens('x'.repeat(streamedChars));
+        
+        // Record metrics
+        metricsService.recordChatCompletion({
+          provider: provider.id,
+          model: targetModel,
+          status: 'success',
+          stream: true,
+          durationMs: latency,
+          promptTokens,
+          completionTokens,
+        });
+        
         db.addLog({
           endpoint: '/v1/chat/completions',
           model,
@@ -854,6 +902,18 @@ class ProxyService {
           this._estimateTokens(data.choices?.[0]?.message?.content);
         // Tell the client which model really answered (alias ids can differ).
         data.wenker_served_by = data.model || targetModel;
+        
+        // Record metrics
+        metricsService.recordChatCompletion({
+          provider: provider.id,
+          model: targetModel,
+          status: 'success',
+          stream: false,
+          durationMs: latency,
+          promptTokens,
+          completionTokens,
+        });
+        
         db.addLog({
           endpoint: '/v1/chat/completions',
           model,
@@ -878,6 +938,25 @@ class ProxyService {
     } catch (err) {
       console.error('Proxy Service Exception:', err);
       const latency = Date.now() - startTime;
+      
+      // Record error metrics
+      metricsService.recordError(
+        status >= 500 ? 'server_error' : 'client_error',
+        err.code || status.toString(),
+        '/v1/chat/completions'
+      );
+      
+      // Record failed chat completion
+      metricsService.recordChatCompletion({
+        provider: provider?.id || 'unknown',
+        model: targetModel,
+        status: 'error',
+        stream: Boolean(stream),
+        durationMs: latency,
+        promptTokens: 0,
+        completionTokens: 0,
+      });
+      
       db.addLog({
         endpoint: '/v1/chat/completions',
         model,

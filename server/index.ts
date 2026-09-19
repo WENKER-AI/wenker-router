@@ -262,15 +262,185 @@ app.get('/health', RateLimiter.healthLimiter, (req: Request, res: Response) => {
 // Prometheus metrics endpoint
 app.get('/metrics', metricsService.getMetricsEndpoint());
 
+// =============================================================================
+// P2P NETWORK MODULE - GoGo Code Combo Feature
+// =============================================================================
+
+// Import P2P module
+let p2pModule: any = null;
+
+// Initialize P2P module
+const initP2P = async () => {
+  try {
+    // Only enable P2P if WENKER_P2P_ENABLED is set (opt-in for now)
+    const p2pEnabled = process.env.WENKER_P2P_ENABLED === 'true' ||
+      (process.env.WENKER_P2P_ENABLED !== 'false' && process.env.NODE_ENV === 'development');
+    
+    if (p2pEnabled) {
+      const p2pPort = parseInt(process.env.WENKER_P2P_PORT || '11435');
+      const { initP2P } = require('./p2p/src/index');
+      p2pModule = await initP2P({
+        enabled: true,
+        port: p2pPort,
+        listenAddresses: [
+          `/ip4/0.0.0.0/tcp/${p2pPort}`,
+          `/ip6/::/tcp/${p2pPort}`,
+        ],
+      });
+      
+      // Start P2P network
+      await p2pModule.start();
+      
+      // Log P2P status
+      const p2pStatus = p2pModule.getStatus();
+      console.log('[P2P] WENKER P2P Network enabled');
+      console.log(`[P2P] Node ID: ${p2pStatus.nodeId}`);
+      console.log(`[P2P] Listening on port: ${p2pPort}`);
+      
+      // Update P2P with initial models and providers
+      p2pModule.updateModels(db.getAllModels().map(m => ({
+        id: m.id,
+        name: m.name,
+        type: 'local',
+        available: true,
+      })));
+      
+      p2pModule.updateProviders(db.getAllProviders().map(p => ({
+        name: p.id,
+        status: 'up',
+        latency: 0,
+      })));
+    }
+  } catch (error) {
+    console.warn('[P2P] Failed to initialize P2P module:', error);
+  }
+};
+
+// Call P2P init (but don't block startup)
+initP2P().catch(() => {});
+
+// P2P API Endpoints
+app.get('/api/p2p/status', async (req: Request, res: Response) => {
+  try {
+    if (!p2pModule) {
+      return res.json({
+        enabled: false,
+        error: 'P2P module not initialized',
+      });
+    }
+    
+    const status = p2pModule.getStatus();
+    const stats = p2pModule.getStats();
+    const blacklist = p2pModule.getBlacklist();
+    const peers = p2pModule.swarmManager.getPeers();
+    
+    res.json({
+      enabled: true,
+      nodeId: status.nodeId,
+      peerCount: stats.peerCount,
+      connectedPeers: stats.connectedPeers,
+      listenAddresses: status.listenAddresses,
+      messagesSent: stats.messagesSent,
+      messagesReceived: stats.messagesReceived,
+      blacklistSize: stats.blacklistSize,
+      sharedModels: stats.sharedModels,
+      blacklist,
+      peers: peers.map((p: any) => ({
+        id: p.id,
+        address: p.address,
+        models: p.models.length,
+        providers: p.providers.length,
+        lastSeen: p.lastSeen,
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to get P2P status',
+      details: error,
+    });
+  }
+});
+
+// Get P2P blacklist
+app.get('/api/p2p/blacklist', async (req: Request, res: Response) => {
+  try {
+    if (!p2pModule) {
+      return res.json({ enabled: false, blacklist: [] });
+    }
+    
+    const blacklist = p2pModule.getBlacklist();
+    res.json({ blacklist });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get blacklist' });
+  }
+});
+
+// Report dead provider/model to P2P network
+app.post('/api/p2p/report-dead', async (req: Request, res: Response) => {
+  try {
+    if (!p2pModule) {
+      return res.json({ success: false, error: 'P2P not enabled' });
+    }
+    
+    const { id, type, reason } = req.body;
+    
+    if (!id || !type) {
+      return res.status(400).json({ error: 'id and type are required' });
+    }
+    
+    p2pModule.reportDead(id, type, reason || 'Unknown error');
+    
+    res.json({ success: true, message: 'Dead item reported to swarm' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to report dead item' });
+  }
+});
+
+// Check if model is available in swarm
+app.get('/api/p2p/models/:modelId/available', async (req: Request, res: Response) => {
+  try {
+    if (!p2pModule) {
+      return res.json({ available: false, error: 'P2P not enabled' });
+    }
+    
+    const { modelId } = req.params;
+    const available = p2pModule.isModelAvailable(modelId);
+    const bestModel = p2pModule.getBestModel(modelId);
+    
+    res.json({
+      available,
+      model: bestModel,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to check model availability' });
+  }
+});
+
+// Get all available models in swarm
+app.get('/api/p2p/models', async (req: Request, res: Response) => {
+  try {
+    if (!p2pModule) {
+      return res.json({ models: [], error: 'P2P not enabled' });
+    }
+    
+    const models = p2pModule.swarmManager.getAllAvailableModels();
+    res.json({ models });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get swarm models' });
+  }
+});
+
+// =============================================================================
+
 // Serve frontend static build if available
 const clientDistPath = path.join(__dirname, '..', 'client', 'dist');
 app.use(express.static(clientDistPath));
 
-// Trang giới thiệu/markdown tĩnh (web/) được phục vụ dưới /web để không đụng
+// Trang giới thiệu/markdown tĩnh (web/) được phục vụ dưới /wenker để không đụng
 // asset của dashboard (dashboard chiếm /assets/*).
 const webPath = path.join(__dirname, '..', 'web');
-app.use('/web', express.static(webPath));
-app.get('/web', (req: Request, res: Response) => res.redirect('/web/'));
+app.use('/wenker', express.static(webPath));
+app.get('/wenker', (req: Request, res: Response) => res.redirect('/wenker/'));
 
 const clientIndex = path.join(clientDistPath, 'index.html');
 const notFoundPage = path.join(webPath, '404.html');
@@ -286,7 +456,7 @@ app.get('*', (req: Request, res: Response) => {
         '<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>404</title>' +
           '<style>body{font-family:system-ui;background:#05070f;color:#eaf2ff;display:grid;place-items:center;height:100vh;margin:0}' +
           'a{color:#7ee787}</style></head><body><div style="text-align:center"><h1>Off. 404</h1>' +
-          '<p>Không tìm thấy tài nguyên này.</p><p><a href="/web/404.html">Chơi mini game cá voi</a> · <a href="/">Về dashboard</a></p></div></body></html>'
+          '<p>Không tìm thấy tài nguyên này.</p><p><a href="/wenker/404.html">Chơi mini game cá voi</a> · <a href="/">Về dashboard</a></p></div></body></html>'
       );
   }
   if (fs.existsSync(clientIndex)) {
@@ -295,7 +465,7 @@ app.get('*', (req: Request, res: Response) => {
     // không cần đẩy mọi path về index.html; path sai nên trả 404 thật.
     if (req.path !== '/' && fs.existsSync(notFoundPage)) {
       let html = fs.readFileSync(notFoundPage, 'utf8');
-      html = html.replace('<head>', '<head><base href="/web/">');
+      html = html.replace('<head>', '<head><base href="/wenker/">');
       return res.status(404).type('html').send(html);
     }
     return res.sendFile(clientIndex);

@@ -1,0 +1,66 @@
+{
+ "client\\src\\components\\ModelFinder.jsx": [
+  {
+   "line": 34,
+   "text": "Tất cả"
+  },
+  {
+   "line": 35,
+   "text": "WENKER gốc"
+  },
+  {
+   "line": 36,
+   "text": "Miễn phí no-key"
+  }
+ ],
+ "client\\src\\components\\Playground.jsx": [
+  {
+   "line": 24,
+   "text": "Yêu cầu deepseek-r1 trên Pollinations; nếu model không khả dụng, router tự chuyển sang mod"
+  },
+  {
+   "line": 25,
+   "text": "Alias của WENKER Cloud — model thực sự trả lời phụ thuộc upstream tại thời điểm gọi (xem c"
+  },
+  {
+   "line": 26,
+   "text": "Yêu cầu qwen-coder trên Pollinations."
+  },
+  {
+   "line": 27,
+   "text": "Yêu cầu llama trên Pollinations."
+  },
+  {
+   "line": 28,
+   "text": "Yêu cầu mistral trên Pollinations."
+  },
+  {
+   "line": 29,
+   "text": "Yêu cầu openai (alias openai-fast = GPT-OSS 20B) - model thực tế ổn định nhất của tier miễ"
+  },
+  {
+   "line": 30,
+   "text": "Yêu cầu searchgpt trên Pollinations."
+  },
+  {
+   "line": 31,
+   "text": "Chat ẩn danh DuckDuckGo. Cần mạng cho phép handshake VQD; nếu lỗi sẽ trả 503 thật (không t"
+  },
+  {
+   "line": 32,
+   "text": "Claude 3 Haiku qua DuckDuckGo (cùng điều kiện mạng ở trên)."
+  },
+  {
+   "line": 33,
+   "text": "Meta Llama qua DuckDuckGo (cùng điều kiện mạng ở trên)."
+  },
+  {
+   "line": 34,
+   "text": "Gọi thẳng upstream Pollinations với model deepseek."
+  },
+  {
+   "line": 35,
+   "text": "Gọi thẳng upstream Pollinations với model qwen-coder."
+  }
+ ]
+}

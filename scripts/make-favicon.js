@@ -30,7 +30,7 @@ const svg =
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" shape-rendering="crispEdges">` +
   `<rect width="${w}" height="${h}" rx="2" fill="#0d1a29"/>` +
   `<g fill="#5aa7e8" transform="translate(0,0.8) scale(1,0.84)">${rects}</g>` +
-  `</svg>\n`;
+  '</svg>\n';
 
 const out = [
   path.join(root, 'web', 'assets', 'favicon-w.svg'),

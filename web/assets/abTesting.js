@@ -148,12 +148,7 @@ class ABTesting {
       ...metadata,
     };
 
-    // Track với Google Analytics
-    if (typeof trackEvent === 'function') {
-      trackEvent('AB Testing', 'conversion', JSON.stringify(eventData));
-    }
-
-    // Lưu vào localStorage
+    // Log conversion locally (no external analytics)
     this.saveConversion(eventData);
     console.log(`[ABTesting] Conversion tracked:`, eventData);
   }
@@ -178,9 +173,8 @@ class ABTesting {
           timestamp: new Date().toISOString(),
         };
 
-        if (typeof trackEvent === 'function') {
-          trackEvent('AB Testing', 'page_view', JSON.stringify(eventData));
-        }
+        // Log page view locally (no external analytics)
+        console.log('[ABTesting] Page view tracked:', eventData);
       }
     });
   }

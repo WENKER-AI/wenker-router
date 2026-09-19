@@ -25,8 +25,14 @@ let latest = { current: CURRENT, latest: CURRENT, available: false, checkedAt: n
 
 /** So sanh hai chuoi semver "a.b.c" (bo qua pre-release tag). tra ve >0 neu a moi hon b. */
 function compareSemver(a, b) {
-  const pa = String(a).split('-')[0].split('.').map((n) => parseInt(n, 10) || 0);
-  const pb = String(b).split('-')[0].split('.').map((n) => parseInt(n, 10) || 0);
+  const pa = String(a)
+    .split('-')[0]
+    .split('.')
+    .map((n) => parseInt(n, 10) || 0);
+  const pb = String(b)
+    .split('-')[0]
+    .split('.')
+    .map((n) => parseInt(n, 10) || 0);
   for (let i = 0; i < 3; i++) {
     const d = (pa[i] || 0) - (pb[i] || 0);
     if (d !== 0) return d;
@@ -38,7 +44,12 @@ function compareSemver(a, b) {
 async function checkNow({ force = false } = {}) {
   if (!ENABLED) return latest;
   // Da biet ban moi hon va vua check gan day -> bo qua, tranh spam registry.
-  if (!force && latest.available && latest.checkedAt && Date.now() - latest.checkedAt < CHECK_INTERVAL_MS) {
+  if (
+    !force &&
+    latest.available &&
+    latest.checkedAt &&
+    Date.now() - latest.checkedAt < CHECK_INTERVAL_MS
+  ) {
     return latest;
   }
   try {

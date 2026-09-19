@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const cssPath = path.join(__dirname, '..', 'client', 'src', 'styles', 'index.css');
-let s = fs.readFileSync(cssPath, 'utf8');
+const s = fs.readFileSync(cssPath, 'utf8');
 
 const idx = s.indexOf('WENKER PIXEL SKIN');
 if (idx === -1) {
